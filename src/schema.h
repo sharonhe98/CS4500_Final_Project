@@ -88,9 +88,9 @@ public:
     width_ = strlen(track_types);
     printf("size init: %d\n", width_);
     columns = new Column*[width_];
-    // for (size_t i = 0; i < strlen(track_types); i++) {
-	  //   add_column_to_row(track_types[i], nullptr);
-    // }
+     for (size_t i = 0; i < strlen(track_types); i++) {
+	     add_column_to_row(track_types[i], nullptr);
+     }
     index_ = 0;
   }
 
@@ -393,9 +393,10 @@ public:
   {
     track_types = (char*)types;
     row_size = 0;
-    col_size = strlen(track_types);
+    col_size = 0;
     row_names = new StringArray();
     col_names = new StringArray[col_size];
+
 
     for (size_t i = 0; i < strlen(track_types); i++)
     {
@@ -405,7 +406,6 @@ public:
       add_row(nullptr);
       printf("add row success\n");
     }
-    printf("track types col size\n");
   }
 
   ~Schema() {
@@ -443,7 +443,7 @@ public:
     // track_types = newtt;
     printf("track types success!\n");
     col_size += 1;
-    printf("add_column success!\n");
+    printf("add_column success! col size? %i\n", col_size);
   }
 
   /** Add a row with a name (possibly nullptr), name is external. */

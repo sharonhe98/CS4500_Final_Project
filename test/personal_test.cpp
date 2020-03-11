@@ -22,12 +22,13 @@ void testArray() {
 
 void test() {
   Schema s("II");
+  printf("schema cols %i rows %i\n", s.width(), s.length());
   printf("SCHEMA IS BUILT!!\n");
   DataFrame df(s);
   printf("DATAFRAME IS BUILT!\n");
   Row  r(df.get_schema());
   printf("ROW IS BUILLTTTTT!\n");
-  for(size_t i = 0; i <  1000 * 1000; i++) {
+  for(size_t i = 0; i <  5 * 5; i++) {
     printf("working?!!\n");
     r.set(0,(int)i);
     printf("INT SET 1!!\n");

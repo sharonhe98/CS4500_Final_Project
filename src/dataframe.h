@@ -280,6 +280,13 @@ public:
   {
     printf("row name\n");
     scm.add_row(row.name);
+
+    for (size_t i = 0; i < ncols(); i++) {
+	row.add_column_to_row(cols[i]->get_type(), nullptr);
+    }
+
+    printf("schema dot add row is fine!\n");
+
     for (size_t i = 0; i < scm.width(); i++) {
 	if (row.col_type(i) != cols[i]->get_type()) {
 		printf("Incorrect schema! row: %c col %c\n", row.col_type(i), cols[i]->get_type());
