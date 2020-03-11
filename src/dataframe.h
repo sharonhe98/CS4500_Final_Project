@@ -36,11 +36,16 @@ public:
     scm = schema;
     cols = new Column*[scm.width()];
     for (size_t i = 0; i < scm.width(); i++) {
+      printf("create new col not work i is %i\n", i);
 	    cols[i] = createNewColumn(scm.track_types[i]);
+      printf("set col name not work i is %i\n", i);
 	    cols[i]->setColName(scm.col_names->get(i));
-	    for (size_t j = 0; j < scm.length(); j++) {
-		    cols[i]->push_back(nullptr);
-	    }
+      printf("scm.length is: %i\n", scm.length());
+	    // for (size_t j = 0; j < scm.length(); j++) {
+      //   printf("push back not work i is %i j is\n", i, j);
+      //   printf("col type field is %c\n", cols[i]->get_type());
+		  //   cols[i]->push_back(NULL);
+	    // }
     }
 
   }

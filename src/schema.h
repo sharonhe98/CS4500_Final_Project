@@ -168,7 +168,6 @@ public:
     printf("col is %d\n", col);
     printf("val is %d\n", val);
     printf("int set is called\n");
-    printf("address of columns: %i\n", columns[col]);
 
     Column* c = nullptr;
     
