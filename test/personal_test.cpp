@@ -7,7 +7,6 @@ void testArray() {
   StringArray* sa = new StringArray();
   assert(sa->length() == 0);
   assert(sa->size_ == 0);
-  assert(sa->currSizes == 0);
   printf("test passsed\n");
   String* something = new String("something");
   sa->append(something);
@@ -15,11 +14,9 @@ void testArray() {
   printf("append init passed\n");
   sa->append(something);
   assert(sa->length() == 2);
-  printf("currsize now %d\n", sa->currSizes);
   printf("append next passed\n");
   sa->append(something);
   assert(sa->length() == 3);
-  printf("currsize now %d\n", sa->currSizes);
   printf("append final passed\n");
 }
 
