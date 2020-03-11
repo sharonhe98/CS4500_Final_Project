@@ -169,8 +169,17 @@ public:
     printf("val is %d\n", val);
     printf("int set is called\n");
     printf("address of columns: %i\n", columns[col]);
+
+    Column* c = nullptr;
     
-    Column* c = columns[col];
+    if (columns[col] == nullptr) {
+	c = new IntColumn();
+	columns[col] = c;
+    }
+    else {
+	c = columns[col];
+    }
+
 
     printf("c->type: %c\n", columns[col]->get_type());
 
