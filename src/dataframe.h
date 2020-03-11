@@ -36,7 +36,7 @@ public:
     scm = schema;
     cols = new Column*[scm.width()];
     for (size_t i = 0; i < scm.width(); i++) {
-	    cols[i] = new Column();
+	    cols[i] = createNewColumn(scm.track_types[i]);
 	    cols[i]->setColName(scm.col_names->get(i));
 	    for (size_t j = 0; j < scm.length(); j++) {
 		    cols[i]->push_back(nullptr);
@@ -55,6 +55,48 @@ public:
   {
     return scm;
   }
+
+  /**
+   * Another helper that gets an integer depending on the type
+   */ 
+  int getTypeNum(char type) {
+	if (type == 'I') {
+		return 1;
+	}
+	if (type == 'F') {
+		return 2;
+	}
+	if (type == 'B') {
+		return 3;
+	}
+	if (type == 'S') {
+		return 4;
+	}
+	return 0;	
+  }
+
+
+  /**
+   * Returns a new column, given its type
+   * A helper to construct the dataframe
+   */
+  Column* createNewColumn(char type) {
+	int typeNum = getTypeNum(type);
+
+	switch(typeNum) {
+		case 1:
+			return new IntColumn();
+		case 2:
+			return new FloatColumn();
+		case 3:
+			return new BoolColumn();
+		case 4:
+			return new StringColumn();
+		default:
+			return new Column();
+	}
+  }
+
 
   /** Adds a column this dataframe, updates the schema, the new column
     * is external, and appears as the last column of the dataframe, the
@@ -235,7 +277,7 @@ public:
     scm.add_row(row.name);
     for (size_t i = 0; i < scm.width(); i++) {
 	if (row.col_type(i) != cols[i]->get_type()) {
-		printf("Incorrect schema!\n");
+		printf("Incorrect schema! row: %c col %c\n", row.col_type(i), cols[i]->get_type());
 		exit(1);
 	}
 	else if (cols[i]->get_type() == 'I') {
