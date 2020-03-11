@@ -846,6 +846,7 @@ public:
 class StringArray : public Array
 {
 public:
+  size_t size_;
   String** str_elements_;
 
   // constructor
