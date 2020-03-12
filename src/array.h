@@ -853,6 +853,7 @@ public:
   StringArray()
   {
     size_ = 0;
+    printf("CONSTRUCTOR SIZE?? %i\n", size_);
     str_elements_ = nullptr;
   }
 
@@ -862,6 +863,7 @@ public:
   // putting an item at the end of the array
   void append(String* oo)
   {
+    printf("strarray size?? %i\n", size_);
     // allocate memory for result array with larger size
     String** res = new String*[size_ + 1];
     // if not empty array, put item to end of array

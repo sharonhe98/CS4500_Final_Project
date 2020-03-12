@@ -28,7 +28,7 @@ void test() {
   printf("DATAFRAME IS BUILT!\n");
   Row  r(df.get_schema());
   printf("ROW IS BUILLTTTTT!\n");
-  for(size_t i = 0; i <  5 * 5; i++) {
+  for(size_t i = 0; i <  100 * 100; i++) {
     printf("working?!!\n");
     r.set(0,(int)i);
     printf("INT SET 1!!\n");
@@ -36,6 +36,8 @@ void test() {
     printf("INT SET 2!!\n");
     df.add_row(r);
     printf("ADD ROW PASSED!\n");
+    printf("row num %i\n", df.nrows());
+    printf("col num %i\n", df.ncols());
   }
   
   exit(0);

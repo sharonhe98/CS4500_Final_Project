@@ -88,9 +88,9 @@ public:
     width_ = strlen(track_types);
     printf("size init: %d\n", width_);
     columns = new Column*[width_];
-     for (size_t i = 0; i < strlen(track_types); i++) {
-	     add_column_to_row(track_types[i], nullptr);
-     }
+    //  for (size_t i = 0; i < strlen(track_types); i++) {
+	  //    add_column_to_row(track_types[i], nullptr);
+    //  }
     index_ = 0;
   }
 
