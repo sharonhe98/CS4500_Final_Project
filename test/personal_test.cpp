@@ -52,7 +52,7 @@ void test2() {
   printf("DATAFRAME IS BUILT!\n");
   Row  r(df.get_schema());
   printf("ROW IS BUILLTTTTT!\n");
-  for(size_t i = 0; i <  5 * 5; i++) {
+  for(size_t i = 0; i <  2 * 2; i++) {
  //   printf("working?!!\n");
     r.set(0,(int)i);
    // printf("INT SET 1!!\n");

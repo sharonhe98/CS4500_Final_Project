@@ -417,7 +417,7 @@ public:
     row_size = 0;
     col_size = 0;
     row_names = new StringArray();
-    col_names = new StringArray[col_size];
+    col_names = new StringArray();
 
 
     for (size_t i = 0; i < strlen(track_types); i++)
@@ -425,8 +425,8 @@ public:
       printf("before add column! %d\n", i);
       add_column(track_types[i], nullptr);
       printf("add column yay!\n");
-      add_row(nullptr);
-      printf("add row success\n");
+      // add_row(nullptr);
+      // printf("add row success\n");
     }
   }
 
@@ -441,29 +441,7 @@ public:
     printf("col size: %d\n", col_size);
     col_names->append(name);
     printf("append col success %c\n", typ);
-    printf("track types?\n");
-    pln(track_types);
 
-    // char str[100];
-    // printf("what is str init?\n");
-    // pln(str);
-    // strcpy (str, (const char*)track_types);
-    // printf("what is str?  copy\n");
-    // pln(str);
-    // strcat (str, (const char*)typ);
-    // printf("what is str? strcat\n");
-    // pln(str);
-    // track_types = str;
-
-    // char* newtt = new char[strlen(track_types) + 1];
-    // for (size_t i = 0; i < strlen(track_types); i++) {
-    //     newtt[i] = track_types[i];
-    // }
-    
-    // newtt[strlen(track_types)] = typ;
-    // newtt[strlen(track_types) + 1] = '\0';
-    // track_types = newtt;
-    printf("track types success!\n");
     col_size += 1;
     printf("add_column success! col size? %i\n", col_size);
   }
