@@ -178,16 +178,12 @@ public:
     else {
 	c = columns[col];
     }
-
-
     printf("c->type: %c\n", columns[col]->get_type());
-
     if (c->get_type() == 'I') {
       //IntColumn* c_i = c->as_int();
       c = c->as_int();
       printf("asInt OK - Checking set in Column\n");
       printf("index is %d\n", index_);
-      
       
       c->set(index_, val);
       printf("set in Column OK\n");
@@ -195,29 +191,55 @@ public:
   }
   void set(size_t col, float val)
   {
-    Column* c = columns[col];
+    Column* c = nullptr;
+    if (columns[col] == nullptr) {
+	    c = new FloatColumn();
+	    columns[col] = c;
+    }
+    else {
+      c = columns[col];
+    }
     if (c->get_type() == 'F') {
-      FloatColumn* c_f = c->as_float();
-      c_f->vals_->set(index_, val);
+      c = c->as_float();
+      c->set(index_,val);
     }
   }
   void set(size_t col, bool val)
   {
-    Column* c = columns[col];
+    Column* c = nullptr;
+    if (columns[col] == nullptr) {
+	    c = new BoolColumn();
+	    columns[col] = c;
+    }
+    else {
+      c = columns[col];
+    }
     if (c->get_type() == 'B') {
-      BoolColumn* c_b = c->as_bool();
-      c_b->vals_->set(index_, val);
+      c = c->as_bool();
+      c->set(index_,val);
     }
   }
   /** Acquire ownership of the string. */
   void set(size_t col, String* val)
   {
-    String* ourString = val->clone();
-    Column* c = columns[col];
-    if (c->get_type() == 'S') {
-      StringColumn* c_s = c->as_string();
-      c_s->vals_->set(index_, ourString);
+    Column* c = nullptr;
+    if (columns[col] == nullptr) {
+	    c = new StringColumn();
+	    columns[col] = c;
     }
+    else {
+      c = columns[col];
+    }
+    if (c->get_type() == 'S') {
+      c = c->as_string();
+      c->set(index_,val);
+    }
+    // String* ourString = val->clone();
+    // Column* c = columns[col];
+    // if (c->get_type() == 'S') {
+    //   StringColumn* c_s = c->as_string();
+    //   c_s->vals_->set(index_, ourString);
+    // }
   }
 
   /** Set/get the index of this row (ie. its position in the dataframe. This is

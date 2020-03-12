@@ -193,12 +193,14 @@ public:
   {
     type_ = 'S';
     colName_ = nullptr;
+    vals_ = new StringArray();
   }
 
   StringColumn(int n, ...) 
   {
     type_ = 'S';
     va_list args;
+    vals_ = new StringArray();
     String* valueString;
 
     va_start (args, n);
@@ -235,6 +237,10 @@ public:
   size_t size() {
     vals_->length();
   }
+
+  char get_type() {
+    return type_;
+  }
 };
 
 /*************************************************************************
@@ -252,12 +258,14 @@ public:
   {
     type_ = 'F';
     colName_ = nullptr;
+    vals_ = new FloatArray();
   }
 
   FloatColumn(float n, ...)
   {
     type_ = 'F';
     va_list args;
+    vals_ = new FloatArray();
 
     va_start (args, n);
 
@@ -290,6 +298,10 @@ public:
   size_t size() {
     return vals_->length();
   }
+
+  char get_type() {
+    return type_;
+  }
 };
 
 /*************************************************************************
@@ -307,12 +319,14 @@ public:
   {
     type_ = 'B';
     colName_ = nullptr;
+    vals_ = new BoolArray();
   }
 
   BoolColumn(bool n, ...) 
   {
     type_ = 'B';
     va_list args;
+    vals_ = new BoolArray();
 
     va_start (args, n);
 
@@ -344,5 +358,9 @@ public:
 
   size_t size() {
     return vals_->length();
+  }
+  
+  char get_type() {
+    return type_;
   }
 };
