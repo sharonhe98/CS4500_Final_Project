@@ -352,5 +352,12 @@ public:
   }
 
   /** Print the dataframe in SoR format to standard output. */
-  void print();
+  void print() {
+	for (size_t i = 0; i < nrows(); i++) {
+		for (size_t j = 0; j < ncols(); j++) {
+			printf("%s\t", cols[j]->get(i));
+		}
+		printf("\n");
+	}
+  }
 };

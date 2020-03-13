@@ -65,7 +65,11 @@ void test2() {
     printf("ADD ROW PASSED!\n");
     printf("row num %i\n", df.nrows());
     printf("col num %i\n", df.ncols());
-    //df.print();
+    
+
+    df.print();
+    //
+
   }
   
   exit(0);

@@ -57,6 +57,8 @@ public:
   // get the n'th item in the array
   Object* get(size_t nn)
   {
+
+    printf("size_ : %i, nn : %i\n", &size_, nn);
     // if index not within bounds, return nullptr
     if (size_ == 0 || nn >= size_)
     {
