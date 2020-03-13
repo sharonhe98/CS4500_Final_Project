@@ -62,15 +62,19 @@ void test2() {
     r.set(4, (bool)1);
     //printf("INT SET 2!!\n");
     df.add_row(r);
+
+    df.fill_row(i, r);
     printf("ADD ROW PASSED!\n");
     printf("row num %i\n", df.nrows());
     printf("col num %i\n", df.ncols());
     
 
-    df.print();
     //
 
   }
+
+  df.print();
+
   
   exit(0);
 }

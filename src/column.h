@@ -107,9 +107,9 @@ public:
     return type_;
   };
 
-  void* get(size_t idx) {
+  /*void* get(size_t idx) {
     return vals_->get(idx); 
-  }
+  }*/
 
 };
 

@@ -270,7 +270,18 @@ public:
       printf("eeee2\n");
       //pln(r->columns[i]->type_);
 
-      row.set(i, cols[i]->vals_->get(idx));
+	if (cols[i]->get_type() == 'I') {
+		row.set(i, cols[i]->as_int()->get(idx));
+    	}
+	if (cols[i]->get_type() == 'F') {
+		row.set(i, cols[i]->as_float()->get(idx));
+    	}
+	if (cols[i]->get_type() == 'B') {
+		row.set(i, cols[i]->as_bool()->get(idx));
+    	}
+	if (cols[i]->get_type() == 'S') {
+		row.set(i, cols[i]->as_string()->get(idx));
+    	}
     }
   }
 
@@ -355,7 +366,23 @@ public:
   void print() {
 	for (size_t i = 0; i < nrows(); i++) {
 		for (size_t j = 0; j < ncols(); j++) {
-			printf("%s\t", cols[j]->get(i));
+			if (cols[j]->get_type() == 'I') {
+				printf("row data: ");
+				pln(cols[j]->as_int()->get(i));
+				printf("\t");
+			}	
+			if (cols[j]->get_type() == 'B') {
+				pln(cols[j]->as_bool()->get(i));
+				printf("\t");
+			}	
+			if (cols[j]->get_type() == 'F') {
+				pln(cols[j]->as_float()->get(i));
+				printf("\t");
+			}	
+			if (cols[j]->get_type() == 'S') {
+				pln(cols[j]->as_string()->get(i));
+				printf("\t");
+			}	
 		}
 		printf("\n");
 	}
