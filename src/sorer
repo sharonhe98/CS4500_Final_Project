@@ -1,0 +1,196 @@
+#!/usr/bin/env python
+import sys
+import os
+import re
+
+max_col = 0
+total_type = {}
+col_types = {}
+
+
+def main():
+    # A list of the command line arguments
+    argv = sys.argv
+    global max_col
+    global total_type
+    global col_types
+
+    # if we have a file to read
+    # if there's no file to read from,
+    # all the other flag options are moot
+    if ("-f" in argv):
+        fileName = argv[argv.index("-f")+1]
+    # check the schem
+        with open(fileName) as filePointer:
+            # read the first 500 lines
+            firstNlines = filePointer.readlines()[0:500]
+            # Iterate through each row to find column values
+            for line in firstNlines:
+                # Break the line into the values in between the <>
+                fields = re.findall("\<\s*(.*?)\s*\>", line)
+
+                # update the maximum number of columns in our schema
+                if (len(fields) > max_col):
+                    max_col = len(fields)
+
+            # Start building the schema once we've found the maximum number of columns
+            for i in range(max_col):
+                # Initialize the empty array of the columns
+                total_type[i] = []
+                # Initialize the column type to be empty
+                col_types[i] = ""
+
+                # Read the lines again to find the values
+                for line in firstNlines:
+                    fields = re.findall("\<\s*(.*?)\s*\>", line)
+                    # If there are more columns than the row has values, fill in empty stri
+                    if (i >= len(fields)):
+                        # Append the value of the column at that row
+                        total_type[i].append("")
+                    else:
+                        total_type[i].append(fields[i])
+
+                # Only set column type if we haven't already set it
+                if (col_types[i] == ""):
+                    # If we have any kind of character aside from 0-9, +, -, or ., the column type is a string
+                    if (any(bool(re.match('^(?=.*[a-zA-Z,/\*\&\^\%\$\#\@\!\~\:\/\\\"\'])', value)) for value in total_type[i])):
+                        col_types[i] = "STRING"
+                    # Else we check if any of the column values is a float
+                    elif (any(bool(re.search('[-+]?[0-9]+\.[0-9]+', value)) for value in total_type[i])):
+                        col_types[i] = "FLOAT"
+                    # It's easier to check a boolean because it can only equal 0, 1, or empty string
+                    elif (all(value == "" or (value != "" and int(value) == 1 or int(value) == 0) for value in total_type[i])):
+                        col_types[i] = "BOOL"
+                    else:
+                        # The only other type left is int, which can be greater than 1 and begin with + or - (BOOL can't)
+                        col_types[i] = "INT"
+
+            # Initialize start to 0 in case -from is 0 or not given
+            start = 0
+
+            if ("-from" in argv):
+                # We assume the arguments are well formed, so we take the number following -from
+                start = int(argv[argv.index("-from")+1])
+                # Set the file pointer to the start specified by the user
+                filePointer.seek(int(start))
+            if ("-len" in argv):
+                # We assume the arguments are well formed, so we take the number following -len
+                fileSize = int(argv[argv.index("-len")+1])
+                # We are already at the beginning given by -from, so we read until the given number of bytes or end of the file
+                filePointer.read(fileSize)
+            if ("-print_col_type" in argv):
+                # We assume the arguments are well formed, so we take the number following -print_col_type
+                colNum = int(argv[argv.index("-print_col_type")+1])
+                # We can simply print from the schema, since the column types are the same throughout
+                print(col_types[colNum])
+            if ("-print_col_idx" in argv):
+                # We assume the arguments are well formed, so we take the numbers following -print_col_idx
+                colNum = int(argv[argv.index("-print_col_idx")+1])
+                offset = int(argv[argv.index("-print_col_idx")+2])
+                # Because we previously read lines, we must reset our filePointer
+                filePointer.seek(int(start))
+                # Use lineOffset to find the row
+                lineOffset = 0
+                # Use readStart to discard the first line if -from is not 0 (ie, we start somewhere that's not the beginning)
+                readStart = 0
+                if (start != 0):
+                    readStart = 1
+                # Read each line in the filePointer
+                for line in filePointer.readlines()[readStart:]:
+                    fields = re.findall("\<\s*(.*?)\s*\>", line)
+                    for j in range(len(fields)):
+                        # If a field doesn't match the schema or isn't valid, replace it with an empty string
+                        if (not matchesSchema(fields[j], j) or not isValid(fields[j])):
+                            fields[j] = ""
+                    # Upon reaching the offset given by the user, return the value
+                    if (lineOffset == offset):
+                        if (colNum >= len(fields)):
+                            print("")
+                            break
+                        else:
+                            printResult = fields[colNum]
+                            # If our column is a string, wrap the value in double quotes for consitency with strings wrapped by quotes
+                            if (col_types[colNum] == "STRING" and printResult[:1] != "\"" and printResult[-1:] != "\""):
+                                printResult = "\"" + str(printResult) + "\""
+                            print(printResult)
+                            break
+                    lineOffset += 1
+            # Apply the same logic as print_col_idx
+            if ("-is_missing_idx" in argv):
+                colNum = int(argv[argv.index("-is_missing_idx")+1])
+                offset = int(argv[argv.index("-is_missing_idx")+2])
+                filePointer.seek(int(start))
+                lineOffset = 0
+                readStart = 0
+                if (start != 0):
+                    readStart = 1
+                for line in filePointer.readlines()[readStart:]:
+                    fields = re.findall("\<\s*(.*?)\s*\>", line)
+                    for j in range(len(fields)):
+                        if (not matchesSchema(fields[j], j) or not isValid(fields[j])):
+                            fields[j] = ""
+                    if (lineOffset == offset):
+                        # If the column is out of bounds or the value at that row and column is the empty string, that means the value is missing, so return 1 for true
+                        if((colNum < len(fields) and fields[colNum] == '') or colNum >= len(fields)):
+                            print(1)
+                        else:
+                            print(0)
+
+                        break
+                    lineOffset += 1
+    else:
+        print("No file found. Sorry :(\n")
+    return 0
+
+# A helper function to check if a value is type BOOL
+
+
+def isBool(value):
+    return int(value) == 0 or int(value) == 1 or value == ""
+
+# A helper function to check if value is type STRING (ie: contains any non-numeric
+# character beyond +, -, or .
+
+
+def isString(value):
+    return bool(re.match('^(?=.*[a-zA-Z,/\*\&\^\%\$\#\@\!\~\:\/\\\"\'])', value))
+
+# Checks if a value is in float format
+
+
+def isFloat(value):
+    return bool(re.search('[-+]?[0-9]+\.[0-9]+', value))
+
+# Checks if a value is in int format
+
+
+def isInt(value):
+    return bool(re.search('[-+]?[0-9]+', value))
+
+# Checks whether the value in that column/row matches the column schema
+
+
+def matchesSchema(value, i):
+    if (value == ""):
+        return True
+    if (isString(value) and col_types[i] != "STRING"):
+        return False
+    elif (isFloat(value) and col_types[i] != "STRING" and col_types[i] != "FLOAT"):
+        return False
+    # We should check whether col_types is BOOL because 1 and 0 both count as BOOL types, too
+    elif(isInt(value) and col_types[i] != "STRING" and col_types[i] != "FLOAT" and col_types[i] != "INT" and col_types[i] != "BOOL"):
+        return False
+    return True
+
+# Check for "unauthorized" whitespace
+
+def isValid(value):
+    if (value[:1] == "\"" and value[-1:] == "\""):
+        return True
+    elif (" " in value):
+        return False
+    return True
+
+
+# call the main function
+main()
