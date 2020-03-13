@@ -230,6 +230,8 @@ public:
   }
   /** Returns the string at idx; undefined on invalid idx.*/
   String* get(size_t idx) {
+    printf("string column get vals: %i\n", idx);
+
     return vals_->get(idx);
   }
 

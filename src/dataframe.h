@@ -304,16 +304,24 @@ public:
 		exit(1);
 	}
 	else if (cols[i]->get_type() == 'I') {
-		cols[i]->push_back(row.get_int(i));
+		cols[i]->push_back(row.get_int(0));
+		printf("\nadding row int: %i\n\n", row.get_int(0));
+		set(i, nrows() - 1, row.get_int(0));
 	}
 	else if (cols[i]->get_type() == 'F') {
-		cols[i]->push_back(row.get_float(i));
+		cols[i]->push_back(row.get_float(0));
+		set(i, nrows() - 1, row.get_float(0));
 	}
 	else if (cols[i]->get_type() == 'B') {
-		cols[i]->push_back(row.get_bool(i));
+		cols[i]->push_back(row.get_bool(0));
+		set(i, nrows() - 1, row.get_bool(0));
 	}
 	else if (cols[i]->get_type() == 'S') {
-		cols[i]->push_back(row.get_string(i));
+		printf("setting row in dataframe add row 1\n");
+		cols[i]->push_back(row.get_string(0));
+		printf("setting row in dataframe add row 2\n");
+		printf("adding row: %s\n", row.get_string(0));
+		set(i, nrows() - 1, row.get_string(0));
 	}
 
 	else {

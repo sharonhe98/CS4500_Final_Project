@@ -902,6 +902,7 @@ public:
       {
         if (i == nn)
         {
+	  printf("get in string array: return element = %i\n", &str_elements_[i]);
           return str_elements_[i];
         }
       }
@@ -983,8 +984,14 @@ public:
   // returns the replace Object.
   String* set(size_t nn, String* oo)
   {
+
+    if (size_ == 0) {
+	append(oo);
+
+	printf("after setting in stringarray: %s\n", get(0)->c_str());
+    }
     // if size not within bounds, return nullptr
-    if (size_ == 0 || nn >= size_)
+    if (size_ > 0 && nn >= size_)
     {
       return nullptr;
     }

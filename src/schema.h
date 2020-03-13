@@ -88,9 +88,21 @@ public:
     width_ = strlen(track_types);
     printf("size init: %d\n", width_);
     columns = new Column*[width_];
-    //  for (size_t i = 0; i < strlen(track_types); i++) {
-	  //    add_column_to_row(track_types[i], nullptr);
-    //  }
+    for (size_t i = 0; i < strlen(track_types); i++) {
+	//add_column_to_row(track_types[i], nullptr);
+	if (track_types[i] == 'I') {
+		columns[i] = new IntColumn();
+	}
+	if (track_types[i] == 'B') {
+		columns[i] = new BoolColumn();
+	}
+	if (track_types[i] == 'F') {
+		columns[i] = new FloatColumn();
+	}
+	if (track_types[i] == 'S') {
+		columns[i] = new StringColumn();
+	}
+    }
     index_ = 0;
   }
 
@@ -181,12 +193,12 @@ public:
     printf("c->type: %c\n", columns[col]->get_type());
     if (c->get_type() == 'I') {
       //IntColumn* c_i = c->as_int();
-      c = c->as_int();
+      //c = c->as_int();
       printf("asInt OK - Checking set in Column\n");
       printf("index is %d\n", index_);
       
       c->set(index_, val);
-      printf("set in Column OK\n");
+      printf("set in Column OK, %i\n", val);
     }
   }
   void set(size_t col, float val)
@@ -215,7 +227,7 @@ public:
       c = columns[col];
     }
     if (c->get_type() == 'B') {
-      c = c->as_bool();
+      //c = c->as_bool();
       c->set(index_,val);
     }
   }
@@ -232,6 +244,9 @@ public:
     }
     if (c->get_type() == 'S') {
       c = c->as_string();
+
+      printf("in row set string val: %s\n", val->c_str());
+
       c->set(index_,val);
     }
     // String* ourString = val->clone();
@@ -308,8 +323,11 @@ public:
     if (isRequestedType(col))
     {
       Column* c = columns[col];
-      // StringColumn* c_s = c->as_string();
-      StringColumn* c_s = dynamic_cast<StringColumn*>(c);
+      StringColumn* c_s = c->as_string();
+      //StringColumn* c_s = dynamic_cast<StringColumn*>(c);
+      
+      printf("in get string in row: index_ = %i\n", index_);
+
       return c_s->get(index_);
     }
     else

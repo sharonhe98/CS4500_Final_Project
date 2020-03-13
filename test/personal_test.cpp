@@ -52,12 +52,13 @@ void test2() {
   printf("DATAFRAME IS BUILT!\n");
   Row  r(df.get_schema());
   printf("ROW IS BUILLTTTTT!\n");
+  String* str = new String("hello world!");
   for(size_t i = 0; i <  2 * 2; i++) {
  //   printf("working?!!\n");
-    r.set(0,(int)i);
+    r.set(0,(int)22);
    // printf("INT SET 1!!\n");
-    r.set(1,(int)i+1);
-    r.set(2, new String("hello world"));
+    r.set(1,(int)23);
+    r.set(2, (String*)str);
     r.set(3, (float)2.0);
     r.set(4, (bool)1);
     //printf("INT SET 2!!\n");
