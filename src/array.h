@@ -886,10 +886,12 @@ public:
     str_elements_ = res;
     // increase size of array
     size_ += 1;
+    printf("size after append: %i\n", size_);
   };
 
   String* get(size_t nn)
   {
+    printf("size in get? in array.h stringarray: %i\n", size_);
     // if index not within bounds, return nullptr
     if (size_ == 0 || nn >= size_)
     {
@@ -1050,5 +1052,9 @@ public:
       res += str_elements_[i]->hash_me();
     }
     return res;
+  }
+
+  size_t length() {
+	return size_;
   }
 };

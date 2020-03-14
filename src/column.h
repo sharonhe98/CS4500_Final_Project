@@ -228,16 +228,24 @@ public:
   StringColumn* as_string() {
     return this;
   }
+
+
   /** Returns the string at idx; undefined on invalid idx.*/
   String* get(size_t idx) {
-    printf("string column get vals: %i\n", idx);
-
+    printf("vals? %i looks like vals_ is what's segfaulting???\n", &vals_);
     return vals_->get(idx);
   }
 
   /** Out of bound idx is undefined. */
   void set(size_t idx, String* val) {
+    if (vals_->length() == 0) {
+	vals_->append(val);
+    }
     vals_->set(idx, val);
+    printf("set stringcolumn: %s\n", val->c_str());
+    printf("set stringcolumn vals: %s\n", vals_->get(0)->c_str());
+
+    printf("size of vals_ in set string column: %i\n", vals_->length());
   }
 
   size_t size() {
