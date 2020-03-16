@@ -45,7 +45,7 @@ void test() {
 
 
 void test2() {
-  Schema s("IISFB");
+  Schema s("IIFB");
  // printf("schema cols %i rows %i\n", s.width(), s.length());
  // printf("SCHEMA IS BUILT!!\n");
   DataFrame df(s);
@@ -58,9 +58,9 @@ void test2() {
     r.set(0,(int)22);
    // printf("INT SET 1!!\n");
     r.set(1,(int)23);
-    r.set(2, (String*)str);
-    r.set(3, (float)2.0);
-    r.set(4, (bool)1);
+    //r.set(2, (String*)str);
+    r.set(2, (float)2.0);
+    r.set(3, (bool)1);
     //printf("INT SET 2!!\n");
     df.add_row(r);
 

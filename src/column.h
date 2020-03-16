@@ -198,6 +198,7 @@ public:
     type_ = 'S';
     colName_ = nullptr;
     vals_ = new StringArray();
+    printf("vals_ is at: %i\n", &vals_);
   }
 
   StringColumn(int n, ...) 
@@ -219,7 +220,9 @@ public:
     va_end(args);
   }
 
-  ~StringColumn(){}
+  ~StringColumn(){
+    delete vals_;
+  }
 
   void push_back(String* val) {
     vals_->append(val);
@@ -232,7 +235,8 @@ public:
 
   /** Returns the string at idx; undefined on invalid idx.*/
   String* get(size_t idx) {
-    printf("vals? %i looks like vals_ is what's segfaulting???\n", &vals_);
+    printf("get index: %i\n", idx);
+    printf("vals? %i looks like vals_ is what's segfaulting???\n", vals_);
     return vals_->get(idx);
   }
 
@@ -246,6 +250,7 @@ public:
     printf("set stringcolumn vals: %s\n", vals_->get(0)->c_str());
 
     printf("size of vals_ in set string column: %i\n", vals_->length());
+    printf("get vals_ in set string column???: %s\n", vals_->get(0)->c_str());
   }
 
   size_t size() {
@@ -292,12 +297,18 @@ public:
 
   ~FloatColumn(){}
 
+  void setColName(String* name) {
+    colName_ = name;
+  }
+
+
   void push_back(float val) {
     vals_->append(val);
   }
 
   float get(size_t idx) {
-    vals_->get(idx);
+    printf("address of vals: %i\n", &vals_);
+    return vals_->get(idx);
   }
 
   FloatColumn* as_float() {
@@ -352,6 +363,10 @@ public:
   }
 
   ~BoolColumn(){}
+  
+  void setColName(String* name) {
+    colName_ = name;
+  }
 
   void push_back(bool val) {
     vals_->append(val);

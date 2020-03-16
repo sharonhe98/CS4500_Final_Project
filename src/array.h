@@ -490,6 +490,7 @@ public:
     // else return element of given index
     else
     {
+      printf("element of float: %i\n", elements_[nn]);
       return elements_[nn];
     }
   }

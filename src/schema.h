@@ -240,12 +240,13 @@ public:
 	    columns[col] = c;
     }
     else {
+      printf("confirm col exists\n");
       c = columns[col];
     }
     if (c->get_type() == 'S') {
       c = c->as_string();
 
-      printf("in row set string val: %s\n", val->c_str());
+      printf("in row set string val cols: %i\n", &c->vals_);
 
       c->set(index_,val);
     }
