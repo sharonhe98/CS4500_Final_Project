@@ -212,7 +212,7 @@ public:
       c = columns[col];
     }
     if (c->get_type() == 'F') {
-      c = c->as_float();
+      // c = c->as_float();
       c->set(index_,val);
     }
   }
@@ -244,7 +244,7 @@ public:
       c = columns[col];
     }
     if (c->get_type() == 'S') {
-      c = c->as_string();
+      // c = c->as_string();
 
       printf("in row set string val cols: %i\n", &c->vals_);
 
@@ -324,8 +324,8 @@ public:
     if (isRequestedType(col))
     {
       Column* c = columns[col];
-      StringColumn* c_s = c->as_string();
-      //StringColumn* c_s = dynamic_cast<StringColumn*>(c);
+      // StringColumn* c_s = c->as_string();
+      StringColumn* c_s = dynamic_cast<StringColumn*>(c);
       
       printf("in get string in row: index_ = %i\n", index_);
 
@@ -333,7 +333,7 @@ public:
     }
     else
     {
-      return NULL;
+      return nullptr;
     }
   }
 
