@@ -332,7 +332,6 @@ public:
   /** The number of columns in the dataframe.*/
   size_t ncols()
   {
-    printf("hi from dataframe ncols\n");
     return scm.width();
   }
 
@@ -365,22 +364,23 @@ public:
   /** Print the dataframe in SoR format to standard output. */
   void print() {
 	for (size_t i = 0; i < nrows(); i++) {
+    printf("row data idx: %i\n", i);
 		for (size_t j = 0; j < ncols(); j++) {
 			if (cols[j]->get_type() == 'I') {
-				printf("row data: ");
-				pln(cols[j]->as_int()->get(i));
+				
+				p(cols[j]->as_int()->get(i));
 				printf("\t");
 			}	
 			if (cols[j]->get_type() == 'B') {
-				pln(cols[j]->as_bool()->get(i));
+				p(cols[j]->as_bool()->get(i));
 				printf("\t");
 			}	
 			if (cols[j]->get_type() == 'F') {
-				pln(cols[j]->as_float()->get(i));
+				p(cols[j]->as_float()->get(i));
 				printf("\t");
 			}	
 			if (cols[j]->get_type() == 'S') {
-				pln(cols[j]->as_string()->get(i));
+				p(cols[j]->as_string()->get(i));
 				printf("\t");
 			}	
 		}
