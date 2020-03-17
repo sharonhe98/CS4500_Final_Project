@@ -11,10 +11,10 @@ class Array : public Object
 {
 public:
   // elements_ is a pointer to a Object* that we stored
-  Object** elements_;
+  Object **elements_;
   // the number of items stored in the array
   size_t size_;
-  
+
   // constructor
   // initializes size_ to 0
   // initializes elements_ to nullptr
@@ -28,10 +28,10 @@ public:
   ~Array() {}
 
   // putting an item at the end of the array
-  virtual void append(Object* oo)
+  virtual void append(Object *oo)
   {
     // allocate memory for result array with larger size
-    Object** res = new Object*[size_ + 1];
+    Object **res = new Object *[size_ + 1];
     // if not empty array, put item to end of array
     if (size_ != 0)
     {
@@ -55,7 +55,7 @@ public:
   }
 
   // get the n'th item in the array
-  Object* get(size_t nn)
+  Object *get(size_t nn)
   {
     assert(nn < size_);
     return elements_[nn];
@@ -63,7 +63,7 @@ public:
 
   // remove the n'th item in the array
   // returning the removed item to the caller
-  Object* remove(size_t nn)
+  Object *remove(size_t nn)
   {
     // if size not within bounds, return nullptr
     if (size_ == 0 || nn >= size_)
@@ -74,9 +74,9 @@ public:
     else
     {
       // make variable for removed to be returned
-      Object* removed;
+      Object *removed;
       // allocate memory for result array with one less size since we remove
-      Object** res = new Object*[size_ - 1];
+      Object **res = new Object *[size_ - 1];
       // copy the elements up to nn in result array
       for (size_t i = 0; i < nn; i++)
       {
@@ -105,24 +105,24 @@ public:
 
   // set n'th element to the given object
   // returns the replace Object.
-  virtual Object* set(size_t nn, Object* oo)
+  virtual Object *set(size_t nn, Object *oo)
   {
-    // if size not within bounds, return nullptr
-    if (size_ == 0 || nn >= size_)
+    // check if out of bounds
+    assert(size_ == 0 || nn < size_);
+    if (size_ == 0)
     {
-      return nullptr;
+      append(oo);
     }
-    // else set nth element
     else
     {
-      Object* res = elements_[nn];
+      Object *res = elements_[nn];
       elements_[nn] = oo;
       return res;
     }
   }
 
   // get the index of an object in the array
-  virtual size_t index_of(Object* oo)
+  virtual size_t index_of(Object *oo)
   {
     // if empty array, return arbitrary large number
     if (size_ == 0)
@@ -159,7 +159,7 @@ public:
   };
 
   // Compares other with this array for equality.
-  bool equals(Object* oo)
+  bool equals(Object *oo)
   {
     // set false if nullptr
     if (oo == nullptr)
@@ -167,7 +167,7 @@ public:
       return false;
     }
     // cast oo to Array
-    Array* a = dynamic_cast<Array*>(oo);
+    Array *a = dynamic_cast<Array *>(oo);
     if (a == nullptr)
     {
       return false;
@@ -216,7 +216,7 @@ class IntArray : public Array
 {
 public:
   // elements_ is a pointer to a int* that we stored
-  int* elements_;
+  int *elements_;
   // size of the array
   size_t size_;
 
@@ -236,7 +236,7 @@ public:
   void append(int oo)
   {
     // allocate memory for result array with larger size
-    int* res = new int[size_ + 1];
+    int *res = new int[size_ + 1];
     // if empty array, set first element of result array
     if (size_ == 0)
     {
@@ -260,16 +260,8 @@ public:
   // get the n'th item in the array
   int get(size_t nn)
   {
-    // if size of array out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
-    {
-      return NULL;
-    }
-    // else return element of given index
-    else
-    {
-      return elements_[nn];
-    }
+    assert(nn < size_);
+    return elements_[nn];
   }
 
   // remove the n'th item in the array
@@ -284,7 +276,7 @@ public:
     else
     {
       // allocate memory for temp array with one less than size
-      int* temp = new int[size_ - 1];
+      int *temp = new int[size_ - 1];
       // set the result to be returned to the element at given index
       int res = elements_[nn];
       // set temp to elements up to the index of removed
@@ -307,10 +299,11 @@ public:
   // returns the replace Object.
   int set(size_t nn, int oo)
   {
+    // check if out of bounds
     assert(nn == 0 || nn < size_);
-    // if out of bounds, return NULL
-    if (size_ == 0) {
-	append(oo);
+    if (size_ == 0)
+    {
+      append(oo);
     }
     else
     {
@@ -364,7 +357,7 @@ public:
   };
 
   // Compares other with this array for equality.
-  bool equals(Object* oo)
+  bool equals(Object *oo)
   {
     // set false if nullptr
     if (oo == nullptr)
@@ -372,7 +365,7 @@ public:
       return false;
     }
     // cast oo to IntArray
-    IntArray* ia = dynamic_cast<IntArray*>(oo);
+    IntArray *ia = dynamic_cast<IntArray *>(oo);
     if (ia == nullptr)
     {
       return false;
@@ -421,7 +414,7 @@ class FloatArray : public Array
 {
 public:
   // elements_ is a pointer to a int* that we stored
-  float* elements_;
+  float *elements_;
   // size of the array
   size_t size_;
 
@@ -441,7 +434,7 @@ public:
   void append(float oo)
   {
     // allocate memory for result array with larger size
-    float* res = new float[size_ + 1];
+    float *res = new float[size_ + 1];
     // if empty array, set first element of result array
     if (size_ == 0)
     {
@@ -465,16 +458,8 @@ public:
   // get the n'th item in the array
   float get(size_t nn)
   {
-    // if size of array out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
-    {
-      return NULL;
-    }
-    // else return element of given index
-    else
-    {
-      return elements_[nn];
-    }
+    assert(nn < size_);
+    return elements_[nn];
   }
 
   // remove the n'th item in the array
@@ -489,7 +474,7 @@ public:
     else
     {
       // allocate memory for temp array with one less than size
-      float* temp = new float[size_ - 1];
+      float *temp = new float[size_ - 1];
       // set the result to be returned to the element at given index
       float res = elements_[nn];
       // set temp to elements up to the index of removed
@@ -512,7 +497,7 @@ public:
   // returns the replace Object.
   float set(size_t nn, float oo)
   {
-    // if out of bounds, return NULL
+    // check if out of bounds
     assert(size_ == 0 || nn < size_);
     if (size_ == 0)
     {
@@ -569,7 +554,7 @@ public:
   };
 
   // Compares other with this array for equality.
-  bool equals(Object* oo)
+  bool equals(Object *oo)
   {
     // set false if nullptr
     if (oo == nullptr)
@@ -577,7 +562,7 @@ public:
       return false;
     }
     // cast oo to IntArray
-    FloatArray* fa = dynamic_cast<FloatArray*>(oo);
+    FloatArray *fa = dynamic_cast<FloatArray *>(oo);
     if (fa == nullptr)
     {
       return false;
@@ -626,7 +611,7 @@ class BoolArray : public Array
 {
 public:
   // elements_ is a pointer to a int* that we stored
-  bool* elements_;
+  bool *elements_;
   // size of the array
   size_t size_;
 
@@ -646,7 +631,7 @@ public:
   void append(bool oo)
   {
     // allocate memory for result array with larger size
-    bool* res = new bool[size_ + 1];
+    bool *res = new bool[size_ + 1];
     // if empty array, set first element of result array
     if (size_ == 0)
     {
@@ -670,16 +655,8 @@ public:
   // get the n'th item in the array
   bool get(size_t nn)
   {
-    // if size of array out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
-    {
-      return NULL;
-    }
-    // else return element of given index
-    else
-    {
-      return elements_[nn];
-    }
+    assert(nn < size_);
+    return elements_[nn];
   }
 
   // remove the n'th item in the array
@@ -694,7 +671,7 @@ public:
     else
     {
       // allocate memory for temp array with one less than size
-      bool* temp = new bool[size_ - 1];
+      bool *temp = new bool[size_ - 1];
       // set the result to be returned to the element at given index
       bool res = elements_[nn];
       // set temp to elements up to the index of removed
@@ -773,7 +750,7 @@ public:
   };
 
   // Compares other with this array for equality.
-  bool equals(Object* oo)
+  bool equals(Object *oo)
   {
     // set false if nullptr
     if (oo == nullptr)
@@ -781,7 +758,7 @@ public:
       return false;
     }
     // cast oo to IntArray
-    BoolArray* ba = dynamic_cast<BoolArray*>(oo);
+    BoolArray *ba = dynamic_cast<BoolArray *>(oo);
     if (ba == nullptr)
     {
       return false;
@@ -830,7 +807,7 @@ class StringArray : public Array
 {
 public:
   size_t size_;
-  String** str_elements_;
+  String **str_elements_;
 
   // constructor
   StringArray()
@@ -843,12 +820,13 @@ public:
   ~StringArray() {}
 
   // putting an item at the end of the array
-  void append(String* oo)
+  void append(String *oo)
   {
     // allocate memory for result array with larger size
-    String** res = new String*[size_ + 1];
+    String **res = new String *[size_ + 1];
     // if not empty array, put item to end of array
-    if (size_ == 0) {
+    if (size_ == 0)
+    {
       res[0] == oo;
     }
     else
@@ -866,23 +844,13 @@ public:
     size_ += 1;
   };
 
-  String* get(size_t nn)
+  String *get(size_t nn)
   {
-    printf("do we get to equals?\n");
-
-    // if index not within bounds, return nullptr
-    if (size_ == 0 || nn >= size_)
-    {
-      return nullptr;
-    }
-    // else return element of given index
-    else
-    {
-      elements_[nn];
-    }
+    assert(nn < size_);
+    return str_elements_[nn];
   };
 
-  size_t index_of(String* ss)
+  size_t index_of(String *ss)
   {
     // if empty array, return arbitrary large number
     if (size_ == 0)
@@ -905,7 +873,7 @@ public:
 
   // remove the n'th item in the array
   // returning the removed item to the caller
-  String* remove(size_t nn)
+  String *remove(size_t nn)
   {
     // if size not within bounds, return nullptr
     if (size_ == 0 || nn > size_)
@@ -915,9 +883,9 @@ public:
     else
     {
       // allocate memory for result array with one less size since we remove
-      String** res = new String*[size_ - 1];
+      String **res = new String *[size_ - 1];
       // set the removed value to be returned
-      String* removed = str_elements_[nn];
+      String *removed = str_elements_[nn];
       // copy the elements up to index to be removed in result array
       for (size_t i = 0; i < nn; i++)
       {
@@ -953,7 +921,7 @@ public:
 
   // set n'th element to the given object
   // returns the replace Object.
-  String* set(size_t nn, String* oo)
+  String *set(size_t nn, String *oo)
   {
     assert(size_ == 0 || nn < size_);
     if (size_ == 0)
@@ -962,14 +930,14 @@ public:
     }
     else
     {
-      String* res = str_elements_[nn];
+      String *res = str_elements_[nn];
       str_elements_[nn] = oo;
       return res;
     }
   };
 
   // Compares other with this array for equality.
-  bool equals(Object* oo)
+  bool equals(Object *oo)
   {
     printf("do we get to equals?\n");
     // set false if nullptr
@@ -977,7 +945,7 @@ public:
     {
       return false;
     }
-    StringArray* s = dynamic_cast<StringArray*>(oo);
+    StringArray *s = dynamic_cast<StringArray *>(oo);
     // set false if nullptr
     if (s == nullptr)
     {
@@ -1018,7 +986,8 @@ public:
     return res;
   }
 
-  size_t length() {
-	return size_;
+  size_t length()
+  {
+    return size_;
   }
 };

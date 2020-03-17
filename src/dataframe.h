@@ -292,24 +292,19 @@ public:
       if (cols[i]->get_type() == 'I')
       {
         cols[i]->push_back(row.get_int(i));
-
-        // set(i, nrows() - 1, row.get_int(0));
       }
       else if (cols[i]->get_type() == 'F')
       {
 	printf("we are getting float in add row!\n");
         cols[i]->push_back(row.get_float(i));
-        // set(i, nrows() - 1, row.get_float(0));
       }
       else if (cols[i]->get_type() == 'B')
       {
         cols[i]->push_back(row.get_bool(i));
-        // set(i, nrows() - 1, row.get_bool(0));
       }
       else if (cols[i]->get_type() == 'S')
       {
-        cols[i]->push_back(row.get_string(0));
-        // set(i, nrows() - 1, row.get_string(0));
+        cols[i]->push_back(row.get_string(i));
       }
 
       else
@@ -386,7 +381,8 @@ public:
         }
         if (cols[j]->get_type() == 'S')
         {
-          p(cols[j]->as_string()->get(i));
+          String* s = cols[j]->as_string()->get(i);
+          p(s->c_str());
           printf("\t");
         }
       }
