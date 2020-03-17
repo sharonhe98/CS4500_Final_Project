@@ -13,19 +13,21 @@ class DataFrame : public Object
 {
 public:
   Schema scm;
-  Column** cols;
+  Column **cols;
 
   /** Create a data frame with the same columns as the give df but no rows */
   DataFrame(DataFrame &df)
   {
     scm = df.scm;
-    cols = new Column*[scm.width()];
-    for (size_t i = 0; i < scm.width(); i++) {
-	    cols[i] = new Column();
-	    cols[i]->setColName(scm.col_names->get(i));
-	    for (size_t j = 0; j < scm.length(); j++) {
-		    cols[i]->push_back(nullptr);
-	    }
+    cols = new Column *[scm.width()];
+    for (size_t i = 0; i < scm.width(); i++)
+    {
+      cols[i] = new Column();
+      cols[i]->setColName(scm.col_names->get(i));
+      for (size_t j = 0; j < scm.length(); j++)
+      {
+        cols[i]->push_back(nullptr);
+      }
     }
   }
 
@@ -34,24 +36,25 @@ public:
   DataFrame(Schema &schema)
   {
     scm = schema;
-    cols = new Column*[scm.width()];
-    for (size_t i = 0; i < scm.width(); i++) {
+    cols = new Column *[scm.width()];
+    for (size_t i = 0; i < scm.width(); i++)
+    {
       printf("create new col not work i is %i\n", i);
-	    cols[i] = createNewColumn(scm.track_types[i]);
+      cols[i] = createNewColumn(scm.track_types[i]);
       printf("set col name not work i is %i\n", i);
-	    cols[i]->setColName(scm.col_names->get(i));
+      cols[i]->setColName(scm.col_names->get(i));
       printf("scm.length is: %i\n", scm.length());
-	    // for (size_t j = 0; j < scm.length(); j++) {
+      // for (size_t j = 0; j < scm.length(); j++) {
       //   printf("push back not work i is %i j is\n", i, j);
       //   printf("col type field is %c\n", cols[i]->get_type());
-		  //   cols[i]->push_back(NULL);
-	    // }
+      //   cols[i]->push_back(NULL);
+      // }
     }
-
   }
 
-  ~DataFrame() {
-	delete[] cols;
+  ~DataFrame()
+  {
+    delete[] cols;
   }
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
@@ -63,131 +66,142 @@ public:
 
   /**
    * Another helper that gets an integer depending on the type
-   */ 
-  int getTypeNum(char type) {
-	if (type == 'I') {
-		return 1;
-	}
-	if (type == 'F') {
-		return 2;
-	}
-	if (type == 'B') {
-		return 3;
-	}
-	if (type == 'S') {
-		return 4;
-	}
-	return 0;	
+   */
+  int getTypeNum(char type)
+  {
+    if (type == 'I')
+    {
+      return 1;
+    }
+    if (type == 'F')
+    {
+      return 2;
+    }
+    if (type == 'B')
+    {
+      return 3;
+    }
+    if (type == 'S')
+    {
+      return 4;
+    }
+    return 0;
   }
-
 
   /**
    * Returns a new column, given its type
    * A helper to construct the dataframe
    */
-  Column* createNewColumn(char type) {
-	int typeNum = getTypeNum(type);
+  Column *createNewColumn(char type)
+  {
+    int typeNum = getTypeNum(type);
 
-	switch(typeNum) {
-		case 1:
-			return new IntColumn();
-		case 2:
-			return new FloatColumn();
-		case 3:
-			return new BoolColumn();
-		case 4:
-			return new StringColumn();
-		default:
-			return new Column();
-	}
+    switch (typeNum)
+    {
+    case 1:
+      return new IntColumn();
+    case 2:
+      return new FloatColumn();
+    case 3:
+      return new BoolColumn();
+    case 4:
+      return new StringColumn();
+    default:
+      return new Column();
+    }
   }
-
 
   /** Adds a column this dataframe, updates the schema, the new column
     * is external, and appears as the last column of the dataframe, the
     * name is optional and external. A nullptr colum is undefined. */
-  void add_column(Column* col, String* name)
+  void add_column(Column *col, String *name)
   {
-    Column* c;
+    Column *c;
     scm.add_column(col->get_type(), name);
-    switch(col->get_type()) {
-	case 'I':
-		c = new IntColumn();
-		break;
-	case 'F':
-		c = new FloatColumn();
-		break;
-	case 'B':
-		c = new BoolColumn();
-		break;
-	case 'S':
-		c = new StringColumn();
-		break;
-	default:
-		c = new Column();	
+    switch (col->get_type())
+    {
+    case 'I':
+      c = new IntColumn();
+      break;
+    case 'F':
+      c = new FloatColumn();
+      break;
+    case 'B':
+      c = new BoolColumn();
+      break;
+    case 'S':
+      c = new StringColumn();
+      break;
+    default:
+      c = new Column();
     }
     c->setColName(name);
-    Column** newCols = new Column*[scm.width()];
-    for (size_t i = 0; i < scm.width() - 1; i++) {
-	    newCols[i] = cols[i];
+    Column **newCols = new Column *[scm.width()];
+    for (size_t i = 0; i < scm.width() - 1; i++)
+    {
+      newCols[i] = cols[i];
     }
     newCols[scm.width() - 1] = c;
-    cols = newCols; 
+    cols = newCols;
   }
 
   /** Return the value at the given column and row. Accessing rows or
    *  columns out of bounds, or request the wrong type is undefined.*/
   int get_int(size_t col, size_t row)
   {
-    if (cols[col]->get_type() != 'I' || col >= scm.width() || row >= scm.length()) {
-	printf("Index out of bounds or type incorrect!\n");
-	exit(1);
-   }
+    if (cols[col]->get_type() != 'I' || col >= scm.width() || row >= scm.length())
+    {
+      printf("Index out of bounds or type incorrect!\n");
+      exit(1);
+    }
   }
   bool get_bool(size_t col, size_t row)
   {
-   if (cols[col]->get_type() != 'B' || col >= scm.width() || row >= scm.length()) {
-	printf("Index out of bounds or type incorrect!\n");
-	exit(1);
-   }
-
+    if (cols[col]->get_type() != 'B' || col >= scm.width() || row >= scm.length())
+    {
+      printf("Index out of bounds or type incorrect!\n");
+      exit(1);
+    }
   }
   float get_float(size_t col, size_t row)
   {
-   if (cols[col]->get_type() != 'I' || col >= scm.width() || row >= scm.length()) {
-	printf("Index out of bounds or type incorrect!\n");
-	exit(1);
-   }
-
+    if (cols[col]->get_type() != 'I' || col >= scm.width() || row >= scm.length())
+    {
+      printf("Index out of bounds or type incorrect!\n");
+      exit(1);
+    }
   }
-  String* get_string(size_t col, size_t row)
+  String *get_string(size_t col, size_t row)
   {
-   if (cols[col]->get_type() != 'I' || col >= scm.width() || row >= scm.length()) {
-	printf("Index out of bounds or type incorrect!\n");
-	exit(1);
-   }
-
+    if (cols[col]->get_type() != 'I' || col >= scm.width() || row >= scm.length())
+    {
+      printf("Index out of bounds or type incorrect!\n");
+      exit(1);
+    }
   }
 
   /** Return the offset of the given column name or -1 if no such col. */
   int get_col(String &col)
   {
-    for (size_t i = 0; i < scm.width(); i++) {
-	if (scm.col_names->get(i)->equals(&col)) {
-		return i;
-	}
+    for (size_t i = 0; i < scm.width(); i++)
+    {
+      if (scm.col_names->get(i)->equals(&col))
+      {
+        return i;
+      }
     }
   }
 
   /** Return the offset of the given row name or -1 if no such row. */
   int get_row(String &col)
   {
-    for (size_t i = 0; i < scm.length(); i++) {
-	if (scm.row_names->get(i)->equals(&col)) {
-		return i;
-	}
+    for (size_t i = 0; i < scm.length(); i++)
+    {
+      if (scm.row_names->get(i)->equals(&col))
+      {
+        return i;
+      }
     }
-
   }
 
   /** Set the value at the given column and row to the given value.
@@ -196,53 +210,28 @@ public:
   void set(size_t col, size_t row, int val)
   {
     printf("DATAFRAME SET CALLED\n");
-    Column* c = cols[col];
-    if (c->get_type() == 'I')
-    {
-      c->set(row, val);
-    }
-    else {
-      printf("Type is not of I\n");
-      exit(1);
-    }
+    Column *c = cols[col];
+    assert(c->get_type() == 'I');
+    c->set(row, val);
   }
   void set(size_t col, size_t row, bool val)
   {
-    Column* c = cols[col];
-    if (c->get_type() == 'B')
-    {
-      c->set(row, val);
-    }
-    else {
-      printf("Type is not of B\n");
-      exit(1);
-    }
-
+    Column *c = cols[col];
+    assert(c->get_type() == 'B');
+    c->set(row, val);
   }
   void set(size_t col, size_t row, float val)
   {
-    Column* c = cols[col];
-    if (c->get_type() == 'F')
-    {
-      c->set(row, val);
-    }
-    else {
-      printf("Type is not of F\n");
-      exit(1);
-    }
+    Column *c = cols[col];
+    assert(c->get_type() == 'F');
+    c->set(row, val);
+    
   }
-  void set(size_t col, size_t row, String* val)
+  void set(size_t col, size_t row, String *val)
   {
-    Column* c = cols[col];
-    if (c->get_type() == 'S')
-    {
-      c->set(row, val);
-    }
-    else {
-      printf("Type is not of S\n");
-      exit(1);
-    }
-
+    Column *c = cols[col];
+    assert(c->get_type() == 'S');
+    c->set(row, val);
   }
 
   /** Set the fields of the given row object with values from the columns at
@@ -259,29 +248,34 @@ public:
     //{
     printf("index rn is: %d\n", idx);
     printf("size of scm.row\n");
-//    Row* r = scm.row[idx];
-//    pln(sizeof(scm.row));
+    //    Row* r = scm.row[idx];
+    //    pln(sizeof(scm.row));
     printf("size of scm.col_size\n");
-//    pln(scm.col_size);
-    for (size_t i = 0; i < scm.width(); i++) {
+    //    pln(scm.col_size);
+    for (size_t i = 0; i < scm.width(); i++)
+    {
       printf("huhhh\n");
       printf("\ni is: \n");
-     // pln(i);
+      // pln(i);
       printf("eeee2\n");
       //pln(r->columns[i]->type_);
 
-	if (cols[i]->get_type() == 'I') {
-		row.set(i, cols[i]->as_int()->get(idx));
-    	}
-	if (cols[i]->get_type() == 'F') {
-		row.set(i, cols[i]->as_float()->get(idx));
-    	}
-	if (cols[i]->get_type() == 'B') {
-		row.set(i, cols[i]->as_bool()->get(idx));
-    	}
-	if (cols[i]->get_type() == 'S') {
-		row.set(i, cols[i]->as_string()->get(idx));
-    	}
+      if (cols[i]->get_type() == 'I')
+      {
+        row.set(i, cols[i]->as_int()->get(idx));
+      }
+      if (cols[i]->get_type() == 'F')
+      {
+        row.set(i, cols[i]->as_float()->get(idx));
+      }
+      if (cols[i]->get_type() == 'B')
+      {
+        row.set(i, cols[i]->as_bool()->get(idx));
+      }
+      if (cols[i]->get_type() == 'S')
+      {
+        row.set(i, cols[i]->as_string()->get(idx));
+      }
     }
   }
 
@@ -292,42 +286,44 @@ public:
     printf("row name\n");
     scm.add_row(row.name);
 
-  //   for (size_t i = 0; i < ncols(); i++) {
-	// row.add_column_to_row(cols[i]->get_type(), nullptr);
-  //   }
+    for (size_t i = 0; i < scm.width(); i++)
+    {
+      // TODO: scm check rather than row
+      if (row.col_type(i) != cols[i]->get_type())
+      {
+        printf("Incorrect schema! row: %c col %c\n", row.col_type(i), cols[i]->get_type());
+        exit(1);
+      }
+      else if (cols[i]->get_type() == 'I')
+      {
+        cols[i]->push_back(row.get_int(0));
+        printf("\nadding row int: %i\n\n", row.get_int(0));
+        // set(i, nrows() - 1, row.get_int(0));
+      }
+      else if (cols[i]->get_type() == 'F')
+      {
+        cols[i]->push_back(row.get_float(0));
+        // set(i, nrows() - 1, row.get_float(0));
+      }
+      else if (cols[i]->get_type() == 'B')
+      {
+        cols[i]->push_back(row.get_bool(0));
+        // set(i, nrows() - 1, row.get_bool(0));
+      }
+      else if (cols[i]->get_type() == 'S')
+      {
+        printf("setting row in dataframe add row 1\n");
+        cols[i]->push_back(row.get_string(0));
+        printf("setting row in dataframe add row 2\n");
+        printf("adding row: %s\n", row.get_string(0));
+        // set(i, nrows() - 1, row.get_string(0));
+      }
 
-  //   printf("schema dot add row is fine!\n");
-
-    for (size_t i = 0; i < scm.width(); i++) {
-	if (row.col_type(i) != cols[i]->get_type()) {
-		printf("Incorrect schema! row: %c col %c\n", row.col_type(i), cols[i]->get_type());
-		exit(1);
-	}
-	else if (cols[i]->get_type() == 'I') {
-		cols[i]->push_back(row.get_int(0));
-		printf("\nadding row int: %i\n\n", row.get_int(0));
-		set(i, nrows() - 1, row.get_int(0));
-	}
-	else if (cols[i]->get_type() == 'F') {
-		cols[i]->push_back(row.get_float(0));
-		set(i, nrows() - 1, row.get_float(0));
-	}
-	else if (cols[i]->get_type() == 'B') {
-		cols[i]->push_back(row.get_bool(0));
-		set(i, nrows() - 1, row.get_bool(0));
-	}
-	else if (cols[i]->get_type() == 'S') {
-		printf("setting row in dataframe add row 1\n");
-		cols[i]->push_back(row.get_string(0));
-		printf("setting row in dataframe add row 2\n");
-		printf("adding row: %s\n", row.get_string(0));
-		set(i, nrows() - 1, row.get_string(0));
-	}
-
-	else {
-		printf("Undefined col type\n");
-		exit(1);
-	}
+      else
+      {
+        printf("Undefined col type\n");
+        exit(1);
+      }
     }
   }
 
@@ -340,14 +336,15 @@ public:
   /** The number of columns in the dataframe.*/
   size_t ncols()
   {
-    printf("hi from dataframe ncols\n");
     return scm.width();
   }
 
   /** Visit rows in order */
-  void map(Rower &r) {
-    for (size_t i = 0; i < nrows(); i++) {
-      Row* ro = new Row(scm.row_names->get(i));
+  void map(Rower &r)
+  {
+    for (size_t i = 0; i < nrows(); i++)
+    {
+      Row *ro = new Row(scm.row_names->get(i));
       fill_row(i, *ro);
       r.accept(*ro);
     }
@@ -355,44 +352,54 @@ public:
 
   /** Create a new dataframe, constructed from rows for which the given Rower
     * returned true from its accept method. */
-  DataFrame *filter(Rower &r) {
-    Schema* s = new Schema();
-    for (size_t i = 0; i < nrows(); i++) {
-      Row* ro = new Row(scm.row_names->get(i));
+  DataFrame *filter(Rower &r)
+  {
+    Schema *s = new Schema();
+    for (size_t i = 0; i < nrows(); i++)
+    {
+      Row *ro = new Row(scm.row_names->get(i));
       fill_row(i, *ro);
 
-      if (r.accept(*ro)) {
+      if (r.accept(*ro))
+      {
         s->add_row(scm.row_names->get(i));
       }
     }
-    
-    DataFrame* ndf = new DataFrame(*s);
+
+    DataFrame *ndf = new DataFrame(*s);
     return ndf;
   }
 
   /** Print the dataframe in SoR format to standard output. */
-  void print() {
-	for (size_t i = 0; i < nrows(); i++) {
-		for (size_t j = 0; j < ncols(); j++) {
-			if (cols[j]->get_type() == 'I') {
-				printf("row data: ");
-				pln(cols[j]->as_int()->get(i));
-				printf("\t");
-			}	
-			if (cols[j]->get_type() == 'B') {
-				pln(cols[j]->as_bool()->get(i));
-				printf("\t");
-			}	
-			if (cols[j]->get_type() == 'F') {
-				pln(cols[j]->as_float()->get(i));
-				printf("\t");
-			}	
-			if (cols[j]->get_type() == 'S') {
-				pln(cols[j]->as_string()->get(i));
-				printf("\t");
-			}	
-		}
-		printf("\n");
-	}
+  void print()
+  {
+    for (size_t i = 0; i < nrows(); i++)
+    {
+      printf("row idx: %i\t", i);
+      for (size_t j = 0; j < ncols(); j++)
+      {
+        if (cols[j]->get_type() == 'I')
+        {
+          p(cols[j]->as_int()->get(i));
+          printf("\t");
+        }
+        if (cols[j]->get_type() == 'B')
+        {
+          p(cols[j]->as_bool()->get(i));
+          printf("\t");
+        }
+        if (cols[j]->get_type() == 'F')
+        {
+          p(cols[j]->as_float()->get(i));
+          printf("\t");
+        }
+        if (cols[j]->get_type() == 'S')
+        {
+          p(cols[j]->as_string()->get(i));
+          printf("\t");
+        }
+      }
+      printf("\n");
+    }
   }
 };
