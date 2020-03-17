@@ -165,7 +165,7 @@ public:
   }
   float get_float(size_t col, size_t row)
   {
-    if (cols[col]->get_type() != 'I' || col >= scm.width() || row >= scm.length())
+    if (cols[col]->get_type() != 'F' || col >= scm.width() || row >= scm.length())
     {
       printf("Index out of bounds or type incorrect!\n");
       exit(1);
@@ -173,7 +173,7 @@ public:
   }
   String *get_string(size_t col, size_t row)
   {
-    if (cols[col]->get_type() != 'I' || col >= scm.width() || row >= scm.length())
+    if (cols[col]->get_type() != 'S' || col >= scm.width() || row >= scm.length())
     {
       printf("Index out of bounds or type incorrect!\n");
       exit(1);
