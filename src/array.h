@@ -55,7 +55,7 @@ public:
   }
 
   // get the n'th item in the array
-  Object *get(size_t nn)
+  Object *get_(size_t nn)
   {
     assert(nn < size_);
     return elements_[nn];
@@ -807,10 +807,10 @@ class StringArray : public Array
 {
 public:
   size_t size_;
-  String **str_elements_;
+  String **elements_;
 
   // constructor
-  StringArray()
+ /* StringArray()
   {
     size_ = 0;
     str_elements_ = nullptr;
@@ -989,5 +989,9 @@ public:
   size_t length()
   {
     return size_;
+  }*/
+
+  String* get(size_t nn) {
+	return dynamic_cast<String*>(get_(nn));
   }
 };

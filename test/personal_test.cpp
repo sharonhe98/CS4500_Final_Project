@@ -172,7 +172,7 @@ void testStringArray() {
 		fa->append(s);
 	}
 	assert(fa->length() == 1000);
-	assert(dynamic_cast<String*>(fa->get(0))->equals(s));
+	assert(dynamic_cast<String*>(fa->get_(0))->equals(s));
 	printf("test str array functions pass!\n");
 }
 
