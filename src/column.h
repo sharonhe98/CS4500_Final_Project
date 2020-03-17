@@ -18,77 +18,54 @@ class BoolColumn;
 class Column : public Object
 {
 public:
-  // Array vals_;
-  Array* vals_;
+  Array *vals_;
   char type_;
-  String* colName_;
+  String *colName_;
 
-  Column()
-  {
-//    colName_ = nullptr;
-  //  type_ = 'U';
-  }
+  Column() {}
 
   ~Column() {}
   /** Type converters: Return the same column under its actual type, or
  *    *  nullptr if of the wrong type.  */
 
-  virtual void setColName(String* name) {
+  virtual void setColName(String *name)
+  {
     colName_ = name;
   }
 
-  virtual IntColumn* as_int()
+  virtual IntColumn *as_int()
   {
-   /* IntColumn* ic = new IntColumn();
-    for (size_t i = 0; i < length(); i++) {
-	ic->push_back(vals_->get(i));
-    }*/
-
-    // if (get_type() == 'I') {
-    return nullptr;
-    //return IntColumn* i = dynamic_cast<IntColumn*>(this);
-    //   i->as_int();
-    // }
-    //return nullptr;
-  };
-  virtual BoolColumn* as_bool()
-  {
-    //  if (get_type() == 'B') {
-    //     BoolColumn* b = (BoolColumn*)this;
-    //     b->as_bool();
-    //   }
-    return nullptr;
-    
-  };
-  virtual FloatColumn* as_float()
-  {
-    // if (get_type() == 'F') {
-    //   FloatColumn* f = (FloatColumn*)this;
-    //   f->as_float();
-    // }
     return nullptr;
   };
-  virtual StringColumn* as_string()
+  virtual BoolColumn *as_bool()
   {
-    // if (get_type() == 'S') {
-    //   StringColumn* s = (StringColumn*)this;
-    //   s->as_string();
-    // }
+    return nullptr;
+  };
+  virtual FloatColumn *as_float()
+  {
+    return nullptr;
+  };
+  virtual StringColumn *as_string()
+  {
     return nullptr;
   };
 
   /** Type appropriate push_back methods. Calling the wrong method is
  *     * undefined behavior. **/
-  virtual void push_back(int val) {
+  virtual void push_back(int val)
+  {
     return;
   };
-  virtual void push_back(bool val) {
+  virtual void push_back(bool val)
+  {
     return;
   };
-  virtual void push_back(float val) {
+  virtual void push_back(float val)
+  {
     return;
   };
-  virtual void push_back(String* val) {
+  virtual void push_back(String *val)
+  {
     return;
   };
 
@@ -98,24 +75,20 @@ public:
     vals_->length();
   };
 
-  virtual void set(size_t idx, int val) {
-        printf("desgostang\n");
-	return;
+  virtual void set(size_t idx, int val)
+  {
+    printf("desgostang\n");
+    return;
   }
   virtual void set(size_t index_, bool val) {}
   virtual void set(size_t index_, float val) {}
-  virtual void set(size_t index_, String* val) {}
+  virtual void set(size_t index_, String *val) {}
 
   /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'.*/
   virtual char get_type()
   {
     return type_;
   };
-
-  /*void* get(size_t idx) {
-    return vals_->get(idx); 
-  }*/
-
 };
 
 /*************************************************************************
@@ -125,9 +98,9 @@ public:
 class IntColumn : public Column
 {
 public:
-  IntArray* vals_;
+  IntArray *vals_;
   char type_;
-  String* colName_;
+  String *colName_;
 
   IntColumn()
   {
@@ -136,7 +109,8 @@ public:
     vals_ = new IntArray();
   }
 
-  ~IntColumn(){
+  ~IntColumn()
+  {
     delete vals_;
   }
 
@@ -146,43 +120,50 @@ public:
     va_list args;
     vals_ = new IntArray();
 
-    va_start (args, n);
+    va_start(args, n);
 
-    for (int i = 0; i < n; i++) {
-      printf("%d\n", va_arg(args, int));
+    for (int i = 0; i < n; i++)
+    {
       vals_->append(va_arg(args, int));
     }
 
     va_end(args);
   }
 
-  void setColName(String* name) {
+  void setColName(String *name)
+  {
     colName_ = name;
   }
 
-  void push_back(int val) {
+  void push_back(int val)
+  {
     vals_->append(val);
   }
 
-  int get(size_t idx) {
+  int get(size_t idx)
+  {
     int val = vals_->get(idx);
     return val;
   }
 
-  IntColumn* as_int() {
+  IntColumn *as_int()
+  {
     return this;
   }
 
   /** Set value at idx. An out of bound idx is undefined.  */
-  void set(size_t idx, int val) {
+  void set(size_t idx, int val)
+  {
     vals_->set(idx, val);
   }
 
-  size_t size() {
+  size_t size()
+  {
     vals_->length();
   }
 
-  char get_type() {
+  char get_type()
+  {
     return type_;
   }
 };
@@ -197,28 +178,29 @@ public:
 class StringColumn : public Column
 {
 public:
-  StringArray* vals_;
+  StringArray *vals_;
   char type_;
-  String* colName_;
+  String *colName_;
 
-  StringColumn() 
+  StringColumn()
   {
     type_ = 'S';
     colName_ = nullptr;
     vals_ = new StringArray();
   }
 
-  StringColumn(int n, ...) 
+  StringColumn(int n, ...)
   {
     type_ = 'S';
     va_list args;
     vals_ = new StringArray();
-    String* valueString;
+    String *valueString;
 
-    va_start (args, n);
+    va_start(args, n);
 
-    for (int i = 0; i < n; i++) {
-      String* newString = new String((va_arg(args, char*)));
+    for (int i = 0; i < n; i++)
+    {
+      String *newString = new String((va_arg(args, char *)));
       valueString = newString;
       vals_->append(valueString);
       delete newString;
@@ -227,37 +209,45 @@ public:
     va_end(args);
   }
 
-  ~StringColumn(){
+  ~StringColumn()
+  {
     delete vals_;
   }
 
-  void setColName(String* name) {
+  void setColName(String *name)
+  {
     colName_ = name;
   }
 
-  void push_back(String* val) {
+  void push_back(String *val)
+  {
     vals_->append(val);
   }
 
   /** Returns the string at idx; undefined on invalid idx.*/
-  String* get(size_t idx) {
+  String *get(size_t idx)
+  {
     return vals_->get(idx);
   }
 
-   StringColumn* as_string() {
+  StringColumn *as_string()
+  {
     return this;
   }
 
   /** Out of bound idx is undefined. */
-  void set(size_t idx, String* val) {
+  void set(size_t idx, String *val)
+  {
     vals_->set(idx, val);
   }
 
-  size_t size() {
+  size_t size()
+  {
     vals_->length();
   }
 
-  char get_type() {
+  char get_type()
+  {
     return type_;
   }
 };
@@ -269,11 +259,11 @@ public:
 class FloatColumn : public Column
 {
 public:
-  FloatArray* vals_;
+  FloatArray *vals_;
   char type_;
-  String* colName_;
+  String *colName_;
 
-  FloatColumn() 
+  FloatColumn()
   {
     type_ = 'F';
     colName_ = nullptr;
@@ -286,44 +276,51 @@ public:
     va_list args;
     vals_ = new FloatArray();
 
-    va_start (args, n);
+    va_start(args, n);
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
       vals_->append(va_arg(args, float));
     }
 
     va_end(args);
   }
 
-  ~FloatColumn(){}
+  ~FloatColumn() {}
 
-  void setColName(String* name) {
+  void setColName(String *name)
+  {
     colName_ = name;
   }
 
-
-  void push_back(float val) {
+  void push_back(float val)
+  {
     vals_->append(val);
   }
 
-  float get(size_t idx) {
+  float get(size_t idx)
+  {
     return vals_->get(idx);
   }
 
-  FloatColumn* as_float() {
+  FloatColumn *as_float()
+  {
     return this;
   }
 
   /** Set value at idx. An out of bound idx is undefined.  */
-  void set(size_t idx, float val) {
+  void set(size_t idx, float val)
+  {
     vals_->set(idx, val);
   }
 
-  size_t size() {
+  size_t size()
+  {
     return vals_->length();
   }
 
-  char get_type() {
+  char get_type()
+  {
     return type_;
   }
 };
@@ -335,60 +332,68 @@ public:
 class BoolColumn : public Column
 {
 public:
-  BoolArray* vals_;
+  BoolArray *vals_;
   char type_;
-  String* colName_;
-  
-  BoolColumn() 
+  String *colName_;
+
+  BoolColumn()
   {
     type_ = 'B';
     colName_ = nullptr;
     vals_ = new BoolArray();
   }
 
-  BoolColumn(bool n, ...) 
+  BoolColumn(bool n, ...)
   {
     type_ = 'B';
     va_list args;
     vals_ = new BoolArray();
 
-    va_start (args, n);
+    va_start(args, n);
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
       vals_->append(va_arg(args, bool));
     }
 
     va_end(args);
   }
 
-  ~BoolColumn(){}
-  
-  void setColName(String* name) {
+  ~BoolColumn() {}
+
+  void setColName(String *name)
+  {
     colName_ = name;
   }
 
-  void push_back(bool val) {
+  void push_back(bool val)
+  {
     vals_->append(val);
   }
 
-  bool get(size_t idx) {
+  bool get(size_t idx)
+  {
     return vals_->get(idx);
   }
 
-  BoolColumn* as_bool() {
+  BoolColumn *as_bool()
+  {
     return this;
   }
 
   /** Set value at idx. An out of bound idx is undefined.  */
-  void set(size_t idx, bool val) {
+  void set(size_t idx, bool val)
+  {
     vals_->set(idx, val);
   }
 
-  size_t size() {
+  size_t size()
+  {
     return vals_->length();
   }
-  
-  char get_type() {
+
+  char get_type()
+  {
     return type_;
   }
 };

@@ -39,16 +39,8 @@ public:
     cols = new Column *[scm.width()];
     for (size_t i = 0; i < scm.width(); i++)
     {
-      printf("create new col not work i is %i\n", i);
       cols[i] = createNewColumn(scm.track_types[i]);
-      printf("set col name not work i is %i\n", i);
       cols[i]->setColName(scm.col_names->get(i));
-      printf("scm.length is: %i\n", scm.length());
-      // for (size_t j = 0; j < scm.length(); j++) {
-      //   printf("push back not work i is %i j is\n", i, j);
-      //   printf("col type field is %c\n", cols[i]->get_type());
-      //   cols[i]->push_back(NULL);
-      // }
     }
   }
 
@@ -225,7 +217,6 @@ public:
     Column *c = cols[col];
     assert(c->get_type() == 'F');
     c->set(row, val);
-    
   }
   void set(size_t col, size_t row, String *val)
   {
@@ -240,26 +231,8 @@ public:
     */
   void fill_row(size_t idx, Row &row)
   {
-    printf("wjjjj!!!!\n");
-    //pln(row.width());
-    // TODO: check undefined later
-    //
-    //for (size_t i = 0; i < scm.width(); i++)
-    //{
-    printf("index rn is: %d\n", idx);
-    printf("size of scm.row\n");
-    //    Row* r = scm.row[idx];
-    //    pln(sizeof(scm.row));
-    printf("size of scm.col_size\n");
-    //    pln(scm.col_size);
     for (size_t i = 0; i < scm.width(); i++)
     {
-      printf("huhhh\n");
-      printf("\ni is: \n");
-      // pln(i);
-      printf("eeee2\n");
-      //pln(r->columns[i]->type_);
-
       if (cols[i]->get_type() == 'I')
       {
         row.set(i, cols[i]->as_int()->get(idx));
@@ -287,7 +260,6 @@ public:
 
     for (size_t i = 0; i < scm.width(); i++)
     {
-      // TODO: scm check rather than row
       assert(strcmp(scm.track_types, row.track_types) == 0);
       if (cols[i]->get_type() == 'I')
       {
@@ -295,7 +267,6 @@ public:
       }
       else if (cols[i]->get_type() == 'F')
       {
-	printf("we are getting float in add row!\n");
         cols[i]->push_back(row.get_float(i));
       }
       else if (cols[i]->get_type() == 'B')
@@ -381,7 +352,7 @@ public:
         }
         if (cols[j]->get_type() == 'S')
         {
-          String* s = cols[j]->as_string()->get(i);
+          String *s = cols[j]->as_string()->get(i);
           printf("< %s >", s->c_str());
           printf("\t");
         }

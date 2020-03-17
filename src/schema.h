@@ -9,7 +9,6 @@ class Fielder;
 class Rower;
 class Schema;
 const char *get_schema_track_types(Schema &scm);
-// Column** get_schema_columns(Schema &scm);
 
 /*****************************************************************************
  * Fielder::
@@ -87,13 +86,10 @@ public:
   {
     name = nullptr;
     track_types = get_schema_track_types(scm);
-    // columns = get_schema_columns(scm);
     width_ = strlen(track_types);
-    printf("size init: %d\n", width_);
     columns = new Column *[width_];
     for (size_t i = 0; i < strlen(track_types); i++)
     {
-      //add_column_to_row(track_types[i], nullptr);
       if (track_types[i] == 'I')
       {
         columns[i] = new IntColumn();
@@ -131,48 +127,27 @@ public:
     if (typ == 'I')
     {
       c = new IntColumn;
-      //c = c->as_int();
-      //delete i;
     }
     if (typ == 'F')
     {
       FloatColumn *i = new FloatColumn();
       c = (Column *)i;
-      //delete i;
     }
     if (typ == 'B')
     {
       BoolColumn *i = new BoolColumn();
       c = (Column *)i;
-      //delete i;
     }
     if (typ == 'S')
     {
       StringColumn *i = new StringColumn();
       c = i;
-      //delete i;
     }
-
-    printf("what is da width???! %d\n", width_);
-
-    // Column** temp = new Column*[width_ + 1];
-    // for (size_t i = 0; i < width_; i++) {
-    //   temp[i] = columns[i];
-    //   printf("current columns %i: %d\n", i);
-    // }
     size_t current_idx = 0;
     columns[current_idx] = c;
     current_idx += 1;
 
-    // temp[width_] = c;
     width_ += 1;
-    printf("size after add else: %d\n", width_);
-    // delete [] columns;
-    // delete [] temp;
-    // columns = temp;
-    printf("colimns is not NNULL: %i\n", columns);
-    // }
-    printf("hii\n");
   }
 
   // helper to check if value is in range
@@ -201,7 +176,7 @@ public:
     }
     if (c->get_type() == 'I')
     {
-      IntColumn* ic = dynamic_cast<IntColumn*>(c);
+      IntColumn *ic = dynamic_cast<IntColumn *>(c);
 
       ic->set(0, val);
     }
@@ -221,13 +196,9 @@ public:
     if (c->get_type() == 'F')
     {
 
-      FloatColumn* fc = dynamic_cast<FloatColumn*>(c);
+      FloatColumn *fc = dynamic_cast<FloatColumn *>(c);
 
       fc->set(0, val);
-
-      // c = c->as_float();
-
-      //c->set(index_, val);
     }
   }
   void set(size_t col, bool val)
@@ -244,7 +215,7 @@ public:
     }
     if (c->get_type() == 'B')
     {
-      BoolColumn* bc = dynamic_cast<BoolColumn*>(c);
+      BoolColumn *bc = dynamic_cast<BoolColumn *>(c);
       bc->set(0, val);
     }
   }
@@ -259,14 +230,11 @@ public:
     }
     else
     {
-      printf("confirm col exists\n");
       c = columns[col];
     }
     if (c->get_type() == 'S')
     {
-      // c = c->as_string();
-
-      StringColumn* sc = dynamic_cast<StringColumn*>(c);	
+      StringColumn *sc = dynamic_cast<StringColumn *>(c);
       sc->set(0, val);
     }
   }
@@ -294,7 +262,7 @@ public:
   {
     assert(isRequestedType(col));
     Column *c = columns[col];
-    IntColumn* c_i = c->as_int();
+    IntColumn *c_i = c->as_int();
     //IntColumn *c_i = dynamic_cast<IntColumn *>(c);
     return c_i->get(0);
   }
@@ -302,10 +270,8 @@ public:
   {
     assert(isRequestedType(col));
     Column *c = columns[col];
-    // BoolColumn* c_b = c->as_bool()
     BoolColumn *c_b = dynamic_cast<BoolColumn *>(c);
     bool val = c_b->get(0);
-    printf("val??? %i\n", val);
     return val;
   }
   float get_float(size_t col)
@@ -326,9 +292,6 @@ public:
   /** Number of fields in the row. */
   size_t width()
   {
-    printf("huhhhh???width ");
-    pln(width_);
-    printf("\nwidth of row in row class  \n");
     return width_;
   }
 
@@ -427,11 +390,7 @@ public:
 
     for (size_t i = 0; i < strlen(track_types); i++)
     {
-      printf("before add column! %d\n", i);
       add_column(track_types[i], nullptr);
-      printf("add column yay!\n");
-      // add_row(nullptr);
-      // printf("add row success\n");
     }
   }
 
@@ -443,13 +402,9 @@ public:
 
   void add_column(char typ, String *name)
   {
-    printf("row size: %d\n", row_size);
-    printf("col size: %d\n", col_size);
     col_names->append(name);
-    printf("append col success %c\n", typ);
 
     col_size += 1;
-    printf("add_column success! col size? %i\n", col_size);
   }
 
   /** Add a row with a name (possibly nullptr), name is external. */

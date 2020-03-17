@@ -46,45 +46,28 @@ void test() {
 
 void test2() {
   Schema s("IIFBS");
- // printf("schema cols %i rows %i\n", s.width(), s.length());
- // printf("SCHEMA IS BUILT!!\n");
   DataFrame df(s);
   printf("DATAFRAME IS BUILT!\n");
   Row  r(df.get_schema());
   printf("ROW IS BUILLTTTTT!\n");
   String* str = new String("hello world!");
   for(size_t i = 0; i <  2 * 2; i++) {
-    printf("test pos i is: %i\n", i);
- //   printf("working?!!\n");
     r.set(0,(int)22);
-   // printf("INT SET 1!!\n");
     r.set(1,(int)23);
-    //r.set(2, (String*)str);
     r.set(2, (float)2.0);
     r.set(3, (bool)1);
     r.set(4, (String*)str);
-    //printf("INT SET 2!!\n");
     df.add_row(r);
 
     printf("ADD ROW PASSED!\n");
-    printf("row num %i\n", df.nrows());
-    printf("col num %i\n", df.ncols());
-    
-
-    //
-
   }
 
   df.print();
-
-  
   exit(0);
 }
 
 void test3() {
   Schema s("IIF");
- // printf("schema cols %i rows %i\n", s.width(), s.length());
- // printf("SCHEMA IS BUILT!!\n");
   DataFrame df(s);
   printf("DATAFRAME IS BUILT!\n");
   Row  r(df.get_schema());
@@ -97,14 +80,10 @@ void test3() {
     df.add_row(r);
 
     printf("ADD ROW PASSED!\n");
-    printf("row num %i\n", df.nrows());
-    printf("col num %i\n", df.ncols());
 
   }
 
   df.print();
-
-  
   exit(0);
 }
 
