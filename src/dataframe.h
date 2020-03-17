@@ -288,24 +288,22 @@ public:
     for (size_t i = 0; i < scm.width(); i++)
     {
       // TODO: scm check rather than row
-      if (row.col_type(i) != cols[i]->get_type())
+      assert(strcmp(scm.track_types, row.track_types) == 0);
+      if (cols[i]->get_type() == 'I')
       {
-        printf("Incorrect schema! row: %c col %c\n", row.col_type(i), cols[i]->get_type());
-        exit(1);
-      }
-      else if (cols[i]->get_type() == 'I')
-      {
-        cols[i]->push_back(row.get_int(0));
+        cols[i]->push_back(row.get_int(i));
+
         // set(i, nrows() - 1, row.get_int(0));
       }
       else if (cols[i]->get_type() == 'F')
       {
-        cols[i]->push_back(row.get_float(0));
+	printf("we are getting float in add row!\n");
+        cols[i]->push_back(row.get_float(i));
         // set(i, nrows() - 1, row.get_float(0));
       }
       else if (cols[i]->get_type() == 'B')
       {
-        cols[i]->push_back(row.get_bool(0));
+        cols[i]->push_back(row.get_bool(i));
         // set(i, nrows() - 1, row.get_bool(0));
       }
       else if (cols[i]->get_type() == 'S')
@@ -374,7 +372,7 @@ public:
       {
         if (cols[j]->get_type() == 'I')
         {
-          printf("< %i >/t", cols[j]->as_int()->get(i));
+          printf("< %i >\t", cols[j]->as_int()->get(i));
         }
         if (cols[j]->get_type() == 'B')
         {

@@ -166,7 +166,6 @@ public:
 
   int get(size_t idx) {
     int val = vals_->get(idx);
-    printf("val got = %i\n", vals_->get(0));
     return val;
   }
 

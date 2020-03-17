@@ -57,18 +57,8 @@ public:
   // get the n'th item in the array
   Object* get(size_t nn)
   {
-
-    printf("size_ : %i, nn : %i\n", &size_, nn);
-    // if index not within bounds, return nullptr
-    if (size_ == 0 || nn >= size_)
-    {
-      return nullptr;
-    }
-    // else return element of given index
-    else
-    {
-      elements_[nn];
-    }
+    assert(nn < size_);
+    return elements_[nn];
   }
 
   // remove the n'th item in the array
@@ -523,14 +513,13 @@ public:
   float set(size_t nn, float oo)
   {
     // if out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
+    assert(size_ == 0 || nn < size_);
+    if (size_ == 0)
     {
-      printf("size =0\n");
-      return NULL;
+      append(oo);
     }
     else
     {
-      printf("size %i\n", size_);
       float res = elements_[nn];
       elements_[nn] = oo;
       return res;
@@ -728,15 +717,13 @@ public:
   // returns the replace Object.
   bool set(size_t nn, bool oo)
   {
-    // if out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
+    assert(size_ == 0 || nn < size_);
+    if (size_ == 0)
     {
-      printf("size =0\n");
-      return NULL;
+      append(oo);
     }
     else
     {
-      printf("size %i\n", size_);
       bool res = elements_[nn];
       elements_[nn] = oo;
       return res;
@@ -849,7 +836,6 @@ public:
   StringArray()
   {
     size_ = 0;
-    printf("CONSTRUCTOR SIZE?? %i\n", size_);
     str_elements_ = nullptr;
   }
 
@@ -878,11 +864,12 @@ public:
     str_elements_ = res;
     // increase size of array
     size_ += 1;
-    printf("size after append: %i\n", size_);
   };
 
   String* get(size_t nn)
   {
+    printf("do we get to equals?\n");
+
     // if index not within bounds, return nullptr
     if (size_ == 0 || nn >= size_)
     {
@@ -968,10 +955,10 @@ public:
   // returns the replace Object.
   String* set(size_t nn, String* oo)
   {
-    // if size not within bounds, return nullptr
-    if (size_ == 0 || nn >= size_)
+    assert(size_ == 0 || nn < size_);
+    if (size_ == 0)
     {
-      return nullptr;
+      append(oo);
     }
     else
     {
@@ -984,6 +971,7 @@ public:
   // Compares other with this array for equality.
   bool equals(Object* oo)
   {
+    printf("do we get to equals?\n");
     // set false if nullptr
     if (oo == nullptr)
     {

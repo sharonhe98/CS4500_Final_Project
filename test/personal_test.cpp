@@ -45,7 +45,7 @@ void test() {
 
 
 void test2() {
-  Schema s("IIFB");
+  Schema s("IIFBS");
  // printf("schema cols %i rows %i\n", s.width(), s.length());
  // printf("SCHEMA IS BUILT!!\n");
   DataFrame df(s);
@@ -62,10 +62,10 @@ void test2() {
     //r.set(2, (String*)str);
     r.set(2, (float)2.0);
     r.set(3, (bool)1);
+    r.set(4, (String*)str);
     //printf("INT SET 2!!\n");
     df.add_row(r);
 
-    df.fill_row(i, r);
     printf("ADD ROW PASSED!\n");
     printf("row num %i\n", df.nrows());
     printf("col num %i\n", df.ncols());
@@ -82,7 +82,7 @@ void test2() {
 }
 
 void test3() {
-  Schema s("II");
+  Schema s("IIF");
  // printf("schema cols %i rows %i\n", s.width(), s.length());
  // printf("SCHEMA IS BUILT!!\n");
   DataFrame df(s);
@@ -91,13 +91,11 @@ void test3() {
   printf("ROW IS BUILLTTTTT!\n");
   String* str = new String("hello world!");
   for(size_t i = 0; i <  2 * 2; i++) {
-    printf("test pos i is: %i\n", i);
     r.set(0,(int)22);
     r.set(1,(int)23);
-    printf("r at 0: %i\n", r.get_int(0));
+    r.set(2,(float)23.5);
     df.add_row(r);
 
-    df.fill_row(i, r);
     printf("ADD ROW PASSED!\n");
     printf("row num %i\n", df.nrows());
     printf("col num %i\n", df.ncols());
@@ -111,9 +109,116 @@ void test3() {
 }
 
 
+void testFloatArray() {
+	FloatArray* fa = new FloatArray();
+	assert(fa->length() == 0);
+	for (size_t i = 0; i < 1000; i++) {
+		fa->append(3.5);
+	}
+	assert(fa->length() == 1000);
+	assert(fa->get(0) == 3.5);
+	printf("test float array functions pass!\n");
+}
+
+
+void testFloatColumn() {
+	FloatColumn* fa = new FloatColumn();
+	assert(fa->size() == 0);
+	for (size_t i = 0; i < 1000; i++) {
+		fa->push_back(3.5);
+	}
+	assert(fa->size() == 1000);
+	assert(fa->get(0) == 3.5);
+	printf("test float col functions pass!\n");
+}
+
+void testFloatsForRow() {
+	Schema s("FFF");
+	Row* row = new Row(s);
+	assert(row->width() == 3);
+	row->set(0, (float)3.5);
+	assert(row->get_float(0) == 3.5);
+	printf("testfloatsfor row passed!\n");
+}
+
+void testBoolArray() {
+	BoolArray* fa = new BoolArray();
+	assert(fa->length() == 0);
+	for (size_t i = 0; i < 1000; i++) {
+		fa->append(0);
+	}
+	assert(fa->length() == 1000);
+	assert(fa->get(0) == 0);
+	printf("test bool array functions pass!\n");
+}
+
+
+void testBoolColumn() {
+	BoolColumn* fa = new BoolColumn();
+	assert(fa->size() == 0);
+	for (size_t i = 0; i < 1000; i++) {
+		fa->push_back(1);
+	}
+	assert(fa->size() == 1000);
+	assert(fa->get(0) == 1);
+	printf("test bool col functions pass!\n");
+}
+
+void testStringArray() {
+	Array* fa = new Array();
+	assert(fa->length() == 0);
+	String* s = new String("hello world!");
+	for (size_t i = 0; i < 1000; i++) {
+		fa->append(s);
+	}
+	assert(fa->length() == 1000);
+	assert(dynamic_cast<String*>(fa->get(0))->equals(s));
+	printf("test str array functions pass!\n");
+}
+
+
+void testStringColumn() {
+	StringColumn* fa = new StringColumn();
+	String* s = new String("hello world!");
+	assert(fa->size() == 0);
+	for (size_t i = 0; i < 1000; i++) {
+		fa->push_back(s);
+	}
+	assert(fa->size() == 1000);
+	assert(fa->get(0)->equals(s));
+	printf("test str col functions pass!\n");
+}
+
+void testStringForRow() {
+	Schema s("SSS");
+	Row* row = new Row(s);
+	String* str = new String("hello world!");
+	assert(row->width() == 3);
+	row->set(0, (String*)str);
+	assert(row->get_string(0) == str);
+	printf("teststringsfor row passed!\n");
+}
+
+void testBoolsForRow() {
+	Schema s("BBB");
+	Row* row = new Row(s);
+	assert(row->width() == 3);
+	row->set(0, (bool)1);
+	assert(row->get_bool(0) == 1);
+	printf("testboolsfor row passed!\n");
+}
+
+
 int main(int argc, char **argv) {
   // testArray();
 	//test();
 	// test2();
-  test3();
+ test2();
+// testFloatsForRow();
+// testBoolArray();
+// testBoolColumn();
+// testBoolsForRow();
+// testStringArray();
+// testStringColumn();
+// testStringForRow();
 }

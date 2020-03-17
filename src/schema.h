@@ -220,8 +220,14 @@ public:
     }
     if (c->get_type() == 'F')
     {
+
+      FloatColumn* fc = dynamic_cast<FloatColumn*>(c);
+
+      fc->set(0, val);
+
       // c = c->as_float();
-      c->set(index_, val);
+
+      //c->set(index_, val);
     }
   }
   void set(size_t col, bool val)
@@ -238,8 +244,8 @@ public:
     }
     if (c->get_type() == 'B')
     {
-      //c = c->as_bool();
-      c->set(index_, val);
+      BoolColumn* bc = dynamic_cast<BoolColumn*>(c);
+      bc->set(0, val);
     }
   }
   /** Acquire ownership of the string. */
@@ -260,16 +266,9 @@ public:
     {
       // c = c->as_string();
 
-      printf("in row set string val cols: %i\n", &c->vals_);
-
-      c->set(index_, val);
+      StringColumn* sc = dynamic_cast<StringColumn*>(c);	
+      sc->set(0, val);
     }
-    // String* ourString = val->clone();
-    // Column* c = columns[col];
-    // if (c->get_type() == 'S') {
-    //   StringColumn* c_s = c->as_string();
-    //   c_s->vals_->set(index_, ourString);
-    // }
   }
 
   /** Set/get the index of this row (ie. its position in the dataframe. This is
@@ -305,7 +304,9 @@ public:
     Column *c = columns[col];
     // BoolColumn* c_b = c->as_bool()
     BoolColumn *c_b = dynamic_cast<BoolColumn *>(c);
-    return c_b->get(index_);
+    bool val = c_b->get(0);
+    printf("val??? %i\n", val);
+    return val;
   }
   float get_float(size_t col)
   {
@@ -436,8 +437,8 @@ public:
 
   ~Schema()
   {
-    delete[] row_names;
-    delete[] col_names;
+    delete row_names;
+    delete col_names;
   }
 
   void add_column(char typ, String *name)
