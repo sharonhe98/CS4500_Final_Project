@@ -39,6 +39,11 @@ public:
 
   virtual IntColumn* as_int()
   {
+   /* IntColumn* ic = new IntColumn();
+    for (size_t i = 0; i < length(); i++) {
+	ic->push_back(vals_->get(i));
+    }*/
+
     // if (get_type() == 'I') {
     return nullptr;
     //return IntColumn* i = dynamic_cast<IntColumn*>(this);
@@ -160,7 +165,9 @@ public:
   }
 
   int get(size_t idx) {
-    vals_->get(idx);
+    int val = vals_->get(idx);
+    printf("val got = %i\n", vals_->get(0));
+    return val;
   }
 
   IntColumn* as_int() {

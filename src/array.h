@@ -317,11 +317,10 @@ public:
   // returns the replace Object.
   int set(size_t nn, int oo)
   {
+    assert(nn == 0 || nn < size_);
     // if out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
-    {
-      printf("size =0\n");
-      return NULL;
+    if (size_ == 0) {
+	append(oo);
     }
     else
     {

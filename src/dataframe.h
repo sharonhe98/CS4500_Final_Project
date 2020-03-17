@@ -283,7 +283,6 @@ public:
    *  the right schema and be filled with values, otherwise undedined.  */
   void add_row(Row &row)
   {
-    printf("row name\n");
     scm.add_row(row.name);
 
     for (size_t i = 0; i < scm.width(); i++)
@@ -297,7 +296,6 @@ public:
       else if (cols[i]->get_type() == 'I')
       {
         cols[i]->push_back(row.get_int(0));
-        printf("\nadding row int: %i\n\n", row.get_int(0));
         // set(i, nrows() - 1, row.get_int(0));
       }
       else if (cols[i]->get_type() == 'F')
@@ -312,10 +310,7 @@ public:
       }
       else if (cols[i]->get_type() == 'S')
       {
-        printf("setting row in dataframe add row 1\n");
         cols[i]->push_back(row.get_string(0));
-        printf("setting row in dataframe add row 2\n");
-        printf("adding row: %s\n", row.get_string(0));
         // set(i, nrows() - 1, row.get_string(0));
       }
 
@@ -375,13 +370,11 @@ public:
   {
     for (size_t i = 0; i < nrows(); i++)
     {
-      printf("row idx: %i\t", i);
       for (size_t j = 0; j < ncols(); j++)
       {
         if (cols[j]->get_type() == 'I')
         {
-          p(cols[j]->as_int()->get(i));
-          printf("\t");
+          printf("< %i >/t", cols[j]->as_int()->get(i));
         }
         if (cols[j]->get_type() == 'B')
         {

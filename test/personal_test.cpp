@@ -94,7 +94,7 @@ void test3() {
     printf("test pos i is: %i\n", i);
     r.set(0,(int)22);
     r.set(1,(int)23);
-
+    printf("r at 0: %i\n", r.get_int(0));
     df.add_row(r);
 
     df.fill_row(i, r);

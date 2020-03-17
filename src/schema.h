@@ -188,10 +188,6 @@ public:
   /** Setters: set the given column with the given value. */
   void set(size_t col, int val)
   {
-    printf("col is %d\n", col);
-    printf("val is %d\n", val);
-    printf("int set is called\n");
-
     Column *c = nullptr;
 
     if (columns[col] == nullptr)
@@ -203,16 +199,11 @@ public:
     {
       c = columns[col];
     }
-    printf("c->type: %c\n", columns[col]->get_type());
     if (c->get_type() == 'I')
     {
-      //IntColumn* c_i = c->as_int();
-      //c = c->as_int();
-      printf("asInt OK - Checking set in Column\n");
-      printf("index is %d\n", index_);
+      IntColumn* ic = dynamic_cast<IntColumn*>(c);
 
-      c->set(index_, val);
-      printf("set in Column OK, %i\n", val);
+      ic->set(0, val);
     }
   }
   void set(size_t col, float val)
@@ -304,8 +295,8 @@ public:
   {
     assert(isRequestedType(col));
     Column *c = columns[col];
-    // IntColumn* c_i = c->as_int();
-    IntColumn *c_i = dynamic_cast<IntColumn *>(c);
+    IntColumn* c_i = c->as_int();
+    //IntColumn *c_i = dynamic_cast<IntColumn *>(c);
     return c_i->get(0);
   }
   bool get_bool(size_t col)
