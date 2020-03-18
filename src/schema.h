@@ -279,14 +279,14 @@ public:
     assert(isRequestedType(col));
     Column *c = columns[col];
     FloatColumn *c_f = dynamic_cast<FloatColumn *>(c);
-    return c_f->get(index_);
+    return c_f->get(0);
   }
   String *get_string(size_t col)
   {
     assert(isRequestedType(col));
     Column *c = columns[col];
     StringColumn *c_s = dynamic_cast<StringColumn *>(c);
-    return c_s->get(index_);
+    return c_s->get(0);
   }
 
   /** Number of fields in the row. */

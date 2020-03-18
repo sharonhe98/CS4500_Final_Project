@@ -107,8 +107,12 @@ public:
   // returns the replace Object.
   virtual Object *set(size_t nn, Object *oo)
   {
-    assert(nn < size_);
-    
+    assert(size_ == 0 || nn < size_);
+
+    if (size_ == 0) {
+      append(oo);
+    }
+        
     Object *res = elements_[nn];
     elements_[nn] = oo;
     return res;
@@ -286,7 +290,11 @@ public:
   // returns the replace Object.
   int set(size_t nn, int oo)
   {
-    assert(nn < size_);
+
+    assert(size_ == 0 || nn < size_);
+    if (size_ == 0) {
+      append(oo);
+    }
     
     int res = elements_[nn];
     elements_[nn] = oo;
@@ -469,7 +477,10 @@ public:
   // returns the replace Object.
   float set(size_t nn, float oo)
   {
-    assert(nn < size_);
+    assert(size_ == 0 || nn < size_);
+    if (size_ == 0) {
+      append(oo);
+    }
     
     float res = elements_[nn];
     elements_[nn] = oo;
@@ -657,7 +668,10 @@ public:
   // returns the replace Object.
   bool set(size_t nn, bool oo)
   {
-    assert(nn < size_);
+    assert(size_ == 0 || nn < size_);
+    if (size_ == 0) {
+      append(oo);
+    }
     
     bool res = elements_[nn];
     elements_[nn] = oo;

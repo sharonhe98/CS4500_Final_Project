@@ -338,7 +338,8 @@ public:
       {
         if (cols[j]->get_type() == 'I')
         {
-          printf("< %i >\t", cols[j]->as_int()->get(i));
+          printf("< %i >", cols[j]->as_int()->get(i));
+          printf("\t");
         }
         if (cols[j]->get_type() == 'B')
         {

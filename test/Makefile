@@ -3,3 +3,6 @@ build:
 
 run:
 	./a.out
+
+valgrind:
+	valgrind ./a.out
