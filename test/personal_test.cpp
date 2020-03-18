@@ -101,7 +101,7 @@ void test4() {
 	printf("schema is: %s\n", schemaFromFile);
 	Schema s(schemaFromFile);
 	
-	DataFrame df(s);
+	DataFrame df = sor->setDataFrame(f, 0, 100000);
 	df.print();	
 }
 

@@ -184,6 +184,46 @@ class SOR : public Object {
 
             }
         }
+
+// added by us,
+// set df values
+DataFrame setDataFrame(FILE* f, size_t from, size_t len) {
+	Schema s(getSchema(f, from, len));
+	DataFrame df(s);
+        seek_(f, from);
+        char buf[buff_len];
+
+        size_t total_bytes = 0;
+        while (fgets(buf, buff_len, f) != nullptr) {
+                total_bytes += strlen(buf);
+                if (total_bytes >= len) {
+                    break;
+                }
+		Row r(s);
+                size_t num_fields;
+                char** row = parse_row_(buf, &num_fields);
+		for (size_t i = 0; i < num_fields; i++) {
+			if (cols_[i]->get_type() == 'B') {
+				bool b = (bool)atoi(row[i]);
+				r.set(i, b);
+			}
+			else if (cols_[i]->get_type() == 'I') {
+				int in = atoi(row[i]);
+				r.set(i, in);
+			}
+			else if (cols_[i]->get_type() == 'F') {
+				float f = atof(row[i]);
+				r.set(i, f);
+			}
+			else {
+				String* str = new String(row[i]);
+				r.set(i, str);
+			}
+		}
+		df.add_row(r);
+	}
+	return df;	
+}
     
     //added by us after the fact
 //converts from ColumnType to String*
