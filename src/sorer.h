@@ -182,7 +182,7 @@ String* typeConvertToString(char type) {
 	// method added by us, separate from original implementation
 	char* getSchema() {
 		String* schemaString = new String("");
-		for (size_t i = 0; i < cap_; i++) {
+		for (size_t i = 0; i < len_; i++) {
             char colType = cols_[i]->get_type();
             String* typConvert = typeConvertToString(colType);
 

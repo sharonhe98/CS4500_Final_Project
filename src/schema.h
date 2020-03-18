@@ -396,8 +396,8 @@ public:
 
   ~Schema()
   {
-    delete row_names;
-    delete col_names;
+    //delete row_names;
+    //delete col_names;
   }
 
   void add_column(char typ, String *name)
