@@ -122,7 +122,6 @@ class SOR : public Object {
 
         // infers and creates the column objects
         void infer_columns_(FILE* f, size_t from, size_t len) {
-            printf("I hope it's called\n");
             seek_(f, from);
             char buf[buff_len];
 
