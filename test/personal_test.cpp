@@ -97,8 +97,7 @@ void testConcat() {
 void test4() {
 	FILE *f = fopen("../src/data.sor", "r");
 	SOR* sor = new SOR();
-	sor->infer_columns_(f, 0, 1000000); // pass in arbitraily large len
-	char* schemaFromFile = sor->getSchema();
+	char* schemaFromFile = sor->getSchema(f, 0, 1000000);
 	Schema s(schemaFromFile);
 	
 	DataFrame df(s);

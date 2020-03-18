@@ -100,8 +100,29 @@ class SOR : public Object {
             }
         }
 
+        // Helper to convert column type to an enum rank
+        ColumnType typeToEnum(char typ) {
+            if (typ == 'B') {
+                return type_bool;
+            }
+            if (typ == 'I') {
+                return type_int;
+            }
+            if (typ == 'F') {
+                return type_float;
+            }
+            if (typ == 'S') {
+                return type_string;
+            }
+            else {
+                return type_unknown;
+            }
+        }
+
+
         // infers and creates the column objects
         void infer_columns_(FILE* f, size_t from, size_t len) {
+            printf("I hope it's called\n");
             seek_(f, from);
             char buf[buff_len];
 
@@ -123,35 +144,42 @@ class SOR : public Object {
                         len_++;
                     }
                     char type = inferred_type(row[i]);
-                    if(type == 'B') {
-                        cols_[i] = new BoolColumn();
-                    }
-                    if(type == 'I') {
-                        cols_[i] = new IntColumn();
-                    }
-                    if(type == 'F') {
-                        cols_[i] = new FloatColumn();
-                    }
-                    else {
-                        cols_[i] = new StringColumn();
-                    }
-                    // if (inferred_type > cols_[i]->get_type()) {
-                    //     delete cols_[i];
-                    //     switch(inferred_type) {
-                    //         case type_bool:
-                    //             cols_[i] = new ColumnBool();
-                    //             break;
-                    //         case type_int:
-                    //             cols_[i] = new ColumnInt();
-                    //             break;                            
-                    //         case type_float:
-                    //             cols_[i] = new ColumnFloat();
-                    //             break;                               
-                    //         default:
-                    //             cols_[i] = new ColumnString();
-                    //             break;
-                    //     }
+                    ColumnType colType = typeToEnum(type);
+                    printf("what is type inferred %c\n", type);
+                    printf("columntypee: %i What is gettype: %c\n", colType, cols_[i]->get_type());
+                    // if(type == 'B') {
+                    //     cols_[i] = new BoolColumn();
                     // }
+                    // if(type == 'I') {
+                    //     cols_[i] = new IntColumn();
+                    // }
+                    // if(type == 'F') {
+                    //     cols_[i] = new FloatColumn();
+                    // }
+                    // else {
+                    //     cols_[i] = new StringColumn();
+                    // }
+                    if (colType > typeToEnum(cols_[i]->get_type())) {
+                        delete cols_[i];
+                        switch(colType) {
+                            case type_bool:
+                            printf("i %i is type bool\n", i);
+                                cols_[i] = new BoolColumn();
+                                break;
+                            case type_int:
+                            printf("i %i is type int\n", i);
+                                cols_[i] = new IntColumn();
+                                break;                            
+                            case type_float:
+                            printf("i %i is type flaot\n", i);
+                                cols_[i] = new FloatColumn();
+                                break;                               
+                            default:
+                            printf("i %i is type string\n", i);
+                                cols_[i] = new StringColumn();
+                                break;
+                        }
+                    }
                 }
                 delete[] row;
 
@@ -180,7 +208,8 @@ String* typeConvertToString(char type) {
 }
 
 	// method added by us, separate from original implementation
-	char* getSchema() {
+	char* getSchema(FILE* f, size_t from, size_t len) {
+        infer_columns_(f, from, len);
 		String* schemaString = new String("");
 		for (size_t i = 0; i < len_; i++) {
             char colType = cols_[i]->get_type();
