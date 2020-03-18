@@ -16,6 +16,26 @@ enum ColumnType {
     type_string = 3,
 };
 
+//added by us after the fact
+//converts from ColumnType to String*
+String* typeConvertToString(ColumnType type) {
+	if (type == type_bool) {
+		return new String("B");
+	}
+	if (type == type_int) {
+		return new String("I");
+	}
+	if (type == type_float) {
+		return new String("F");
+	}
+	if (type == type_string) {
+		return new String("S");
+	}
+	if (type == type_unknown) {
+		return new String("U");
+	}
+}
+
 // returns the inferred typing of the char*
 ColumnType infer_type(char *c) {
     // missing values

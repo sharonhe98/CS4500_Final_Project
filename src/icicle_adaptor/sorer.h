@@ -138,6 +138,15 @@ class SOR : public Object {
             }
         }
 
+	// method added by us, separate from original implementation
+	char* getSchema() {
+		String* schemaString = new String("");
+		for (size_t i = 0; i < cap_; i++) {
+			schemaString->append(cols_[i]->typeConvertToString(cols_[i]->get_type()));
+		}
+		return schemaString->c_str(); 
+	}
+
         // Find the start of the field value and null terminate it.
         // ASSUMPTION: input field is terminated by '>' char
         // NOTE: will mutate the field value

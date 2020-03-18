@@ -1,7 +1,8 @@
   
 #include <assert.h>
 #include "../src/dataframe.h"
-
+#include "../src/icicle_adaptor/column.h"
+#include "../src/icicle_adaptor/sorer.h"
 
 void testArray() {
   StringArray* sa = new StringArray();
@@ -85,6 +86,19 @@ void test3() {
 
   df.print();
   exit(0);
+}
+
+void test4() {
+	FILE *f = fopen("../src/data.sor", "r");
+	SOR sor = new SOR();
+	sor->infer_columns_(f, 0, 1000000); // pass in arbitraily large len
+	const char* schemaFromFile = sor->getSchema();
+	Schema s(schemaFromFile);
+	
+	DataFrame df(s);
+	df.print();
+
+	close(f);	
 }
 
 
@@ -192,7 +206,7 @@ int main(int argc, char **argv) {
   // testArray();
 	//test();
 	// test2();
- test2();
+ test4();
 // testFloatsForRow();
 // testBoolArray();
 // testBoolColumn();
