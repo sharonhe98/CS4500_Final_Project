@@ -10,27 +10,33 @@ class StringColumn;
 class FloatColumn;
 class BoolColumn;
 
-  // returns the inferred typing of the char*
-char inferred_type(char *c) {
-    // missing values
-    if (c == nullptr) {
-        return 'B';
+// returns the inferred typing of the char*
+char inferred_type(char *c)
+{
+  // missing values
+  if (c == nullptr)
+  {
+    return 'B';
+  }
+  // check boolean
+  if (strlen(c) == 1)
+  {
+    if ((*c == '0') || (*c == '1'))
+    {
+      return 'B';
     }
-    // check boolean
-    if (strlen(c) == 1) {
-        if ((*c == '0') || (*c == '1')) {
-            return 'B';
-        }
-    }
-    // check int
-    if (is_int(c)) {
-        return 'I';
-    }
-    // check float
-    if (is_float(c)) {
-        return 'F';
-    }
-    return 'S';
+  }
+  // check int
+  if (is_int(c))
+  {
+    return 'I';
+  }
+  // check float
+  if (is_float(c))
+  {
+    return 'F';
+  }
+  return 'S';
 }
 
 /**************************************************************************

@@ -178,19 +178,19 @@ public:
                     switch (colType)
                     {
                     case type_bool:
-                        printf("i %i is type bool\n", i);
+                        printf("i %zu is type bool\n", i);
                         cols_[i] = new BoolColumn();
                         break;
                     case type_int:
-                        printf("i %i is type int\n", i);
+                        printf("i %zu is type int\n", i);
                         cols_[i] = new IntColumn();
                         break;
                     case type_float:
-                        printf("i %i is type flaot\n", i);
+                        printf("i %zu is type flaot\n", i);
                         cols_[i] = new FloatColumn();
                         break;
                     default:
-                        printf("i %i is type string\n", i);
+                        printf("i %zu is type string\n", i);
                         cols_[i] = new StringColumn();
                         break;
                     }
@@ -300,7 +300,7 @@ public:
             char colType = cols_[i]->get_type();
             String *typConvert = typeConvertToString(colType);
 
-            schemaString = schemaString->concat(typeConvertToString(cols_[i]->get_type()));
+            schemaString = schemaString->concat(typConvert);
         }
         return schemaString->c_str();
     }

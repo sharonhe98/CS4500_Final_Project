@@ -109,10 +109,11 @@ public:
   {
     assert(size_ == 0 || nn < size_);
 
-    if (size_ == 0) {
+    if (size_ == 0)
+    {
       append(oo);
     }
-        
+
     Object *res = elements_[nn];
     elements_[nn] = oo;
     return res;
@@ -268,22 +269,22 @@ public:
     // if out of bounds, return NULL
     assert(nn < size_);
     // allocate memory for temp array with one less than size
-      int *temp = new int[size_ - 1];
-      // set the result to be returned to the element at given index
-      int res = elements_[nn];
-      // set temp to elements up to the index of removed
-      for (size_t i = 0; i < nn; i++)
-      {
-        temp[i] = elements_[i];
-      }
-      // set temp to elements after index of removed
-      for (size_t j = nn + 1; j < size_; j++)
-      {
-        temp[j - 1] = elements_[j];
-      }
-      // decrease array size
-      size_ -= 1;
-      return res;
+    int *temp = new int[size_ - 1];
+    // set the result to be returned to the element at given index
+    int res = elements_[nn];
+    // set temp to elements up to the index of removed
+    for (size_t i = 0; i < nn; i++)
+    {
+      temp[i] = elements_[i];
+    }
+    // set temp to elements after index of removed
+    for (size_t j = nn + 1; j < size_; j++)
+    {
+      temp[j - 1] = elements_[j];
+    }
+    // decrease array size
+    size_ -= 1;
+    return res;
   }
 
   // set n'th element to the given element
@@ -292,10 +293,11 @@ public:
   {
 
     assert(size_ == 0 || nn < size_);
-    if (size_ == 0) {
+    if (size_ == 0)
+    {
       append(oo);
     }
-    
+
     int res = elements_[nn];
     elements_[nn] = oo;
     return res;
@@ -455,22 +457,22 @@ public:
   {
     assert(nn < size_);
     // allocate memory for temp array with one less than size
-      float *temp = new float[size_ - 1];
-      // set the result to be returned to the element at given index
-      float res = elements_[nn];
-      // set temp to elements up to the index of removed
-      for (size_t i = 0; i < nn; i++)
-      {
-        temp[i] = elements_[i];
-      }
-      // set temp to elements after index of removed
-      for (size_t j = nn + 1; j < size_; j++)
-      {
-        temp[j - 1] = elements_[j];
-      }
-      // decrease array size
-      size_ -= 1;
-      return res;
+    float *temp = new float[size_ - 1];
+    // set the result to be returned to the element at given index
+    float res = elements_[nn];
+    // set temp to elements up to the index of removed
+    for (size_t i = 0; i < nn; i++)
+    {
+      temp[i] = elements_[i];
+    }
+    // set temp to elements after index of removed
+    for (size_t j = nn + 1; j < size_; j++)
+    {
+      temp[j - 1] = elements_[j];
+    }
+    // decrease array size
+    size_ -= 1;
+    return res;
   }
 
   // set n'th element to the given element
@@ -478,10 +480,11 @@ public:
   float set(size_t nn, float oo)
   {
     assert(size_ == 0 || nn < size_);
-    if (size_ == 0) {
+    if (size_ == 0)
+    {
       append(oo);
     }
-    
+
     float res = elements_[nn];
     elements_[nn] = oo;
     return res;
@@ -646,22 +649,22 @@ public:
     }
     assert(nn < size_);
     // allocate memory for temp array with one less than size
-      bool *temp = new bool[size_ - 1];
-      // set the result to be returned to the element at given index
-      bool res = elements_[nn];
-      // set temp to elements up to the index of removed
-      for (size_t i = 0; i < nn; i++)
-      {
-        temp[i] = elements_[i];
-      }
-      // set temp to elements after index of removed
-      for (size_t j = nn + 1; j < size_; j++)
-      {
-        temp[j - 1] = elements_[j];
-      }
-      // decrease array size
-      size_ -= 1;
-      return res;
+    bool *temp = new bool[size_ - 1];
+    // set the result to be returned to the element at given index
+    bool res = elements_[nn];
+    // set temp to elements up to the index of removed
+    for (size_t i = 0; i < nn; i++)
+    {
+      temp[i] = elements_[i];
+    }
+    // set temp to elements after index of removed
+    for (size_t j = nn + 1; j < size_; j++)
+    {
+      temp[j - 1] = elements_[j];
+    }
+    // decrease array size
+    size_ -= 1;
+    return res;
   }
 
   // set n'th element to the given element
@@ -669,10 +672,11 @@ public:
   bool set(size_t nn, bool oo)
   {
     assert(size_ == 0 || nn < size_);
-    if (size_ == 0) {
+    if (size_ == 0)
+    {
       append(oo);
     }
-    
+
     bool res = elements_[nn];
     elements_[nn] = oo;
     return res;
