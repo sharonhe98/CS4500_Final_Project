@@ -11,6 +11,14 @@
 // The maximum length of a line buffer. No lines over 4095 bytes
 static const int buff_len = 4096; 
 
+enum ColumnType {
+    type_unknown = -1,
+    type_bool = 0,
+    type_int = 1,
+    type_float = 2,
+    type_string = 3,
+};
+
 // Reads a file and determines the schema on read
 class SOR : public Object {
     public:
@@ -39,27 +47,27 @@ class SOR : public Object {
 
         // What is the type of the column at the given index? i
         // if the index is too big a -1 is returned
-        ColumnType get_col_type(size_t index) {
+        char get_col_type(size_t index) {
             if (index >= len_) {
-                return type_unknown;
+                return 'U';
             }
             return cols_[index]->get_type();
         }
         
         // What is the value for the given column index and row index?
         // If the coluumn or row index are too large a nullptr is returned
-        char* get_value(size_t col_index, size_t row_index) {
-            if (col_index >= len_) {
-                return nullptr;
-            }
-            return cols_[col_index]->get_char(row_index);
-        }
+        // char* get_value(size_t col_index, size_t row_index) {
+        //     if (col_index >= len_) {
+        //         return nullptr;
+        //     }
+        //     return cols_[col_index]->get_char(row_index);
+        // }
         
         // Is there a value at the given column and row index. 
         // If the indexes are too large, true is returned. 
-        bool is_missing(size_t col_index, size_t row_index) {
-            return get_value(col_index, row_index) == nullptr;
-        }
+        // bool is_missing(size_t col_index, size_t row_index) {
+        //     return get_value(col_index, row_index) == nullptr;
+        // }
 
         // Reads in the data from the file starting at the from byte 
         // and reading at most len bytes
@@ -111,38 +119,71 @@ class SOR : public Object {
                 for (size_t i = 0; i < num_fields; i++) {
                     check_reallocate_();
                     if (i >= len_) {
-                        cols_[i] = new ColumnBool();
+                        cols_[i] = new BoolColumn();
                         len_++;
                     }
-                    ColumnType inferred_type = infer_type(row[i]);
-                    if (inferred_type > cols_[i]->get_type()) {
-                        delete cols_[i];
-                        switch(inferred_type) {
-                            case type_bool:
-                                cols_[i] = new ColumnBool();
-                                break;
-                            case type_int:
-                                cols_[i] = new ColumnInt();
-                                break;                            
-                            case type_float:
-                                cols_[i] = new ColumnFloat();
-                                break;                               
-                            default:
-                                cols_[i] = new ColumnString();
-                                break;
-                        }
+                    char type = inferred_type(row[i]);
+                    if(type == 'B') {
+                        cols_[i] = new BoolColumn();
                     }
+                    if(type == 'I') {
+                        cols_[i] = new IntColumn();
+                    }
+                    if(type == 'F') {
+                        cols_[i] = new FloatColumn();
+                    }
+                    else {
+                        cols_[i] = new StringColumn();
+                    }
+                    // if (inferred_type > cols_[i]->get_type()) {
+                    //     delete cols_[i];
+                    //     switch(inferred_type) {
+                    //         case type_bool:
+                    //             cols_[i] = new ColumnBool();
+                    //             break;
+                    //         case type_int:
+                    //             cols_[i] = new ColumnInt();
+                    //             break;                            
+                    //         case type_float:
+                    //             cols_[i] = new ColumnFloat();
+                    //             break;                               
+                    //         default:
+                    //             cols_[i] = new ColumnString();
+                    //             break;
+                    //     }
+                    // }
                 }
                 delete[] row;
 
             }
         }
+    
+    //added by us after the fact
+//converts from ColumnType to String*
+String* typeConvertToString(char type) {
+	if (type == 'B') {
+		return new String("B");
+	}
+	if (type == 'I') {
+		return new String("I");
+	}
+	if (type == 'F') {
+		return new String("F");
+	}
+	if (type == 'S') {
+		return new String("S");
+	}
+	if (type == 'U') {
+		return new String("U");
+	}
+}
 
 	// method added by us, separate from original implementation
 	char* getSchema() {
 		String* schemaString = new String("");
 		for (size_t i = 0; i < cap_; i++) {
-			schemaString->append(cols_[i]->typeConvertToString(cols_[i]->get_type()));
+            printf("what is it? %s\n", typeConvertToString(cols_[i]->get_type())->c_str());
+			schemaString->concat(typeConvertToString(cols_[i]->get_type()));
 		}
 		return schemaString->c_str(); 
 	}
@@ -249,9 +290,9 @@ class SOR : public Object {
                 // add all fields in this row to columns
                 for (size_t i = 0; i < len_; i++) {
                     if (i >= num_fields || row[i] == nullptr) {
-                        cols_[i]->add_nullptr();
+                        cols_[i]->push_back(nullptr);
                     } else {
-                        cols_[i]->add(row[i]);
+                        cols_[i]->push_back(row[i]);
                     }
                 }
                 delete[] row;

@@ -1,5 +1,7 @@
 #pragma once
+
 #include "array.h"
+#include "helpers.h"
 #include <stdarg.h>
 
 // forward declaration
@@ -7,6 +9,29 @@ class IntColumn;
 class StringColumn;
 class FloatColumn;
 class BoolColumn;
+
+  // returns the inferred typing of the char*
+char inferred_type(char *c) {
+    // missing values
+    if (c == nullptr) {
+        return 'B';
+    }
+    // check boolean
+    if (strlen(c) == 1) {
+        if ((*c == '0') || (*c == '1')) {
+            return 'B';
+        }
+    }
+    // check int
+    if (is_int(c)) {
+        return 'I';
+    }
+    // check float
+    if (is_float(c)) {
+        return 'F';
+    }
+    return 'S';
+}
 
 /**************************************************************************
 * Column ::
@@ -89,6 +114,16 @@ public:
   {
     return type_;
   };
+
+  // checks if the value represented by the char* can be added to this column
+  virtual bool can_add(char *c)
+  {
+    if (c == nullptr)
+    {
+      return true;
+    }
+    return false;
+  }
 };
 
 /*************************************************************************
@@ -165,6 +200,15 @@ public:
   char get_type()
   {
     return type_;
+  }
+
+  bool can_add(char *c)
+  {
+    if (c == nullptr || inferred_type(c) == 'I' || inferred_type(c) == 'B')
+    {
+      return true;
+    }
+    return false;
   }
 };
 
@@ -250,6 +294,11 @@ public:
   {
     return type_;
   }
+
+  bool can_add(char *c)
+  {
+    return true;
+  }
 };
 
 /*************************************************************************
@@ -323,6 +372,15 @@ public:
   {
     return type_;
   }
+
+  bool can_add(char *c)
+  {
+    if (c == nullptr || inferred_type(c) == 'F' || inferred_type(c) == 'B' || inferred_type(c) == 'I')
+    {
+      return true;
+    }
+    return false;
+  }
 };
 
 /*************************************************************************
@@ -395,5 +453,14 @@ public:
   char get_type()
   {
     return type_;
+  }
+
+  bool can_add(char *c)
+  {
+    if (c == nullptr || inferred_type(c) == 'B')
+    {
+      return true;
+    }
+    return false;
   }
 };

@@ -1,8 +1,8 @@
   
 #include <assert.h>
 #include "../src/dataframe.h"
-#include "../src/icicle_adaptor/column.h"
-#include "../src/icicle_adaptor/sorer.h"
+// #include "../src/icicle_adaptor/column.h"
+#include "../src/sorer.h"
 
 void testArray() {
   StringArray* sa = new StringArray();
@@ -88,17 +88,24 @@ void test3() {
   exit(0);
 }
 
+void testConcat() {
+  String* hello = new String("hello");
+  String* world = new String("world");
+  String* helloworld = hello->concat(world);
+  String* expected = new String("helloworld");
+  printf("hheheh %s\n", helloworld->c_str());
+  assert(helloworld->equals(expected));
+}
+
 void test4() {
 	FILE *f = fopen("../src/data.sor", "r");
-	SOR sor = new SOR();
+	SOR* sor = new SOR();
 	sor->infer_columns_(f, 0, 1000000); // pass in arbitraily large len
-	const char* schemaFromFile = sor->getSchema();
+	char* schemaFromFile = sor->getSchema();
 	Schema s(schemaFromFile);
 	
 	DataFrame df(s);
-	df.print();
-
-	close(f);	
+	df.print();	
 }
 
 
@@ -206,6 +213,7 @@ int main(int argc, char **argv) {
   // testArray();
 	//test();
 	// test2();
+ //testConcat();
  test4();
 // testFloatsForRow();
 // testBoolArray();

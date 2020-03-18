@@ -85,17 +85,14 @@ public:
 
     // returns a new String that is the result of concatenating this String's characters
 	// with those of a given String
-	String* concat(String * other) {
-		char* res = new char[size_ + other->size() + 1];
-		for (size_t i = 0; i < size_; i++) {
-			res[i] = cstr_[i];
-		}
-		for (size_t i = size_, j = 0; i < size_ + other->size(); i++, j++) {
-			res[i] = cstr_[j];
-		}
-		res[size_] = '\0';
-		return new String(res);
-	};
+	// returns a new concatenated string: this + o
+        String* concat(String* s) {
+        size_t res_size = size_ + s->size_ + 1;
+        char* array_s = new char[res_size];
+        strcpy(array_s, cstr_);
+        strcat(array_s, s->cstr_);
+        return new String(array_s);
+    }
 
     size_t allocateSize() {
         printf("allocated string size %i\n", size_ + 1);
