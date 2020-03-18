@@ -98,6 +98,7 @@ void test4() {
 	FILE *f = fopen("../src/data.sor", "r");
 	SOR* sor = new SOR();
 	char* schemaFromFile = sor->getSchema(f, 0, 1000000);
+	printf("schema is: %s\n", schemaFromFile);
 	Schema s(schemaFromFile);
 	
 	DataFrame df(s);
