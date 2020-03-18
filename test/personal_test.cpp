@@ -37,8 +37,6 @@ void test() {
     //printf("INT SET 2!!\n");
     df.add_row(r);
     printf("ADD ROW PASSED!\n");
-    printf("row num %i\n", df.nrows());
-    printf("col num %i\n", df.ncols());
   }
   
   exit(0);
@@ -73,7 +71,6 @@ void test3() {
   printf("DATAFRAME IS BUILT!\n");
   Row  r(df.get_schema());
   printf("ROW IS BUILLTTTTT!\n");
-  String* str = new String("hello world!");
   for(size_t i = 0; i <  2 * 2; i++) {
     r.set(0,(int)22);
     r.set(1,(int)23);

@@ -176,14 +176,18 @@ String* typeConvertToString(char type) {
 	if (type == 'U') {
 		return new String("U");
 	}
+    assert(false);
 }
 
 	// method added by us, separate from original implementation
 	char* getSchema() {
 		String* schemaString = new String("");
 		for (size_t i = 0; i < cap_; i++) {
-            printf("what is it? %s\n", typeConvertToString(cols_[i]->get_type())->c_str());
-			schemaString->concat(typeConvertToString(cols_[i]->get_type()));
+            char colType = cols_[i]->get_type();
+            String* typConvert = typeConvertToString(colType);
+
+            printf("what is it? %s\n", typConvert->c_str());
+			schemaString = schemaString->concat(typeConvertToString(cols_[i]->get_type()));
 		}
 		return schemaString->c_str(); 
 	}

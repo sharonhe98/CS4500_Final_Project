@@ -97,7 +97,7 @@ public:
   /** Returns the number of elements in the column. */
   virtual size_t size()
   {
-    vals_->length();
+    return vals_->length();
   };
 
   virtual void set(size_t idx, int val)
@@ -194,7 +194,7 @@ public:
 
   size_t size()
   {
-    vals_->length();
+    return vals_->length();
   }
 
   char get_type()
@@ -287,7 +287,7 @@ public:
 
   size_t size()
   {
-    vals_->length();
+    return vals_->length();
   }
 
   char get_type()

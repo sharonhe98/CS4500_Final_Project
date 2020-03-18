@@ -107,18 +107,11 @@ public:
   // returns the replace Object.
   virtual Object *set(size_t nn, Object *oo)
   {
-    // check if out of bounds
-    assert(size_ == 0 || nn < size_);
-    if (size_ == 0)
-    {
-      append(oo);
-    }
-    else
-    {
-      Object *res = elements_[nn];
-      elements_[nn] = oo;
-      return res;
-    }
+    assert(nn < size_);
+    
+    Object *res = elements_[nn];
+    elements_[nn] = oo;
+    return res;
   }
 
   // get the index of an object in the array
@@ -269,13 +262,8 @@ public:
   int remove(size_t nn)
   {
     // if out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
-    {
-      return NULL;
-    }
-    else
-    {
-      // allocate memory for temp array with one less than size
+    assert(nn < size_);
+    // allocate memory for temp array with one less than size
       int *temp = new int[size_ - 1];
       // set the result to be returned to the element at given index
       int res = elements_[nn];
@@ -292,25 +280,17 @@ public:
       // decrease array size
       size_ -= 1;
       return res;
-    }
   }
 
   // set n'th element to the given element
   // returns the replace Object.
   int set(size_t nn, int oo)
   {
-    // check if out of bounds
-    assert(nn == 0 || nn < size_);
-    if (size_ == 0)
-    {
-      append(oo);
-    }
-    else
-    {
-      int res = elements_[nn];
-      elements_[nn] = oo;
-      return res;
-    }
+    assert(nn < size_);
+    
+    int res = elements_[nn];
+    elements_[nn] = oo;
+    return res;
   }
 
   // return size of array
@@ -465,14 +445,8 @@ public:
   // returning the removed item to the caller
   float remove(size_t nn)
   {
-    // if out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
-    {
-      return NULL;
-    }
-    else
-    {
-      // allocate memory for temp array with one less than size
+    assert(nn < size_);
+    // allocate memory for temp array with one less than size
       float *temp = new float[size_ - 1];
       // set the result to be returned to the element at given index
       float res = elements_[nn];
@@ -489,25 +463,17 @@ public:
       // decrease array size
       size_ -= 1;
       return res;
-    }
   }
 
   // set n'th element to the given element
   // returns the replace Object.
   float set(size_t nn, float oo)
   {
-    // check if out of bounds
-    assert(size_ == 0 || nn < size_);
-    if (size_ == 0)
-    {
-      append(oo);
-    }
-    else
-    {
-      float res = elements_[nn];
-      elements_[nn] = oo;
-      return res;
-    }
+    assert(nn < size_);
+    
+    float res = elements_[nn];
+    elements_[nn] = oo;
+    return res;
   }
 
   // return size of array
@@ -667,9 +633,8 @@ public:
     {
       return NULL;
     }
-    else
-    {
-      // allocate memory for temp array with one less than size
+    assert(nn < size_);
+    // allocate memory for temp array with one less than size
       bool *temp = new bool[size_ - 1];
       // set the result to be returned to the element at given index
       bool res = elements_[nn];
@@ -686,24 +651,17 @@ public:
       // decrease array size
       size_ -= 1;
       return res;
-    }
   }
 
   // set n'th element to the given element
   // returns the replace Object.
   bool set(size_t nn, bool oo)
   {
-    assert(size_ == 0 || nn < size_);
-    if (size_ == 0)
-    {
-      append(oo);
-    }
-    else
-    {
-      bool res = elements_[nn];
-      elements_[nn] = oo;
-      return res;
-    }
+    assert(nn < size_);
+    
+    bool res = elements_[nn];
+    elements_[nn] = oo;
+    return res;
   }
 
   // return size of array

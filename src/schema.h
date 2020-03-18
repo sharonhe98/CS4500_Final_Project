@@ -372,7 +372,7 @@ public:
   {
     row_names = new StringArray();
     col_names = new StringArray();
-    track_types = "";
+    track_types = nullptr;
     col_size = 0;
   }
 

@@ -95,7 +95,6 @@ public:
     }
 
     size_t allocateSize() {
-        printf("allocated string size %i\n", size_ + 1);
         return size_ + 1;
     }
 
