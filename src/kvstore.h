@@ -14,16 +14,43 @@ class Key : public Object {
 
 }
 
-class Value {}
-
 class KVStore : public Object {
 	public:
-		Key** keys_;
-		Value** values_;
+		size_t num_nodes;
+		Array* keys_;
+		StringArray* values_;
+
+	KVStore(size_t nodes) {
+		num_nodes = nodes;
+		
+	}
 
 	// TODO: figure out constructor
 	
-	Value* get(Key* key) {
-		return value_;
+	String* get(Key* key) {
+		for (size_t i = 0; i < keys_->length(); i++) {
+			if (keys->get(i)->equals(key)) {
+				return value_;
+			}
+		}
+		return nullptr;
+	}
+
+	void set(Key* key, String* value) {
+		if (keys_->index_of_(key) > keys_->length()) {
+			keys_->append(key);
+			values->push_back(value);
+		}
+		else {
+			for (size_t i = 0; i < keys_->length(); i++) {
+				if (keys->get(i)->equals(key)) {
+					values->set(i, value_);
+				}
+			}
+		}
+	}
+
+	String* getAndWait(Key* k) {
+		return get(k);
 	}
 }
