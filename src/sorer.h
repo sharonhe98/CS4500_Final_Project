@@ -65,18 +65,21 @@ public:
 
     // What is the value for the given column index and row index?
     // If the coluumn or row index are too large a nullptr is returned
-    // char* get_value(size_t col_index, size_t row_index) {
-    //     if (col_index >= len_) {
-    //         return nullptr;
-    //     }
-    //     return cols_[col_index]->get_char(row_index);
-    // }
+    char *get_value(size_t col_index, size_t row_index)
+    {
+        if (col_index >= len_)
+        {
+            return nullptr;
+        }
+        return cols_[col_index]->get_char(row_index);
+    }
 
     // Is there a value at the given column and row index.
     // If the indexes are too large, true is returned.
-    // bool is_missing(size_t col_index, size_t row_index) {
-    //     return get_value(col_index, row_index) == nullptr;
-    // }
+    bool is_missing(size_t col_index, size_t row_index)
+    {
+        return get_value(col_index, row_index) == nullptr;
+    }
 
     // Reads in the data from the file starting at the from byte
     // and reading at most len bytes
@@ -118,6 +121,7 @@ public:
     }
 
     // Helper to convert column type to an enum rank
+
     ColumnType typeToEnum(char typ)
     {
         if (typ == 'B')
@@ -220,42 +224,46 @@ public:
             Row r(s);
             size_t num_fields;
             char **row = parse_row_(buf, &num_fields);
-
+            size_t row_count = 0;
             for (size_t i = 0; i < df->ncols(); i++)
             {
-                if (cols_[i]->get_type() == 'B')
+                if (i >= num_fields)
                 {
-
-                    if (row[i])
-                    {
-                        bool b = (bool)atoi(row[i]);
-                        r.set(i, b);
+                    if(cols_[i]->get_type() == 'I') {
+                        r.set(i, (int)NULL);
                     }
+                    if(cols_[i]->get_type() == 'F') {
+                        r.set(i, (float)NULL);
+                    }
+                    if(cols_[i]->get_type() == 'B') {
+                        r.set(i, (bool)NULL);
+                    }
+                    else {
+                        String* mt = new String("");
+                        r.set(i, mt);
+                    }
+                    
+                }
+
+                else if (cols_[i]->get_type() == 'B')
+                {
+                    bool b = (bool)atoi(row[i]);
+                    r.set(i, b);
                 }
                 else if (cols_[i]->get_type() == 'I')
                 {
-
-                    if (row[i])
-                    {
-                        int in = atoi(row[i]);
-                        r.set(i, in);
-                    }
+                    int in = atoi(row[i]);
+                    r.set(i, in);
                 }
                 else if (cols_[i]->get_type() == 'F')
                 {
-                    if (row[i])
-                    {
-                        float f = atof(row[i]);
-                        r.set(i, f);
-                    }
+                    float f = atof(row[i]);
+                    r.set(i, f);
                 }
                 else
                 {
-                    if (row[i])
-                    {
-                        String *str = new String(row[i]);
-                        r.set(i, str);
-                    }
+                    String *str = new String(row[i]);
+                    r.set(i, str);
                 }
             }
             df->add_row(r);

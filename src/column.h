@@ -130,6 +130,12 @@ public:
     }
     return false;
   }
+
+  // returns the string representation of the object at the ith index
+  virtual char *get_char(size_t i)
+  {
+    return nullptr;
+  }
 };
 
 /*************************************************************************
@@ -216,6 +222,16 @@ public:
     }
     return false;
   }
+
+  // gets the string representation of the ith element
+        char* get_char(size_t i) {
+            if (i >= size() || vals_->get(i) == NULL) {
+                return nullptr;
+            }
+            char* ret = new char[512];
+            sprintf(ret, "%d", vals_->get(i));
+            return ret;
+        }
 };
 
 // Other primitive column classes similar...
@@ -305,6 +321,25 @@ public:
   {
     return true;
   }
+
+  // returns the string representation of the element at the ith index
+  char *get_char(size_t i)
+  {
+    if (i >= size() || vals_->get(i) == nullptr)
+    {
+      return nullptr;
+    }
+    size_t str_len = vals_->get(i)->size();
+    char *ret = new char[str_len + 3];
+    ret[0] = '"';
+    for (size_t j = 0; j < str_len; j++)
+    {
+      ret[j + 1] = vals_->get(i)->c_str()[j];
+    }
+    ret[str_len + 1] = '"';
+    ret[str_len + 2] = '\0';
+    return ret;
+  }
 };
 
 /*************************************************************************
@@ -387,6 +422,16 @@ public:
     }
     return false;
   }
+
+  // get string rep of element at ith index
+        char* get_char(size_t i) {
+            if (i >= size() || vals_->get(i) == NULL) {
+                return nullptr;
+            }
+            char* ret = new char[512];
+            sprintf(ret, "%f", vals_->get(i));
+            return ret;
+        }
 };
 
 /*************************************************************************
@@ -469,4 +514,14 @@ public:
     }
     return false;
   }
+
+  // get str representation of ith element
+        char* get_char(size_t i) {
+            if (i >= size() || vals_->get(i) == NULL) {
+                return nullptr;
+            }
+            char* ret = new char[512];
+            sprintf(ret, "%d", vals_->get(i));
+            return ret;
+        }
 };
