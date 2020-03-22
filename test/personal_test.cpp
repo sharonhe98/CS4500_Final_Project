@@ -31,7 +31,7 @@ void test()
 	printf("DATAFRAME IS BUILT!\n");
 	Row r(df.get_schema());
 	printf("ROW IS BUILLTTTTT!\n");
-	for (size_t i = 0; i < 1000 * 1000; i++)
+	for (size_t i = 0; i < 100 * 1000; i++)
 	{
 		//  printf("working?!!\n");
 		r.set(0, (int)i);
@@ -100,6 +100,13 @@ void testConcat()
 	assert(helloworld->equals(expected));
 }
 
+void testGetSchema() {
+	FILE *f = fopen("../src/data.sor", "r");
+	SOR *sor = new SOR();
+	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
+	assert(strcmp(schemaFromFile, "BISFI") == 0);	
+}
+
 void test4()
 {
 	FILE *f = fopen("../src/data.sor", "r");
@@ -109,6 +116,13 @@ void test4()
 	Schema s(schemaFromFile);
 
 	DataFrame *df = sor->setDataFrame(f, 0, 100000);
+	df->print();
+}
+
+void test5() {
+	FILE *f = fopen("../src/3.sor", "r");
+	SOR *sor = new SOR();
+	DataFrame *df = sor->setDataFrame(f, 0, 10000000);
 	df->print();
 }
 
@@ -225,16 +239,18 @@ void testBoolsForRow()
 
 int main(int argc, char **argv)
 {
-	// testArray();
-	//test();
-	// test2();
-	//testConcat();
+	testArray();
+	test();
+	test2();
+	testConcat();
 	test4();
-	// testFloatsForRow();
-	// testBoolArray();
-	// testBoolColumn();
-	// testBoolsForRow();
-	// testStringArray();
-	// testStringColumn();
-	// testStringForRow();
+	testFloatsForRow();
+	testBoolArray();
+	testBoolColumn();
+	testBoolsForRow();
+	testStringArray();
+	testStringColumn();
+	testStringForRow();
+	testGetSchema();
+	test5();
 }
