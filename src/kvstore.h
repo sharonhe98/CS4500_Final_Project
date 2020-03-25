@@ -5,6 +5,7 @@
 #include "object.h"
 #include "array.h"
 #include "dataframe.h"
+#include "map.h"
 
 class Key : public Object {
 	public:
