@@ -1,18 +1,22 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include "string.h"
 #include "object.h"
+#include "array.h"
+#include "dataframe.h"
 
 class Key : public Object {
 	public:
 		String* key;
 		size_t home_node_;
 
-	Key(const char* search_key, node_number) {
+	Key(const char* search_key, size_t node_number) {
 		key = new String(search_key);
 		home_node_ = node_number;
 	}
 
-}
+};
 
 class KVStore : public Object {
 	public:
@@ -29,22 +33,22 @@ class KVStore : public Object {
 	
 	String* get(Key* key) {
 		for (size_t i = 0; i < keys_->length(); i++) {
-			if (keys->get(i)->equals(key)) {
-				return value_;
+			if (keys_->get_(i)->equals(key)) {
+				return values_->get(i);
 			}
 		}
 		return nullptr;
 	}
 
 	void set(Key* key, String* value) {
-		if (keys_->index_of_(key) > keys_->length()) {
+		if (keys_->index_of(key) > keys_->length()) {
 			keys_->append(key);
-			values->push_back(value);
+			values_->append(value);
 		}
 		else {
 			for (size_t i = 0; i < keys_->length(); i++) {
-				if (keys->get(i)->equals(key)) {
-					values->set(i, value_);
+				if (keys_->get_(i)->equals(key)) {
+					values_->set(i, value);
 				}
 			}
 		}
@@ -53,7 +57,7 @@ class KVStore : public Object {
 	String* getAndWait(Key* k) {
 		return get(k);
 	}
-}
+};
 
 // a class to talk to the application
 class KDStore {
@@ -61,10 +65,10 @@ class KDStore {
 		KVStore* kv_;
 
 	KDStore(KVStore& kv) {
-		kv_ = kv;
+		kv_ = &kv;
 	}
 
 	DataFrame* get(Key key) {
 
 	}
-}
+};
