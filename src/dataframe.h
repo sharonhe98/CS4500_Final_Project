@@ -2,6 +2,7 @@
 #include "string.h"
 #include "column.h"
 #include "schema.h"
+#include "map.h"
 /****************************************************************************
  * DataFrame::
  *
@@ -360,5 +361,17 @@ public:
       }
       printf("\n");
     }
+  }
+
+  // basic implementation of fromArray using only floats
+  DataFrame fromArray(Key key, KVStore kv, size_t SZ, float* vals) {
+	Schema s("F");
+	Serializer serial;
+	DataFrame df = new DataFrame(s);
+	for (size_t i = 0; i < SZ; i++) {
+		df.set(i, 0, vals[i]);
+	}
+	kv.put(key, df); // first we have to serialize df whoops
+	return df;
   }
 };
