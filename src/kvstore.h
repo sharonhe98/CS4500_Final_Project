@@ -54,3 +54,17 @@ class KVStore : public Object {
 		return get(k);
 	}
 }
+
+// a class to talk to the application
+class KDStore {
+	public:
+		KVStore* kv_;
+
+	KDStore(KVStore& kv) {
+		kv_ = kv;
+	}
+
+	DataFrame* get(Key key) {
+
+	}
+}
