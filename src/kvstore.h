@@ -43,8 +43,16 @@ class KVStore : public Object {
 		kvstore->set(key, value);
 	}
 
+	// getAndWait vs waitAndGet???
 	String* getAndWait(Key* k) {
 		return get(k);
+	}
+
+	DataFrame* waitAndGet(Key* key) {
+		// somehow wait for all threads to finish
+		// when threads are finished, get value
+		// create DataFrame after values are gotten
+		// return the dataframe
 	}
 };
 
