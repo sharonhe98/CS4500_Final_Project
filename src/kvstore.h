@@ -40,7 +40,7 @@ class KVStore : public Object {
 	}
 
 	void put(Key* key, String* value) {
-		kvstore->put(key, value);
+		kvstore->set(key, value);
 	}
 
 	String* getAndWait(Key* k) {
