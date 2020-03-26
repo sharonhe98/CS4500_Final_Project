@@ -3,6 +3,11 @@
 #include "column.h"
 #include "schema.h"
 #include "map.h"
+#include "serial.h"
+
+class Key;
+class KVStore;
+
 /****************************************************************************
  * DataFrame::
  *
@@ -156,7 +161,7 @@ public:
       exit(1);
     }
   }
-  float get_float(size_t col, size_t row)
+  double get_float(size_t col, size_t row)
   {
     if (cols[col]->get_type() != 'F' || col >= scm.width() || row >= scm.length())
     {
@@ -213,11 +218,11 @@ public:
     assert(c->get_type() == 'B');
     c->set(row, val);
   }
-  void set(size_t col, size_t row, float val)
+  void set(size_t col, size_t row, double val)
   {
     Column *c = cols[col];
     assert(c->get_type() == 'F');
-    c->set(row, val);
+    c->set(row, (double)val);
   }
   void set(size_t col, size_t row, String *val)
   {
@@ -349,7 +354,7 @@ public:
         }
         if (cols[j]->get_type() == 'F')
         {
-          printf("< %f >", cols[j]->as_float()->get(i));
+          printf("< %d >", cols[j]->as_float()->get(i));
           printf("\t");
         }
         if (cols[j]->get_type() == 'S')
@@ -363,15 +368,15 @@ public:
     }
   }
 
-  // basic implementation of fromArray using only floats
-  DataFrame fromArray(Key key, KVStore kv, size_t SZ, float* vals) {
+  // basic implementation of fromArray using only doubles
+  DataFrame fromArray(Key key, KVStore kv, size_t SZ, double* vals) {
 	Schema s("F");
 	Serializer serial;
-	DataFrame df = new DataFrame(s);
+	DataFrame* df = new DataFrame(s);
 	for (size_t i = 0; i < SZ; i++) {
 		df.set(i, 0, vals[i]);
 	}
-	kv.put(key, df); // first we have to serialize df whoops
+	//kv.put(key, df); // first we have to serialize df whoops
 	return df;
   }
 };

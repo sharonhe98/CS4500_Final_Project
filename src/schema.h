@@ -23,7 +23,7 @@ public:
 
   /** Called for fields of the argument's type with the value of the field. */
   virtual void accept(bool b);
-  virtual void accept(float f);
+  virtual void accept(double f);
   virtual void accept(int i);
   virtual void accept(String *s);
 
@@ -42,7 +42,7 @@ public:
               << "\t";
   }
 
-  void accept(float f)
+  void accept(double f)
   {
     std::cout << "<" << f << ">"
               << "\t";
@@ -181,7 +181,7 @@ public:
       ic->set(0, val);
     }
   }
-  void set(size_t col, float val)
+  void set(size_t col, double val)
   {
     Column *c = nullptr;
     if (columns[col] == nullptr)
@@ -274,7 +274,7 @@ public:
     bool val = c_b->get(0);
     return val;
   }
-  float get_float(size_t col)
+  double get_float(size_t col)
   {
     assert(isRequestedType(col));
     Column *c = columns[col];

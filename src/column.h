@@ -91,7 +91,7 @@ public:
   {
     return;
   };
-  virtual void push_back(float val)
+  virtual void push_back(double val)
   {
     return;
   };
@@ -112,7 +112,7 @@ public:
     return;
   }
   virtual void set(size_t index_, bool val) {}
-  virtual void set(size_t index_, float val) {}
+  virtual void set(size_t index_, double val) {}
   virtual void set(size_t index_, String *val) {}
 
   /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'.*/
@@ -360,7 +360,7 @@ public:
     vals_ = new FloatArray();
   }
 
-  FloatColumn(float n, ...)
+  FloatColumn(double n, ...)
   {
     type_ = 'F';
     va_list args;
@@ -370,7 +370,7 @@ public:
 
     for (int i = 0; i < n; i++)
     {
-      vals_->append(va_arg(args, float));
+      vals_->append(va_arg(args, double));
     }
 
     va_end(args);
@@ -383,12 +383,12 @@ public:
     colName_ = name;
   }
 
-  void push_back(float val)
+  void push_back(double val)
   {
     vals_->append(val);
   }
 
-  float get(size_t idx)
+  double get(size_t idx)
   {
     return vals_->get(idx);
   }
@@ -399,7 +399,7 @@ public:
   }
 
   /** Set value at idx. An out of bound idx is undefined.  */
-  void set(size_t idx, float val)
+  void set(size_t idx, double val)
   {
     vals_->set(idx, val);
   }
@@ -429,7 +429,7 @@ public:
                 return nullptr;
             }
             char* ret = new char[512];
-            sprintf(ret, "%f", vals_->get(i));
+            sprintf(ret, "%d", vals_->get(i));
             return ret;
         }
 };

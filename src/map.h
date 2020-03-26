@@ -70,7 +70,7 @@ public:
 			return nullptr;
 		}
 		// else return the corresponding value
-		return values_->get(index);
+		return values_->get_(index);
 	}
 
 	// Sets the value at the specified key to the value
@@ -109,7 +109,7 @@ public:
 		}
 		else
 		{
-			Object *val = values_->get(index);
+			Object *val = values_->get_(index);
 			// if the key exists, remove both the key and value pair
 			keys_->remove(index);
 			values_->remove(index);
@@ -265,13 +265,13 @@ public:
 	// Gets all the keys of this map
 	String **getKeys()
 	{
-		return keys_->str_elements_;
+		return keys_->elements_;
 	}
 
 	// Gets all the values of this map
 	String **getValues()
 	{
-		return values_->str_elements_;
+		return values_->elements_;
 	}
 
 	// Checks if this map is equal to another object

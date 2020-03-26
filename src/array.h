@@ -403,7 +403,7 @@ class FloatArray : public Array
 {
 public:
   // elements_ is a pointer to a int* that we stored
-  float *elements_;
+  double *elements_;
   // size of the array
   size_t size_;
 
@@ -420,10 +420,10 @@ public:
   ~FloatArray() {}
 
   // putting an item at the end of the array
-  void append(float oo)
+  void append(double oo)
   {
     // allocate memory for result array with larger size
-    float *res = new float[size_ + 1];
+    double *res = new double[size_ + 1];
     // if empty array, set first element of result array
     if (size_ == 0)
     {
@@ -445,39 +445,15 @@ public:
   }
 
   // get the n'th item in the array
-  float get(size_t nn)
+  double get(size_t nn)
   {
     assert(nn < size_);
     return elements_[nn];
   }
 
-  // remove the n'th item in the array
-  // returning the removed item to the caller
-  float remove(size_t nn)
-  {
-    assert(nn < size_);
-    // allocate memory for temp array with one less than size
-    float *temp = new float[size_ - 1];
-    // set the result to be returned to the element at given index
-    float res = elements_[nn];
-    // set temp to elements up to the index of removed
-    for (size_t i = 0; i < nn; i++)
-    {
-      temp[i] = elements_[i];
-    }
-    // set temp to elements after index of removed
-    for (size_t j = nn + 1; j < size_; j++)
-    {
-      temp[j - 1] = elements_[j];
-    }
-    // decrease array size
-    size_ -= 1;
-    return res;
-  }
-
   // set n'th element to the given element
   // returns the replace Object.
-  float set(size_t nn, float oo)
+  double set(size_t nn, float oo)
   {
     assert(size_ == 0 || nn < size_);
     if (size_ == 0)
@@ -485,7 +461,7 @@ public:
       append(oo);
     }
 
-    float res = elements_[nn];
+    double res = elements_[nn];
     elements_[nn] = oo;
     return res;
   }
@@ -497,7 +473,7 @@ public:
   }
 
   // get the index of an element in the array
-  size_t index_of(float oo)
+  size_t index_of(double oo)
   {
     // if empty array, return arbitrary large number
     if (size_ == 0)
@@ -517,20 +493,6 @@ public:
       return size_ + 500;
     }
   }
-
-  // reset and delete every element in the array
-  void clear()
-  {
-    // if anything in array, remove it
-    if (size_ > 0)
-    {
-      for (size_t i = 0; i < size_; i++)
-      {
-        remove(i);
-      }
-    }
-    size_ = 0;
-  };
 
   // Compares other with this array for equality.
   bool equals(Object *oo)
@@ -788,4 +750,17 @@ public:
   {
     return dynamic_cast<String *>(get_(nn));
   }
+
+  char* serialize(Serializer* &ser) {
+    // serialize size of array
+    ser->write(size_);
+    // for every string, serialize
+    for (size_t i = 0; i < length(); i++) {
+      String* str = vals_[i];
+      ser->write(str);
+      ser->getPos();
+    }
+    return ser->getSerChar();
+  };
+
 };

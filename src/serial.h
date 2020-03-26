@@ -68,7 +68,7 @@ char* getSerChar() {
 }
 
 };
-
+/*
 // serialize a string
 class StringArray {
     public:
@@ -157,6 +157,7 @@ class StringArray {
     return ser->getSerChar();
   }
 };
+*/
 
 class DoubleArray {
   public:
