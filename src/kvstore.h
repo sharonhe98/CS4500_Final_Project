@@ -38,7 +38,7 @@ class KVStore : public Object {
 	DataFrame* get(Key* key) {
 		char* serial_df = kvstore->get(key);
 		Deserializer ds(serial_df);
-		return ds.deserializeDataFrame();
+		return ds.readDataFrame();
 	}
 
 	void put(Key* key, String* value) {

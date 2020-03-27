@@ -380,7 +380,7 @@ public:
   }
 
   // basic implementation of fromScalar using only doubles
-  DataFrame* fromSchema(Key key, KVStore kv, double val) {
+  DataFrame* fromScalar(Key key, KVStore kv, double val) {
 	Schema s("F");
 	DataFrame* df = new DataFrame(s);
 	df->set(0, 0, val);
