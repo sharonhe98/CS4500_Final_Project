@@ -276,6 +276,11 @@ int readInt() {
   return d;
 }
 
+DataFrame* readDataFrame() {
+  DataFrame* df = new DataFrame();
+  // call readInt() if column is int, etc etc 
+}
+
 StringArray* deserializeStringArray(){
   // new StringArray 
   StringArray* deStrArray = new StringArray();

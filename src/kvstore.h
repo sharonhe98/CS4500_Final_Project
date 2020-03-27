@@ -35,8 +35,10 @@ class KVStore : public Object {
 
 	// TODO: figure out constructor
 	
-	String* get(Key* key) {
-		kvstore->get(key);
+	DataFrame* get(Key* key) {
+		char* serial_df = kvstore->get(key);
+		Deserializer ds(serial_df);
+		return ds.deserializeDataFrame();
 	}
 
 	void put(Key* key, String* value) {
