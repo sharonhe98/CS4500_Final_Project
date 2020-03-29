@@ -751,17 +751,4 @@ public:
   {
     return dynamic_cast<String *>(get_(nn));
   }
-
-  char* serialize(Serializer* &ser) {
-    // serialize size of array
-    ser->write(size_);
-    // for every string, serialize
-    for (size_t i = 0; i < length(); i++) {
-      String* str = elements_[i];
-      ser->write(str);
-      ser->getPos();
-    }
-    return ser->getSerChar();
-  };
-
 };

@@ -369,25 +369,12 @@ public:
 
   // basic implementation of fromArray using only doubles
   DataFrame* fromArray(Key key, KVStore kv, size_t SZ, double* vals) {
-	Schema s("F");
-	Serializer serial;
-	DataFrame* df = new DataFrame(s);
-	for (size_t i = 0; i < SZ; i++) {
-		df->set(i, 0, vals[i]);
-	}
-	//kv.put(key, df); // first we have to serialize df whoops
-	return df;
+	return kv.get(key);
   }
 
   // basic implementation of fromScalar using only doubles
   DataFrame* fromScalar(Key key, KVStore kv, double val) {
-	Schema s("F");
-	DataFrame* df = new DataFrame(s);
-	df->set(0, 0, val);
-	// again, serialize df
-	// then do a kv.put
-	
-	return df;
+	return kv.get(key);
   }
 };
 

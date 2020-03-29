@@ -21,11 +21,11 @@ class Key : public Object {
 
 class KVStore : public Object {
 	public:
-		size_t num_nodes;
+		size_t index;
 		Map* kvstore;
 
 	KVStore(size_t nodes) {
-		num_nodes = nodes;
+		index = nodes;
 		kvstore = new Map();
 	}
 
@@ -33,11 +33,9 @@ class KVStore : public Object {
 		delete kvstore;
 	}
 
-	// TODO: figure out constructor
 	
 	DataFrame* get(Key* key) {
-		char* serial_df = kvstore->get(key);
-		Deserializer ds(serial_df);
+		
 		return ds.readDataFrame();
 	}
 
