@@ -39,16 +39,17 @@ int test_small() {
 void test_large() {
 	int sum = 0;
 
-	thread* threads = new thread[1000];
+	thread* threads = new thread[10];
 
 	printf("test large initial sum: 0\n");
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10; i++) {
 		threads[i] = thread(increment, ref(sum));
 	}
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10; i++) {
 		threads[i].join();
 	}
-	assert(sum == 1000);
+	assert(sum == 10);
+	printf("sum at the end is: %i\n", sum);
 }
 
 int main() {

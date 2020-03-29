@@ -46,7 +46,7 @@ class KVStore : public Object {
 	}
 
 	// getAndWait vs waitAndGet???
-	String* getAndWait(Key* k) {
+	DataFrame* getAndWait(Key* k) {
 		return get(k);
 	}
 

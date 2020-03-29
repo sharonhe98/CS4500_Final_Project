@@ -136,6 +136,31 @@ public:
   {
     return nullptr;
   }
+
+  virtual char *serialize(Serializer *ser);
+
+  static Column *deserialize(Deserializer *dser)
+  {
+    Column *result = nullptr;
+    char colType = dser->readChar();
+    printf("colType is: %c\n", colType);
+    switch (colType)
+    {
+    case 'I':
+      result = new IntColumn(dser);
+      break;
+    case 'B':
+      result = new BoolColumn(dser);
+      break;
+    case 'F':
+      result = new FloatColumn(dser);
+      break;
+    case 'S':
+      result = new StringColumn(dser);
+      break;
+    }
+    return result;
+  }
 };
 
 /*************************************************************************
@@ -175,6 +200,21 @@ public:
     }
 
     va_end(args);
+  }
+
+  IntColumn(Deserializer *d)
+  {
+    type_ = d->readChar();
+    colName_ = d->readString();
+    vals_ = vals_->deserializeIntArray(d);
+  }
+
+  char *serialize(Serializer *ser)
+  {
+    ser->write(type_);
+    ser->write(colName_);
+    vals_->serialize(ser);
+    return ser->getSerChar();
   }
 
   void setColName(String *name)
@@ -224,14 +264,16 @@ public:
   }
 
   // gets the string representation of the ith element
-        char* get_char(size_t i) {
-            if (i >= size() || vals_->get(i) == NULL) {
-                return nullptr;
-            }
-            char* ret = new char[512];
-            sprintf(ret, "%d", vals_->get(i));
-            return ret;
-        }
+  char *get_char(size_t i)
+  {
+    if (i >= size() || vals_->get(i) == NULL)
+    {
+      return nullptr;
+    }
+    char *ret = new char[512];
+    sprintf(ret, "%d", vals_->get(i));
+    return ret;
+  }
 };
 
 // Other primitive column classes similar...
@@ -273,6 +315,13 @@ public:
     }
 
     va_end(args);
+  }
+
+  StringColumn(Deserializer *d)
+  {
+    type_ = d->readChar();
+    colName_ = d->readString();
+    vals_ = vals_->deserializeStringArray(d);
   }
 
   ~StringColumn()
@@ -376,6 +425,13 @@ public:
     va_end(args);
   }
 
+  FloatColumn(Deserializer *d)
+  {
+    type_ = d->readChar();
+    colName_ = d->readString();
+    vals_ = vals_->deserializeFloatArray(d);
+  }
+
   ~FloatColumn() {}
 
   void setColName(String *name)
@@ -424,14 +480,16 @@ public:
   }
 
   // get string rep of element at ith index
-        char* get_char(size_t i) {
-            if (i >= size() || vals_->get(i) == NULL) {
-                return nullptr;
-            }
-            char* ret = new char[512];
-            sprintf(ret, "%d", vals_->get(i));
-            return ret;
-        }
+  char *get_char(size_t i)
+  {
+    if (i >= size() || vals_->get(i) == NULL)
+    {
+      return nullptr;
+    }
+    char *ret = new char[512];
+    sprintf(ret, "%d", vals_->get(i));
+    return ret;
+  }
 };
 
 /*************************************************************************
@@ -466,6 +524,13 @@ public:
     }
 
     va_end(args);
+  }
+
+  BoolColumn(Deserializer *d)
+  {
+    type_ = d->readChar();
+    colName_ = d->readString();
+    vals_ = vals_->deserializeBoolArray(d);
   }
 
   ~BoolColumn() {}
@@ -516,12 +581,31 @@ public:
   }
 
   // get str representation of ith element
-        char* get_char(size_t i) {
-            if (i >= size() || vals_->get(i) == NULL) {
-                return nullptr;
-            }
-            char* ret = new char[512];
-            sprintf(ret, "%d", vals_->get(i));
-            return ret;
-        }
+  char *get_char(size_t i)
+  {
+    if (i >= size() || vals_->get(i) == NULL)
+    {
+      return nullptr;
+    }
+    char *ret = new char[512];
+    sprintf(ret, "%d", vals_->get(i));
+    return ret;
+  }
 };
+
+// Column* Column::deserialize(Deserializer* dser) {
+//   Column* result = nullptr;
+//       char colType = dser->readChar();
+//       printf("colType is: %c\n", colType);
+//       switch (colType) {
+//         case 'I': result = new IntColumn();
+//         break;
+//         case 'B': result = new BoolColumn();
+//         break;
+//         case 'F': result = new FloatColumn();
+//         break;
+//         case 'S': result = new StringColumn();
+//         break;
+//       }
+//       return result;
+// }

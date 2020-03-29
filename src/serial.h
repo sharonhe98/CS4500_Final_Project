@@ -42,10 +42,19 @@ void write(int i) {
   pos += sizeof(int);
 }
 
+void write(bool b) {
+  memcpy(buf + pos, &b, sizeof(bool));
+  pos += sizeof(bool);
+}
+
+void write(char c) {
+  memcpy(buf + pos, &c, sizeof(char));
+  pos += sizeof(char);
+}
+
 void write(String* s) {
   printf("successfully write string???\n");
   s->c_str();
-  printf("the sercar \n");
   size_t strSize = s->allocateSize();
   printf("string size %i\n", s->allocateSize());
   memcpy(buf + pos, s->c_str(), s->allocateSize());
@@ -214,7 +223,7 @@ class DoubleArray {
     return size_;
   }
 
-  char* serialize(Serializer* ser) {
+  void serialize(Serializer* ser) {
     printf("serialize init pos %i\n", ser->getPos());
     // serialize size
     ser->write(size_);
@@ -225,10 +234,8 @@ class DoubleArray {
       ser->write(dd);
       ser->getPos();
     }
-    return ser->getSerChar();
   }
    
-
 };
 
 class Deserializer {
@@ -255,6 +262,13 @@ size_t readSizeT() {
   return res;
 }
 
+char readChar() {
+  char res = 0;
+  memcpy(&res, buf + pos, sizeof(char));
+  pos += sizeof(char);
+  return res;
+}
+
 String* readString() {
   String* res = new String(buf+pos);
   pos += res->allocateSize();
@@ -270,38 +284,40 @@ double readDouble() {
 }
 
 int readInt() {
-  int d = 0;
-  memcpy(&d, buf + pos, sizeof(int));
+  int i = 0;
+  memcpy(&i, buf + pos, sizeof(int));
   pos += sizeof(int);
-  return d;
+  return i;
 }
 
-DataFrame* readDataFrame() {
-  DataFrame* df = new DataFrame();
-  // call readInt() if column is int, etc etc 
+int readBool() {
+  bool b = 0;
+  memcpy(&b, buf + pos, sizeof(bool));
+  pos += sizeof(bool);
+  return b;
 }
 
-StringArray* deserializeStringArray(){
-  // new StringArray 
-  StringArray* deStrArray = new StringArray();
+// StringArray* deserializeStringArray(){
+//   // new StringArray 
+//   StringArray* deStrArray = new StringArray();
 
-  // deserialize size at char buffer position 0
-  // amount of bytes of the size field of array (8 bytes)
-  size_t sizeArr = readSizeT();
+//   // deserialize size at char buffer position 0
+//   // amount of bytes of the size field of array (8 bytes)
+//   size_t sizeArr = readSizeT();
     
-  for(size_t i = 0; i < sizeArr;  i++) {
-    // get the new position offset
-    size_t current_offset = getPos();
-    printf("new offset %i get pos %i\n", current_offset, getPos());
-    // deserialize string at the offset position
-    String* deserStr = readString();
-    printf("the serialized str %s\n", &buf[current_offset]);
-    // add string to result array
-    deStrArray->append(deserStr);
-  }
+//   for(size_t i = 0; i < sizeArr;  i++) {
+//     // get the new position offset
+//     size_t current_offset = getPos();
+//     printf("new offset %i get pos %i\n", current_offset, getPos());
+//     // deserialize string at the offset position
+//     String* deserStr = readString();
+//     printf("the serialized str %s\n", &buf[current_offset]);
+//     // add string to result array
+//     deStrArray->append(deserStr);
+//   }
     
-  return deStrArray;
-}
+//   return deStrArray;
+// }
 
 DoubleArray* deserializeDoubleArray(){
    
@@ -336,137 +352,137 @@ char* getSerChar() {
 };
 
  
-enum class MsgKind { Ack, Nack, Put,
+// enum class MsgKind { Ack, Nack, Put,
 
-  Reply,  Get, WaitAndGet, Status,
+//   Reply,  Get, WaitAndGet, Status,
 
-  Kill,   Register,  Directory };
+//   Kill,   Register,  Directory };
 
  
 
-class Message : public Object {
-  public:
-    MsgKind kind_;  // the message kind
+// class Message : public Object {
+//   public:
+//     MsgKind kind_;  // the message kind
 
-    size_t sender_; // the index of the sender node
+//     size_t sender_; // the index of the sender node
 
-    size_t target_; // the index of the receiver node
+//     size_t target_; // the index of the receiver node
 
-    size_t id_;     // an id t unique within the node
+//     size_t id_;     // an id t unique within the node
     
-    Message(MsgKind m, size_t s, size_t t, size_t i) {
-      kind_ = m;
-      sender_ = s;
-      target_ = t;
-      id_ = i;
-    }
+//     Message(MsgKind m, size_t s, size_t t, size_t i) {
+//       kind_ = m;
+//       sender_ = s;
+//       target_ = t;
+//       id_ = i;
+//     }
 
     
-    virtual void serialize(Serializer* ser) {
-      ser->write((int)kind_);
-      ser->write(sender_);
-      ser->write(target_);
-      ser->write(id_);
-    }
+//     virtual void serialize(Serializer* ser) {
+//       ser->write((int)kind_);
+//       ser->write(sender_);
+//       ser->write(target_);
+//       ser->write(id_);
+//     }
 
-    // function declaration
-    static Message* deserializeMsg(Deserializer* dser);
+//     // function declaration
+//     static Message* deserializeMsg(Deserializer* dser);
 
-    // virtual Message* deserializeMessage(Deserializer* dser) {
-    //   char* serArr = dser->getSerChar();
-    //   int msgkind = dser->readInt();
-    //   size_t sender = dser->readSizeT();
-    //   size_t target = dser->readSizeT();
-    //   size_t id = dser->readSizeT();
-    //   return new Message((MsgKind)msgkind, sender, target, id);
-    // }
+//     // virtual Message* deserializeMessage(Deserializer* dser) {
+//     //   char* serArr = dser->getSerChar();
+//     //   int msgkind = dser->readInt();
+//     //   size_t sender = dser->readSizeT();
+//     //   size_t target = dser->readSizeT();
+//     //   size_t id = dser->readSizeT();
+//     //   return new Message((MsgKind)msgkind, sender, target, id);
+//     // }
     
-};
+// };
 
  
 
-class Ack : public Message {
-  public:
+// class Ack : public Message {
+//   public:
 
-  Ack(MsgKind m , size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
-};
-
- 
-
-class Status : public Message {
-  public:
-
-   String* msg_; // owned
-
-  Status(MsgKind kind_, size_t sender_, size_t target_, size_t id_, String* msg_) : Message(kind_, sender_, target_, id_) {}
-
-  // composition allows prevention of duplicate code. Uses parent code from Message
-   void serialize(Serializer* ser) {
-      Message::serialize(ser);
-      printf("pos after msg serial is %i\n", ser->getPos());
-      ser->write(msg_);
-      printf("pos after msg serial is %i\n", ser->getPos());
-    }
-
-    Status* deserialize(Deserializer* dser) {
-      Message::deserializeMsg(dser);
-    }
-};
+//   Ack(MsgKind m , size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
+// };
 
  
 
-class Register : public Message {
-  public:
+// class Status : public Message {
+//   public:
 
-    sockaddr_in client;
+//    String* msg_; // owned
 
-    size_t port;
+//   Status(MsgKind kind_, size_t sender_, size_t target_, size_t id_, String* msg_) : Message(kind_, sender_, target_, id_) {}
 
-    Register(MsgKind kind_, size_t sender_, size_t target_, size_t id_, sockaddr_in client, size_t port) : Message(kind_, sender_, target_, id_) {}
+//   // composition allows prevention of duplicate code. Uses parent code from Message
+//    void serialize(Serializer* ser) {
+//       Message::serialize(ser);
+//       printf("pos after msg serial is %i\n", ser->getPos());
+//       ser->write(msg_);
+//       printf("pos after msg serial is %i\n", ser->getPos());
+//     }
 
-    void serialize(Serializer* ser) {
-      Message::serialize(ser);
-      ser->write(client);
-      ser->write(port);
-    }
-};
+//     Status* deserialize(Deserializer* dser) {
+//       Message::deserializeMsg(dser);
+//     }
+// };
 
  
 
-class Directory : public Message {
-  public:
-   size_t client;
+// class Register : public Message {
+//   public:
 
-   size_t * ports;  // owned
+//     sockaddr_in client;
 
-   // String ** addresses;  // owned; strings owned
-   StringArray* addresses;
+//     size_t port;
 
-   Directory(MsgKind kind_, size_t sender_, size_t target_, size_t id_, size_t client, size_t * ports, StringArray* addresses) : Message(kind_, sender_, target_, id_) {}
+//     Register(MsgKind kind_, size_t sender_, size_t target_, size_t id_, sockaddr_in client, size_t port) : Message(kind_, sender_, target_, id_) {}
 
-   void serialize(Serializer* ser) {
-     Message::serialize(ser);
-     ser->write(client);
-     ser->write(*ports);
-     // use stringArray??
-     addresses->serialize(ser);
-    }
+//     void serialize(Serializer* ser) {
+//       Message::serialize(ser);
+//       ser->write(client);
+//       ser->write(port);
+//     }
+// };
 
-};
+ 
 
-Message* Message::deserializeMsg(Deserializer* dser) {
-  Message* result = nullptr;
-      MsgKind msgkind = (MsgKind)dser->readInt();
-      printf("msgKind is: %i\n", (int)msgkind);
-      switch (msgkind) {
-        case MsgKind::Ack: result = new Ack(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT());
-        break;
-        case MsgKind::Status: result = new Status(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), dser->readString());
-        break;
-        case MsgKind::Register: result = new Register(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), dser->readSockAddrIn(), dser->readSizeT());
-        break;
-        case MsgKind::Directory: result = new Directory(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), (size_t *)dser->readSizeT(), dser->deserializeStringArray());
-        break;
-      }
-      return result;
-}
+// class Directory : public Message {
+//   public:
+//    size_t client;
+
+//    size_t * ports;  // owned
+
+//    // String ** addresses;  // owned; strings owned
+//    StringArray* addresses;
+
+//    Directory(MsgKind kind_, size_t sender_, size_t target_, size_t id_, size_t client, size_t * ports, StringArray* addresses) : Message(kind_, sender_, target_, id_) {}
+
+//    void serialize(Serializer* ser) {
+//      Message::serialize(ser);
+//      ser->write(client);
+//      ser->write(*ports);
+//      // use stringArray??
+//      addresses->serialize(ser);
+//     }
+
+// };
+
+// Message* Message::deserializeMsg(Deserializer* dser) {
+//   Message* result = nullptr;
+//       MsgKind msgkind = (MsgKind)dser->readInt();
+//       printf("msgKind is: %i\n", (int)msgkind);
+//       switch (msgkind) {
+//         case MsgKind::Ack: result = new Ack(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT());
+//         break;
+//         case MsgKind::Status: result = new Status(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), dser->readString());
+//         break;
+//         case MsgKind::Register: result = new Register(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), dser->readSockAddrIn(), dser->readSizeT());
+//         break;
+//         // case MsgKind::Directory: result = new Directory(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), (size_t *)dser->readSizeT(), dser->deserializeStringArray());
+//         // break;
+//       }
+//       return result;
+// }
