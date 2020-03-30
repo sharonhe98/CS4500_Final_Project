@@ -632,7 +632,6 @@ public:
   bool get(size_t idx)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    printf("length: %zu, idx: %zu\n", calculateCurrentChunk(currentSize_), idx_in_val);
     return vals_[calculateCurrentChunk(idx)]->get(idx_in_val);
   }
 
