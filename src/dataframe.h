@@ -1,11 +1,10 @@
 #include "object.h"
 #include "string.h"
-class Key;
-class KVStore;
+// class Key;
+// class KVStore;
 #include "column.h"
 #include "schema.h"
-#include "map.h"
-#include "serial.h"
+#include "kvstore.h"
 
 /****************************************************************************
  * DataFrame::
@@ -152,6 +151,7 @@ public:
       exit(1);
     }
   }
+
   bool get_bool(size_t col, size_t row)
   {
     if (cols[col]->get_type() != 'B' || col >= scm.width() || row >= scm.length())
@@ -160,6 +160,7 @@ public:
       exit(1);
     }
   }
+
   double get_float(size_t col, size_t row)
   {
     if (cols[col]->get_type() != 'F' || col >= scm.width() || row >= scm.length())
@@ -168,6 +169,7 @@ public:
       exit(1);
     }
   }
+
   String *get_string(size_t col, size_t row)
   {
     if (cols[col]->get_type() != 'S' || col >= scm.width() || row >= scm.length())
@@ -211,18 +213,21 @@ public:
     assert(c->get_type() == 'I');
     c->set(row, val);
   }
+
   void set(size_t col, size_t row, bool val)
   {
     Column *c = cols[col];
     assert(c->get_type() == 'B');
     c->set(row, val);
   }
+
   void set(size_t col, size_t row, double val)
   {
     Column *c = cols[col];
     assert(c->get_type() == 'F');
     c->set(row, (double)val);
   }
+
   void set(size_t col, size_t row, String *val)
   {
     Column *c = cols[col];
@@ -334,7 +339,29 @@ public:
     return ndf;
   }
 
-  /** Print the dataframe in SoR format to standard output. */
+  static DataFrame *fromArray(Key &key, KVStore kv, size_t SZ, double *vals)
+  {
+    return kv.get(key);
+  }
+
+  // basic implementation of fromScalar using only doubles
+  static DataFrame *fromScalar(Key &key, KVStore kv, double val)
+  {
+    return kv.get(key);
+  }
+
+  static DataFrame *fromArray(Key &key, KVStore kv, size_t SZ, double *vals)
+  {
+    return kv.get(key);
+  }
+
+  // basic implementation of fromScalar using only doubles
+  static DataFrame *fromScalar(Key &key, KVStore kv, double val)
+  {
+    return kv.get(key);
+  }
+
+    /** Print the dataframe in SoR format to standard output. */
   void print()
   {
     for (size_t i = 0; i < nrows(); i++)
@@ -366,28 +393,4 @@ public:
       printf("\n");
     }
   }
-
-  // basic implementation of fromArray using only doubles
-  static DataFrame* fromArray(Key key, KVStore kv, size_t SZ, double* vals) {
-	Schema s("F");
-	Serializer serial;
-	DataFrame* df = new DataFrame(s);
-	for (size_t i = 0; i < SZ; i++) {
-		df->set(i, 0, vals[i]);
-	}
-	//kv.put(key, df); // first we have to serialize df whoops
-	return df;
-  }
-
-  // basic implementation of fromScalar using only doubles
-  DataFrame* fromSchema(Key& key, KVStore& kv, double val) {
-	Schema s("F");
-	DataFrame* df = new DataFrame(s);
-	df->set(0, 0, val);
-	// again, serialize df
-	// then do a kv.put
-	
-	return df;
-  }
 };
-

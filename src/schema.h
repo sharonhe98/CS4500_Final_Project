@@ -376,6 +376,14 @@ public:
     col_size = 0;
   }
 
+  Schema(Deserializer* d) {
+    track_types = d->readChars();
+    row_size = d->readSizeT();
+    col_size = d->readSizeT();
+    row_names->deserializeStringArray(d);
+    col_names->deserializeStringArray(d);
+  }
+
   /** Create a schema from a string of types. A string that contains
     * characters other than those identifying the four type results in
     * undefined behavior. The argument is external, a nullptr is
@@ -398,6 +406,21 @@ public:
   {
     delete row_names;
     delete col_names;
+  }
+
+  char *serialize(Serializer *ser)
+  {
+    ser->write(track_types);
+    ser->write(row_size);
+    ser->write(col_size);
+    row_names->serialize(ser);
+    col_names->serialize(ser);
+    return ser->getSerChar();
+  }
+
+  static Schema* deserialize(Deserializer *d)
+  {
+    return new Schema(d);
   }
 
   void add_column(char typ, String *name)

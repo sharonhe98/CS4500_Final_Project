@@ -3,12 +3,15 @@
 #include "array.h"
 #include "helpers.h"
 #include <stdarg.h>
+// #include "serial.h"
 
 // forward declaration
 class IntColumn;
 class StringColumn;
 class FloatColumn;
 class BoolColumn;
+
+#define CHUNK_SIZE 1000
 
 // returns the inferred typing of the char*
 char inferred_type(char *c)
@@ -49,9 +52,10 @@ char inferred_type(char *c)
 class Column : public Object
 {
 public:
-  Array *vals_;
+  Array **vals_;
   char type_;
   String *colName_;
+  size_t currentChunk;
 
   Column() {}
 
@@ -103,7 +107,7 @@ public:
   /** Returns the number of elements in the column. */
   virtual size_t size()
   {
-    return vals_->length();
+    return vals_[currentChunk]->length();
   };
 
   virtual void set(size_t idx, int val)
@@ -137,30 +141,14 @@ public:
     return nullptr;
   }
 
-  virtual char *serialize(Serializer *ser);
+  virtual char *serialize(Serializer *ser) {
+    ser->write(type_);
+    ser->write(colName_);
+    // vals_->serialize(ser);
+    return ser->getSerChar();
+  };
 
-  static Column *deserialize(Deserializer *dser)
-  {
-    Column *result = nullptr;
-    char colType = dser->readChar();
-    printf("colType is: %c\n", colType);
-    switch (colType)
-    {
-    case 'I':
-      result = new IntColumn(dser);
-      break;
-    case 'B':
-      result = new BoolColumn(dser);
-      break;
-    case 'F':
-      result = new FloatColumn(dser);
-      break;
-    case 'S':
-      result = new StringColumn(dser);
-      break;
-    }
-    return result;
-  }
+  Column *deserialize(Deserializer *dser);
 };
 
 /*************************************************************************
@@ -173,6 +161,7 @@ public:
   IntArray *vals_;
   char type_;
   String *colName_;
+  int currentChunk;
 
   IntColumn()
   {
@@ -398,41 +387,73 @@ public:
 class FloatColumn : public Column
 {
 public:
-  FloatArray *vals_;
+  FloatArray **vals_;
   char type_;
   String *colName_;
+  int currentChunk_;
+  int currentSize_;
 
   FloatColumn()
   {
     type_ = 'F';
     colName_ = nullptr;
-    vals_ = new FloatArray();
+    vals_ = new FloatArray*[CHUNK_SIZE];
+    for (int i = 0; i < CHUNK_SIZE; i++)
+    {
+      vals_[i] = new FloatArray();
+    }
+    currentChunk_ = 0;
+    currentSize_ = 0;
   }
 
   FloatColumn(double n, ...)
   {
     type_ = 'F';
     va_list args;
-    vals_ = new FloatArray();
+    vals_ = new FloatArray *[CHUNK_SIZE];
+    currentChunk_ = n / CHUNK_SIZE;
+    currentSize_ = 0;
 
     va_start(args, n);
 
+    for (size_t i = 0; i < CHUNK_SIZE; i++)
+    {
+      vals_[i] = new FloatArray();
+    }
     for (int i = 0; i < n; i++)
     {
-      vals_->append(va_arg(args, double));
+      int chunkNum = i / CHUNK_SIZE;
+      vals_[chunkNum]->append(va_arg(args, double));
     }
 
     va_end(args);
   }
 
-  FloatColumn(Deserializer *d)
+  // FloatColumn(Deserializer *d)
+  // {
+  //   type_ = d->readChar();
+  //   colName_ = d->readString();
+  //   vals_ = vals_->deserializeFloatArray(d);
+  // }
+
+  ~FloatColumn()
   {
-    type_ = d->readChar();
-    colName_ = d->readString();
-    vals_ = vals_->deserializeFloatArray(d);
+    delete[] vals_;
   }
 
-  ~FloatColumn() {}
+  int calculateCurrentChunk(size_t idx)
+  {
+    if (idx == NULL)
+    {
+      idx = currentSize_;
+    }
+    int chunkNum = idx / CHUNK_SIZE;
+    if (chunkNum > currentChunk_)
+    {
+      currentChunk_ = chunkNum;
+    }
+    return chunkNum;
+  }
 
   void setColName(String *name)
   {
@@ -441,12 +462,13 @@ public:
 
   void push_back(double val)
   {
-    vals_->append(val);
+    vals_[calculateCurrentChunk(currentSize_)]->append(val);
+    currentSize_ += 1;
   }
 
   double get(size_t idx)
   {
-    return vals_->get(idx);
+    return vals_[calculateCurrentChunk(idx)]->get(idx);
   }
 
   FloatColumn *as_float()
@@ -457,12 +479,12 @@ public:
   /** Set value at idx. An out of bound idx is undefined.  */
   void set(size_t idx, double val)
   {
-    vals_->set(idx, val);
+    vals_[calculateCurrentChunk(idx)]->set(idx, val);
   }
 
   size_t size()
   {
-    return vals_->length();
+    return (size_t)currentSize_;
   }
 
   char get_type()
@@ -482,12 +504,12 @@ public:
   // get string rep of element at ith index
   char *get_char(size_t i)
   {
-    if (i >= size() || vals_->get(i) == NULL)
+    if (i >= size() || vals_[calculateCurrentChunk(i)]->get(i) == NULL)
     {
       return nullptr;
     }
     char *ret = new char[512];
-    sprintf(ret, "%d", vals_->get(i));
+    sprintf(ret, "%d", vals_[calculateCurrentChunk(i)]->get(i));
     return ret;
   }
 };
@@ -593,19 +615,25 @@ public:
   }
 };
 
-// Column* Column::deserialize(Deserializer* dser) {
-//   Column* result = nullptr;
-//       char colType = dser->readChar();
-//       printf("colType is: %c\n", colType);
-//       switch (colType) {
-//         case 'I': result = new IntColumn();
-//         break;
-//         case 'B': result = new BoolColumn();
-//         break;
-//         case 'F': result = new FloatColumn();
-//         break;
-//         case 'S': result = new StringColumn();
-//         break;
-//       }
-//       return result;
-// }
+Column *Column::deserialize(Deserializer *dser)
+{
+    Column *result = nullptr;
+    char colType = dser->readChar();
+    printf("colType is: %c\n", colType);
+    switch (colType)
+    {
+    case 'I':
+      result = new IntColumn(dser);
+      break;
+    case 'B':
+      result = new BoolColumn(dser);
+      break;
+    // case 'F':
+    //   result = new FloatColumn(dser);
+    //   break;
+    case 'S':
+      result = new StringColumn(dser);
+      break;
+    }
+    return result;
+  }

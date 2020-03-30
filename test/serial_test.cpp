@@ -4,6 +4,8 @@
 #include <assert.h>
 #include "../src/helper.h"
 #include "../src/array.h"
+#include "../src/schema.h"
+
 #define LOG(...) fprintf(stderr, "(" __FILE__ ") " __VA_ARGS__);
 
 void testStringSerialize() {
@@ -15,6 +17,8 @@ void testStringSerialize() {
     Deserializer* deserializer = new Deserializer(result);
     String* s = deserializer->readString();
     assert(strfoo->equals(s));
+    delete strfoo;
+    delete deserializer;
     printf("String serialize passed!\n");
 }
 
@@ -39,6 +43,11 @@ void testStringArrSerialize() {
     assert(s1->equals(sa->get(0)));
     String* s2 = dsa->get(1);
     assert(s2->equals(sa->get(1)));
+    delete serializer;
+    delete[] sa;
+    delete strfoo;
+    delete strbar;
+    delete deserializer;
     printf("test StringArray de/serialize passed!\n");
 }
 
@@ -53,9 +62,7 @@ void testIntArrSerialize() {
     assert(ia->length() == 2);
     ia->append(3);
     assert(ia->length() == 3);
-    printf("before serialize intArray\n");
     char* result = ia->serialize(serializer);
-    printf("after serialized intArray\n");
     Deserializer* deserializer = new Deserializer(result);
     IntArray * dia = ia->deserializeIntArray(deserializer);
     assert(dia->length() == 3);
@@ -65,7 +72,9 @@ void testIntArrSerialize() {
     assert(i2 == ia->get(1));
     int i3 = dia->get(2);
     assert(i3 == ia->get(2));
-
+    delete serializer;
+    delete[] ia;
+    delete deserializer;
     printf("test IntArray de/serialize passed!\n");
 }
 
@@ -95,8 +104,41 @@ void testBoolArrSerialize() {
     bool b3 = dba->get(2);
     printf("bool is %d\n", b3);
     assert(b3 == ba->get(2));
-
+    delete serializer;
+    delete ba;
+    delete deserializer;
     printf("test BoolArray de/serialize passed!\n");
+}
+
+void testCharStar() {
+    Serializer* serializer = new Serializer();
+    char* types = "IFSB";
+    serializer->write(types);
+    char* result = serializer->getSerChar();
+    Deserializer* deserializer = new Deserializer(result);
+    char* deChar = deserializer->readChars();
+    assert(types == deChar);
+    assert(strlen(types) == strlen(deChar));
+    assert(types[1] == deChar[1]);
+    printf("deChar result: %s\n", deChar);
+    delete serializer;
+    delete deserializer;
+    printf("char* deserialized!\n");
+    printf("huh?\n");
+}
+
+void testSchemaSerialize() {
+    printf("Called?\n");
+    Serializer* serializer = new Serializer();
+    Schema* isfb = new Schema("ISFB");
+    printf("schema is built\n");
+    isfb->serialize(serializer);
+    Deserializer* deserializer;
+    printf("serialize failed?\n");
+    Schema* deSchema = Schema::deserialize(deserializer);
+    printf("test failed?\n");
+    assert(isfb->track_types == deSchema->track_types);
+    printf("Schema serialize success!\n");
 }
 
 int main(int argc, char **argv) {
@@ -104,6 +146,8 @@ int main(int argc, char **argv) {
     testStringArrSerialize();
     testIntArrSerialize();
     testBoolArrSerialize();
+    testCharStar();
+    testSchemaSerialize();
     // // test serialize double
     // //serializer->serialize(1.3);
     // //serializer->deserializeDouble();

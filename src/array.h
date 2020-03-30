@@ -400,8 +400,7 @@ public:
   char* serialize(Serializer* ser) {
     // serialize size of array
     ser->write(length());
-    printf("size is: %u\n", size_);
-    printf("length is %u\n", length());
+
     // for every string, serialize
     for (size_t i = 0; i < length(); i++) {     
       int item = elements_[i];
@@ -409,7 +408,7 @@ public:
       ser->write(item);
       ser->getPos();
     }
-    ser->getSerChar();
+    return ser->getSerChar();
   };
 
   IntArray* deserializeIntArray(Deserializer* d){
@@ -419,15 +418,10 @@ public:
   // deserialize size at char buffer position 0
   // amount of bytes of the size field of array (8 bytes)
   size_t sizeArr = d->readSizeT();
-  printf("deserialized array size is: %u\n", sizeArr);
     
   for(size_t i = 0; i < sizeArr;  i++) {
-    // get the new position offset
-    size_t current_offset = d->getPos();
-    printf("new offset %i get pos %i\n", current_offset, d->getPos());
     // deserialize string at the offset position
     int deserInt = d->readInt();
-    printf("the serialized str %s\n", &d->buf[current_offset]);
     // add string to result array
     deIntArray->append(deserInt);
   }
@@ -587,8 +581,8 @@ public:
   char* serialize(Serializer* ser) {
     // serialize size of array
     ser->write(length());
-    printf("size is: %u\n", size_);
-    printf("length is %u\n", length());
+    printf("size is: %zu\n", size_);
+    printf("length is %zu\n", length());
     // for every string, serialize
     for (size_t i = 0; i < length(); i++) {     
       int item = elements_[i];
@@ -596,7 +590,7 @@ public:
       ser->write(item);
       ser->getPos();
     }
-    ser->getSerChar();
+    return ser->getSerChar();
   };
 
   FloatArray* deserializeIntArray(Deserializer* d){
@@ -606,12 +600,12 @@ public:
   // deserialize size at char buffer position 0
   // amount of bytes of the size field of array (8 bytes)
   size_t sizeArr = d->readSizeT();
-  printf("deserialized array size is: %u\n", sizeArr);
+  printf("deserialized array size is: %zu\n", sizeArr);
     
   for(size_t i = 0; i < sizeArr;  i++) {
     // get the new position offset
     size_t current_offset = d->getPos();
-    printf("new offset %i get pos %i\n", current_offset, d->getPos());
+    printf("new offset %zu get pos %zu\n", current_offset, d->getPos());
     // deserialize string at the offset position
     double deserDouble = d->readDouble();
     printf("the serialized str %s\n", &d->buf[current_offset]);
@@ -817,8 +811,8 @@ public:
   char* serialize(Serializer* ser) {
     // serialize size of array
     ser->write(length());
-    printf("size is: %u\n", size_);
-    printf("length is %u\n", length());
+    printf("size is: %zu\n", size_);
+    printf("length is %zu\n", length());
     // for every string, serialize
     for (size_t i = 0; i < length(); i++) {     
       bool item = elements_[i];
@@ -826,7 +820,7 @@ public:
       ser->write(item);
       ser->getPos();
     }
-    ser->getSerChar();
+    return ser->getSerChar();
   };
 
   BoolArray* deserializeBoolArray(Deserializer* d){
@@ -836,12 +830,12 @@ public:
   // deserialize size at char buffer position 0
   // amount of bytes of the size field of array (8 bytes)
   size_t sizeArr = d->readSizeT();
-  printf("deserialized array size is: %u\n", sizeArr);
+  printf("deserialized array size is: %zu\n", sizeArr);
     
   for(size_t i = 0; i < sizeArr;  i++) {
     // get the new position offset
     size_t current_offset = d->getPos();
-    printf("new offset %i get pos %i\n", current_offset, d->getPos());
+    printf("new offset %zu get pos %zu\n", current_offset, d->getPos());
     // deserialize string at the offset position
     bool deserBool = d->readBool();
     printf("the serialized str %s\n", &d->buf[current_offset]);
@@ -869,8 +863,8 @@ public:
   char* serialize(Serializer* ser) {
     // serialize size of array
     ser->write(length());
-    printf("size is: %u\n", size_);
-    printf("length is %u\n", length());
+    printf("size is: %zu\n", size_);
+    printf("length is %zu\n", length());
     // for every string, serialize
     for (size_t i = 0; i < length(); i++) {     
       String* str = (String*)get_(i);
@@ -878,7 +872,7 @@ public:
       ser->write(str);
       ser->getPos();
     }
-    ser->getSerChar();
+    return ser->getSerChar();
   };
 
   StringArray* deserializeStringArray(Deserializer* d){
@@ -888,12 +882,12 @@ public:
   // deserialize size at char buffer position 0
   // amount of bytes of the size field of array (8 bytes)
   size_t sizeArr = d->readSizeT();
-  printf("deserialized array size is: %u\n", sizeArr);
+  printf("deserialized array size is: %zu\n", sizeArr);
     
   for(size_t i = 0; i < sizeArr;  i++) {
     // get the new position offset
     size_t current_offset = d->getPos();
-    printf("new offset %i get pos %i\n", current_offset, d->getPos());
+    printf("new offset %zu get pos %zu\n", current_offset, d->getPos());
     // deserialize string at the offset position
     String* deserStr = d->readString();
     printf("the serialized str %s\n", &d->buf[current_offset]);

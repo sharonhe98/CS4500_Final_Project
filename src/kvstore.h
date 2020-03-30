@@ -1,3 +1,4 @@
+#pragma once
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,11 +22,12 @@ class Key : public Object {
 
 class KVStore : public Object {
 	public:
-		size_t num_nodes;
+		size_t index;
 		Map* kvstore;
+		// Array of keys?
 
 	KVStore(size_t nodes) {
-		num_nodes = nodes;
+		index = nodes;
 		kvstore = new Map();
 	}
 
@@ -33,21 +35,14 @@ class KVStore : public Object {
 		delete kvstore;
 	}
 
-	// TODO: figure out constructor
 	
-	DataFrame* get(Key* key) {
-		char* serial_df = kvstore->get(key);
-		Deserializer ds(serial_df);
-		return ds.deserializeDataFrame();
+	DataFrame* get(Key key) {
+		
+		return; //ds.readDataFrame();
 	}
 
 	void put(Key* key, String* value) {
 		kvstore->set(key, value);
-	}
-
-	// getAndWait vs waitAndGet???
-	DataFrame* getAndWait(Key* k) {
-		return get(k);
 	}
 
 	DataFrame* waitAndGet(Key* key) {

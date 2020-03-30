@@ -87,7 +87,7 @@ void test3()
 	}
 
 	df.print();
-	exit(0);
+	//exit(0);
 }
 
 void testConcat()
@@ -104,7 +104,8 @@ void testGetSchema() {
 	FILE *f = fopen("../src/data.sor", "r");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
-	assert(strcmp(schemaFromFile, "BISFI") == 0);	
+	assert(strcmp(schemaFromFile, "BISFI") == 0);
+	printf("get schema passed!\n");	
 }
 
 void test4()
@@ -128,6 +129,7 @@ void test5() {
 
 void testFloatArray()
 {
+	printf("ITS CALLED!\n");
 	FloatArray *fa = new FloatArray();
 	assert(fa->length() == 0);
 	for (size_t i = 0; i < 1000; i++)
@@ -240,8 +242,8 @@ void testBoolsForRow()
 int main(int argc, char **argv)
 {
 	testArray();
-	test();
-	test2();
+	// test();
+	// test2();
 	testConcat();
 	test4();
 	testFloatsForRow();
@@ -252,5 +254,5 @@ int main(int argc, char **argv)
 	testStringColumn();
 	testStringForRow();
 	testGetSchema();
-	test5();
+	// test5();
 }

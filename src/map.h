@@ -265,13 +265,13 @@ public:
 	// Gets all the keys of this map
 	String **getKeys()
 	{
-		return keys_->elements_;
+		return (String**)(keys_->elements_);
 	}
 
 	// Gets all the values of this map
 	String **getValues()
 	{
-		return values_->elements_;
+		return (String**)values_->elements_;
 	}
 
 	// Checks if this map is equal to another object
