@@ -147,10 +147,6 @@ public:
 
   virtual size_t calculateCurrentChunk(size_t idx)
   {
-    if (idx == NULL)
-    {
-      idx = currentSize_;
-    }
     size_t chunkNum = idx / CHUNK_SIZE;
     if (chunkNum > currentChunk_)
     {
@@ -253,10 +249,6 @@ public:
 
   size_t calculateCurrentChunk(size_t idx)
   {
-    if (idx == NULL)
-    {
-      idx = currentSize_;
-    }
     size_t chunkNum = idx / CHUNK_SIZE;
     if (chunkNum > currentChunk_)
     {
@@ -370,10 +362,6 @@ public:
 
   size_t calculateCurrentChunk(size_t idx)
   {
-    if (idx == NULL)
-    {
-      idx = currentSize_;
-    }
     size_t chunkNum = idx / CHUNK_SIZE;
     if (chunkNum > currentChunk_)
     {
@@ -502,10 +490,6 @@ public:
 
   size_t calculateCurrentChunk(size_t idx)
   {
-    if (idx == NULL)
-    {
-      idx = currentSize_;
-    }
     size_t chunkNum = idx / CHUNK_SIZE;
     if (chunkNum > currentChunk_)
     {
@@ -648,6 +632,7 @@ public:
   bool get(size_t idx)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
+    printf("length: %zu, idx: %zu\n", calculateCurrentChunk(currentSize_), idx_in_val);
     return vals_[calculateCurrentChunk(idx)]->get(idx_in_val);
   }
 
@@ -658,10 +643,6 @@ public:
 
   size_t calculateCurrentChunk(size_t idx)
   {
-    if (idx == NULL)
-    {
-      idx = currentSize_;
-    }
     size_t chunkNum = idx / CHUNK_SIZE;
     if (chunkNum > currentChunk_)
     {
