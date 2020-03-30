@@ -53,7 +53,7 @@ void test2()
 	Row r(df.get_schema());
 	printf("ROW IS BUILLTTTTT!\n");
 	String *str = new String("hello world!");
-	for (size_t i = 0; i < 2 * 2; i++)
+	for (size_t i = 0; i < 1000 * 100; i++)
 	{
 		r.set(0, (int)22);
 		r.set(1, (int)23);
@@ -246,7 +246,7 @@ int main(int argc, char **argv)
 {
 	testArray();
 	// test();
-	// test2();
+	test2();
 	testConcat();
 	test4();
 	testFloatsForRow();

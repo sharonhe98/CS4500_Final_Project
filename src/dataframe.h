@@ -339,38 +339,36 @@ public:
     return ndf;
   }
 
-  // static DataFrame *fromArray(Key &key, KVStore kv, size_t SZ, double *vals)
-  // {
-  //   Schema s("F");
-  //   DataFrame* df = new DataFrame(s);
-  //   FloatColumn* fc = new FloatColumn();
-  //   for (size_t i = 0; i < SZ; i++) {
-  //     fc->push_back(vals[i]);
-  //   }
-  //   df->add_column(fc, key.key);
-  //   Serializer* serializer;
-  //   // TODO
-  //   // df->serialize(serializer);
-  //   Value* df_v = new Value(serializer->getSerChar());
-  //   kv.put(&key, df_v);
-  //   return df;
-  // }
+  static DataFrame *fromArray(Key key, KVStore kv, size_t SZ, double *vals)
+  {
+    Schema s("F");
+    DataFrame* df = new DataFrame(s);
+    FloatColumn* fc = new FloatColumn();
+    for (size_t i = 0; i < SZ; i++) {
+      fc->push_back(vals[i]);
+    }
+    df->add_column(fc, key.key);
+    Serializer* serializer;
+    df->serialize(serializer);
+    Value* df_v = new Value(serializer->getSerChar());
+    kv.put(&key, df_v);
+    return df;
+  }
 
-  // // basic implementation of fromScalar using only doubles
-  // static DataFrame *fromScalar(Key &key, KVStore kv, double val)
-  // {
-  //   Schema s("F");
-  //   DataFrame* df = new DataFrame(s);
-  //   FloatColumn* fc = new FloatColumn();
-  //   fc->push_back(val);
-  //   df->add_column(fc, key.key);
-  //   Serializer* serializer;
-  //   // TODO
-  //   // df->serialize(serializer);
-  //   Value* df_v = new Value(serializer->getSerChar());
-  //   kv.put(&key, df_v);
-  //   return df;
-  // }
+  // basic implementation of fromScalar using only doubles
+  static DataFrame *fromScalar(Key key, KVStore kv, double val)
+  {
+    Schema s("F");
+    DataFrame* df = new DataFrame(s);
+    FloatColumn* fc = new FloatColumn();
+    fc->push_back(val);
+    df->add_column(fc, key.key);
+    Serializer* serializer;
+    df->serialize(serializer);
+    Value* df_v = new Value(serializer->getSerChar());
+    kv.put(&key, df_v);
+    return df;
+  }
 
 
 
