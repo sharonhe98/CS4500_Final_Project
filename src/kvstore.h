@@ -46,12 +46,12 @@ class KVStore : public Object {
 		delete kvstore;
 	}
 
-	Value* get_(Key key) {
-		return kvstore->get(key); // returns nullptr if key is not in map
+	Value* get_(Key* key) {
+		return dynamic_cast<Value*>(kvstore->get(key)); // returns nullptr if key is not in map
 	}
 
 	
-	DataFrame* get(Key key) {
+	DataFrame* get(Key* key) {
 		Value* df_v = get_(key);
 		assert(df_v);
 		Deserializer des;
