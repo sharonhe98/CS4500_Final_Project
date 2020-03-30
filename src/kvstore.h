@@ -20,6 +20,17 @@ class Key : public Object {
 
 };
 
+class Value : public Object {
+	public:
+		char* data_;
+		size_t len_;
+
+		Value(char* data) {
+			data_ = data;
+			len_ = strlen(data);
+		}
+};
+
 class KVStore : public Object {
 	public:
 		size_t index;
@@ -41,7 +52,7 @@ class KVStore : public Object {
 		return; //ds.readDataFrame();
 	}
 
-	void put(Key* key, String* value) {
+	void put(Key* key, Value* value) {
 		kvstore->set(key, value);
 	}
 

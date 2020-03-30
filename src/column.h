@@ -429,13 +429,6 @@ public:
     va_end(args);
   }
 
-  // FloatColumn(Deserializer *d)
-  // {
-  //   type_ = d->readChar();
-  //   colName_ = d->readString();
-  //   vals_ = vals_->deserializeFloatArray(d);
-  // }
-
   ~FloatColumn()
   {
     delete[] vals_;
@@ -468,7 +461,8 @@ public:
 
   double get(size_t idx)
   {
-    return vals_[calculateCurrentChunk(idx)]->get(idx);
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    return vals_[calculateCurrentChunk(idx)]->get(idx_in_val);
   }
 
   FloatColumn *as_float()
@@ -479,7 +473,8 @@ public:
   /** Set value at idx. An out of bound idx is undefined.  */
   void set(size_t idx, double val)
   {
-    vals_[calculateCurrentChunk(idx)]->set(idx, val);
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    vals_[calculateCurrentChunk(idx)]->set(idx_in_val, val);
   }
 
   size_t size()
