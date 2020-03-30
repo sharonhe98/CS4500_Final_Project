@@ -15,6 +15,7 @@ void testGet()
 	assert(!kv->get(key));
 	Serializer *ser;
 	Value *v = new Value(df->serialize(ser));
+
 	kv->put(key, v);
 	assert(kv->get(key)->equals(v));
 	printf("kv store get success!\n");
