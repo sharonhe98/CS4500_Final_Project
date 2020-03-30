@@ -13,6 +13,7 @@ void test_double_column() {
 	assert(fc->get(2001) == 3.0);
 	fc->set(2001, 3.5);
 	assert(fc->get(2001) == 3.5);
+	assert(fc->get(0) == 3.0);
 	printf("colttype %c\n", fc->type_);
 	printf("colttype %c\n", fc->get_type());
 	printf("test_double_column succeeded!\n");

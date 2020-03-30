@@ -593,7 +593,7 @@ public:
     return ser->getSerChar();
   };
 
-  FloatArray* deserializeIntArray(Deserializer* d){
+  FloatArray* deserializeFloatArray(Deserializer* d){
   // new StringArray 
   FloatArray* deFloatArray = new FloatArray();
 

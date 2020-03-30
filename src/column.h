@@ -141,10 +141,6 @@ public:
     return nullptr;
   }
 
-  virtual char* serialize(Serializer *ser) {
-    ser->write(type_);
-  };
-
   virtual size_t calculateCurrentChunk(size_t idx)
   {
     size_t chunkNum = idx / CHUNK_SIZE;
@@ -154,6 +150,12 @@ public:
     }
     return chunkNum;
   }
+
+  char *serialize(Serializer *ser)
+  {
+    ser->write(type_);
+    return ser->getSerChar();
+  };
 
   static Column *deserialize(Deserializer *dser);
 };
@@ -174,7 +176,7 @@ public:
   {
     type_ = 'I';
     colName_ = nullptr;
-    vals_ = new IntArray*[CHUNK_SIZE];
+    vals_ = new IntArray *[CHUNK_SIZE];
     for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
       vals_[i] = new IntArray();
@@ -214,14 +216,26 @@ public:
   {
     type_ = d->readChar();
     colName_ = d->readString();
-    // vals_ = vals_->deserializeIntArray(d);
+    currentChunk_ = d->readSizeT();
+    currentSize_ = d->readSizeT();
+    vals_ = new IntArray *[CHUNK_SIZE];
+    for (size_t i = 0; i < currentChunk_; i++)
+    {
+      vals_[i]->deserializeIntArray(d);
+      add_chunk(vals_[i], i);
+    }
   }
 
   char *serialize(Serializer *ser)
   {
-    ser->write(type_);
+    Column::serialize(ser);
     ser->write(colName_);
-    // vals_->serialize(ser);
+    ser->write(currentChunk_);
+    ser->write(currentSize_);
+    for (size_t i = 0; i < currentChunk_; i++)
+    {
+      vals_[i]->serialize(ser);
+    }
     return ser->getSerChar();
   }
 
@@ -255,6 +269,18 @@ public:
       currentChunk_ = chunkNum;
     }
     return chunkNum;
+  }
+
+  void add_chunk(IntArray *ia, size_t idx)
+  {
+    vals_[idx] = ia;
+    // We assume that the arrays we add as chunks
+    // will only have length 1000
+    // which we arbitrarily set in the kv store
+    if (ia->length == CHUNK_SIZE)
+    {
+      currentChunk_ += 1;
+    }
   }
 
   /** Set value at idx. An out of bound idx is undefined.  */
@@ -315,7 +341,7 @@ public:
   {
     type_ = 'S';
     colName_ = nullptr;
-    vals_ = new StringArray*[CHUNK_SIZE];
+    vals_ = new StringArray *[CHUNK_SIZE];
     for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
       vals_[i] = new StringArray();
@@ -331,7 +357,7 @@ public:
     vals_ = new StringArray *[CHUNK_SIZE];
     currentChunk_ = n / CHUNK_SIZE;
     currentSize_ = 0;
-      String *valueString = new String((va_arg(args, char *)));
+    String *valueString = new String((va_arg(args, char *)));
 
     va_start(args, n);
 
@@ -352,7 +378,39 @@ public:
   {
     type_ = d->readChar();
     colName_ = d->readString();
-    // vals_ = vals_->deserializeStringArray(d);
+    currentChunk_ = d->readSizeT();
+    currentSize_ = d->readSizeT();
+    vals_ = new StringArray *[CHUNK_SIZE];
+    for (size_t i = 0; i < currentChunk_; i++)
+    {
+      vals_[i]->deserializeStringArray(d);
+      add_chunk(vals_[i], i);
+    }
+  }
+
+  void add_chunk(StringArray *sa, size_t idx)
+  {
+    vals_[idx] = sa;
+    // We assume that the arrays we add as chunks
+    // will only have length 1000
+    // which we arbitrarily set in the kv store
+    if (sa->length == CHUNK_SIZE)
+    {
+      currentChunk_ += 1;
+    }
+  }
+
+  char *serialize(Serializer *ser)
+  {
+    Column::serialize(ser);
+    ser->write(colName_);
+    ser->write(currentChunk_);
+    ser->write(currentSize_);
+    for (size_t i = 0; i < currentChunk_; i++)
+    {
+      vals_[i]->serialize(ser);
+    }
+    return ser->getSerChar();
   }
 
   ~StringColumn()
@@ -451,7 +509,7 @@ public:
   {
     type_ = 'F';
     colName_ = nullptr;
-    vals_ = new FloatArray*[CHUNK_SIZE];
+    vals_ = new FloatArray *[CHUNK_SIZE];
     for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
       vals_[i] = new FloatArray();
@@ -488,13 +546,57 @@ public:
     delete[] vals_;
   }
 
+  FloatColumn(Deserializer *d)
+  {
+    type_ = d->readChar();
+    colName_ = d->readString();
+    currentChunk_ = d->readSizeT();
+    currentSize_ = d->readSizeT();
+    vals_ = new FloatArray *[CHUNK_SIZE];
+    for (size_t i = 0; i < currentChunk_; i++)
+    {
+      vals_[i]->deserializeFloatArray(d);
+      add_chunk(vals_[i], i);
+    }
+  }
+
+  void add_chunk(FloatArray *fa, size_t idx)
+  {
+    vals_[idx] = fa;
+    // We assume that the arrays we add as chunks
+    // will only have length 1000
+    // which we arbitrarily set in the kv store
+    if (fa->length == CHUNK_SIZE)
+    {
+      currentChunk_ += 1;
+    }
+  }
+
+  char *serialize(Serializer *ser)
+  {
+    Column::serialize(ser);
+    ser->write(colName_);
+    ser->write(currentChunk_);
+    ser->write(currentSize_);
+    for (size_t i = 0; i < currentChunk_; i++)
+    {
+      vals_[i]->serialize(ser);
+    }
+    return ser->getSerChar();
+  }
+
   size_t calculateCurrentChunk(size_t idx)
   {
+    if (idx == NULL)
+    {
+      idx = currentSize_;
+    }
     size_t chunkNum = idx / CHUNK_SIZE;
     if (chunkNum > currentChunk_)
     {
       currentChunk_ = chunkNum;
     }
+
     return chunkNum;
   }
 
@@ -575,7 +677,7 @@ public:
   {
     type_ = 'B';
     colName_ = nullptr;
-    vals_ = new BoolArray*[CHUNK_SIZE];
+    vals_ = new BoolArray *[CHUNK_SIZE];
     for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
       vals_[i] = new BoolArray();
@@ -611,12 +713,47 @@ public:
   {
     type_ = d->readChar();
     colName_ = d->readString();
-    // vals_ = vals_->deserializeBoolArray(d);
+    currentChunk_ = d->readSizeT();
+    currentSize_ = d->readSizeT();
+    vals_ = new BoolArray *[CHUNK_SIZE];
+    for (size_t i = 0; i < currentChunk_; i++)
+    {
+      vals_[i]->deserializeBoolArray(d);
+      add_chunk(vals_[i], i);
+    }
   }
 
-  ~BoolColumn() {
+  ~BoolColumn()
+  {
     delete[] vals_;
   }
+
+  void add_chunk(BoolArray *ba, size_t idx)
+  {
+    vals_[idx] = ba;
+    // We assume that the arrays we add as chunks
+    // will only have length 1000
+    // which we arbitrarily set in the kv store
+    if (ba->length == CHUNK_SIZE)
+    {
+      currentChunk_ += 1;
+    }
+  }
+
+  char *serialize(Serializer *ser)
+  {
+    Column::serialize(ser);
+    ser->write(colName_);
+    ser->write(currentChunk_);
+    ser->write(currentSize_);
+    for (size_t i = 0; i < currentChunk_; i++)
+    {
+      vals_[i]->serialize(ser);
+    }
+    return ser->getSerChar();
+  }
+
+  
 
   void setColName(String *name)
   {
@@ -632,7 +769,6 @@ public:
   bool get(size_t idx)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    printf("length: %zu, idx: %zu\n", calculateCurrentChunk(currentSize_), idx_in_val);
     return vals_[calculateCurrentChunk(idx)]->get(idx_in_val);
   }
 
@@ -692,23 +828,23 @@ public:
 
 Column *Column::deserialize(Deserializer *dser)
 {
-    Column *result = nullptr;
-    char colType = dser->readChar();
-    printf("colType is: %c\n", colType);
-    switch (colType)
-    {
-    case 'I':
-      result = new IntColumn(dser);
-      break;
-    case 'B':
-      result = new BoolColumn(dser);
-      break;
-    // case 'F':
-    //   result = new FloatColumn(dser);
-    //   break;
-    case 'S':
-      result = new StringColumn(dser);
-      break;
-    }
-    return result;
+  Column *result = nullptr;
+  char colType = dser->readChar();
+  printf("colType is: %c\n", colType);
+  switch (colType)
+  {
+  case 'I':
+    result = new IntColumn(dser);
+    break;
+  case 'B':
+    result = new BoolColumn(dser);
+    break;
+  case 'F':
+    result = new FloatColumn(dser);
+    break;
+  case 'S':
+    result = new StringColumn(dser);
+    break;
   }
+  return result;
+}
