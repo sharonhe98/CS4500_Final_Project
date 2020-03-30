@@ -65,13 +65,18 @@ class KVStore : public Object {
 
 	DataFrame* waitAndGet(Key* key) {
 		Value* df_v = get_(key);
+		Deserializer des;
+
 		if (df_v) {
-			Deserializer des;
 			DataFrame* df = df_v->deserialize(des);
 			return df;
 		}
 		else {
-			// request get from other kvstores	
+			// request get from other kvstores
+			while (!df_v) {
+				df_v = get_(key);
+			}	
+			return df_v->deserialize(des);
 		}
 	}
 };
