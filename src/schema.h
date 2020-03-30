@@ -376,7 +376,8 @@ public:
     col_size = 0;
   }
 
-  Schema(Deserializer* d) {
+  Schema(Deserializer *d)
+  {
     track_types = d->readChars();
     row_size = d->readSizeT();
     col_size = d->readSizeT();
@@ -418,7 +419,7 @@ public:
     return ser->getSerChar();
   }
 
-  static Schema* deserialize(Deserializer *d)
+  static Schema *deserialize(Deserializer *d)
   {
     return new Schema(d);
   }

@@ -64,12 +64,9 @@ public:
 
   void write(String *s)
   {
-    printf("successfully write string???\n");
     s->c_str();
-    printf("string size %zu\n", s->allocateSize());
     memcpy(buf + pos, s->c_str(), s->allocateSize());
     pos += s->allocateSize();
-    printf("successfully write string\n");
   }
 
   void write(sockaddr_in s)
@@ -80,7 +77,6 @@ public:
 
   size_t getPos()
   {
-    printf("pos is: %zu\n", pos);
     return pos;
   }
 
@@ -106,7 +102,6 @@ public:
 
   size_t getPos()
   {
-    printf("pos is: %zu\n", pos);
     return pos;
   }
 
@@ -138,7 +133,6 @@ public:
   {
     String *res = new String(buf + pos);
     pos += res->allocateSize();
-    printf("deserialize str pos %zu\n", pos);
     return res;
   }
 

@@ -656,7 +656,6 @@ public:
       return nullptr;
     }
     char *ret = new char[512];
-    sprintf(ret, "%d", vals_[calculateCurrentChunk(i)]->get(i));
     return ret;
   }
 };
@@ -754,7 +753,6 @@ public:
   }
 
   
-
   void setColName(String *name)
   {
     colName_ = name;
@@ -821,7 +819,6 @@ public:
       return nullptr;
     }
     char *ret = new char[512];
-    sprintf(ret, "%d", vals_[calculateCurrentChunk(i)]->get(i));
     return ret;
   }
 };
@@ -830,7 +827,6 @@ Column *Column::deserialize(Deserializer *dser)
 {
   Column *result = nullptr;
   char colType = dser->readChar();
-  printf("colType is: %c\n", colType);
   switch (colType)
   {
   case 'I':

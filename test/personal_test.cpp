@@ -1,7 +1,6 @@
 
 #include <assert.h>
 #include "../src/kvstore.h"
-// #include "../src/icicle_adaptor/column.h"
 #include "../src/sorer.h"
 
 void testArray()
@@ -9,35 +8,27 @@ void testArray()
 	StringArray *sa = new StringArray();
 	assert(sa->length() == 0);
 	assert(sa->size_ == 0);
-	printf("test passsed\n");
 	String *something = new String("something");
 	sa->append(something);
 	assert(sa->length() == 1);
-	printf("append init passed\n");
 	sa->append(something);
 	assert(sa->length() == 2);
-	printf("append next passed\n");
 	sa->append(something);
 	assert(sa->length() == 3);
-	printf("append final passed\n");
+	assert(sa->get(0)->c_str() == something->c_str());
+	printf("test array passsed\n");
 }
 
 void test()
 {
 	Schema s("II");
 	// printf("schema cols %i rows %i\n", s.width(), s.length());
-	printf("SCHEMA IS BUILT!!\n");
 	DataFrame df(s);
-	printf("DATAFRAME IS BUILT!\n");
 	Row r(df.get_schema());
-	printf("ROW IS BUILLTTTTT!\n");
 	for (size_t i = 0; i < 100 * 1000; i++)
 	{
-		//  printf("working?!!\n");
 		r.set(0, (int)i);
-		//printf("INT SET 1!!\n");
 		r.set(1, (int)i + 1);
-		//printf("INT SET 2!!\n");
 		df.add_row(r);
 		printf("ADD ROW PASSED!\n");
 	}
@@ -49,11 +40,9 @@ void test2()
 {
 	Schema s("IIFBS");
 	DataFrame df(s);
-	printf("DATAFRAME IS BUILT!\n");
 	Row r(df.get_schema());
-	printf("ROW IS BUILLTTTTT!\n");
 	String *str = new String("hello world!");
-	for (size_t i = 0; i < 1000 * 100; i++)
+	for (size_t i = 0; i < 2 * 2; i++)
 	{
 		r.set(0, (int)22);
 		r.set(1, (int)23);
@@ -61,8 +50,6 @@ void test2()
 		r.set(3, (bool)1);
 		r.set(4, (String *)str);
 		df.add_row(r);
-
-		printf("ADD ROW PASSED!\n");
 	}
 
 	df.print();
@@ -73,17 +60,13 @@ void test3()
 {
 	Schema s("IIF");
 	DataFrame df(s);
-	printf("DATAFRAME IS BUILT!\n");
 	Row r(df.get_schema());
-	printf("ROW IS BUILLTTTTT!\n");
 	for (size_t i = 0; i < 2 * 2; i++)
 	{
 		r.set(0, (int)22);
 		r.set(1, (int)23);
 		r.set(2, (float)23.5);
 		df.add_row(r);
-
-		printf("ADD ROW PASSED!\n");
 	}
 
 	df.print();
@@ -96,16 +79,17 @@ void testConcat()
 	String *world = new String("world");
 	String *helloworld = hello->concat(world);
 	String *expected = new String("helloworld");
-	printf("hheheh %s\n", helloworld->c_str());
 	assert(helloworld->equals(expected));
+	printf("test concat passed!\n");
 }
 
-void testGetSchema() {
+void testGetSchema()
+{
 	FILE *f = fopen("../src/data.sor", "r");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
 	assert(strcmp(schemaFromFile, "BISFI") == 0);
-	printf("get schema passed!\n");	
+	printf("get schema passed!\n");
 }
 
 void test4()
@@ -113,14 +97,15 @@ void test4()
 	FILE *f = fopen("../src/data.sor", "r");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
-	printf("schema is: %s\n", schemaFromFile);
 	Schema s(schemaFromFile);
 
 	DataFrame *df = sor->setDataFrame(f, 0, 100000);
 	df->print();
+	printf("Build DF from file passed!\n");
 }
 
-void test5() {
+void test5()
+{
 	FILE *f = fopen("../src/3.sor", "r");
 	SOR *sor = new SOR();
 	DataFrame *df = sor->setDataFrame(f, 0, 10000000);
@@ -129,7 +114,6 @@ void test5() {
 
 void testFloatArray()
 {
-	printf("ITS CALLED!\n");
 	FloatArray *fa = new FloatArray();
 	assert(fa->length() == 0);
 	for (size_t i = 0; i < 1000; i++)
@@ -186,9 +170,6 @@ void testBoolColumn()
 		fa->push_back(1);
 	}
 	assert(fa->size() == 1000);
-	printf("%zu\n", fa->currentSize_);
-	printf("%zu\n", fa->size());
-	printf("%i\n", fa->get(1));
 	assert(fa->get(0) == 1);
 	printf("test bool col functions pass!\n");
 }
@@ -246,9 +227,10 @@ int main(int argc, char **argv)
 {
 	testArray();
 	// test();
-	test2();
+	// test2();
 	testConcat();
 	test4();
+	testFloatArray();
 	testFloatsForRow();
 	testBoolArray();
 	testBoolColumn();

@@ -19,6 +19,7 @@ public:
   Schema scm;
   Column **cols;
 
+  DataFrame() {}
   /** Create a data frame with the same columns as the give df but no rows */
   DataFrame(DataFrame &df)
   {
@@ -51,6 +52,24 @@ public:
   ~DataFrame()
   {
     delete[] cols;
+  }
+
+  char* serialize(Serializer* ser) {
+    scm.serialize(ser);
+    for (size_t i = 0; i < ncols(); i++) {
+      cols[i]->serialize(ser);
+    }
+  }
+
+  DataFrame* deserialize(Deserializer* d) {
+    Schema* s = scm.deserialize(d);
+    cols = new Column *[scm.width()];
+    for (size_t i = 0; i < s->width(); i++) {
+      cols[i]->deserialize(d);
+      add_column(cols[i], s->col_names->get(i));
+    }
+    DataFrame* df = new DataFrame();
+    return df;
   }
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
@@ -161,7 +180,7 @@ public:
     }
   }
 
-  double get_float(size_t col, size_t row)
+  double get_double(size_t col, size_t row)
   {
     if (cols[col]->get_type() != 'F' || col >= scm.width() || row >= scm.length())
     {
@@ -208,7 +227,6 @@ public:
     * bound, the result is undefined. */
   void set(size_t col, size_t row, int val)
   {
-    printf("DATAFRAME SET CALLED\n");
     Column *c = cols[col];
     assert(c->get_type() == 'I');
     c->set(row, val);
