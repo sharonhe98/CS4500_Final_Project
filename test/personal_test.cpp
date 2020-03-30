@@ -1,6 +1,6 @@
 
 #include <assert.h>
-#include "../src/dataframe.h"
+#include "../src/kvstore.h"
 // #include "../src/icicle_adaptor/column.h"
 #include "../src/sorer.h"
 
@@ -186,6 +186,9 @@ void testBoolColumn()
 		fa->push_back(1);
 	}
 	assert(fa->size() == 1000);
+	printf("%zu\n", fa->currentSize_);
+	printf("%zu\n", fa->size());
+	printf("%i\n", fa->get(1));
 	assert(fa->get(0) == 1);
 	printf("test bool col functions pass!\n");
 }

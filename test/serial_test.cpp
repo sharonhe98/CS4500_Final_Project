@@ -141,6 +141,11 @@ void testSchemaSerialize() {
     printf("Schema serialize success!\n");
 }
 
+// void testColumnSerialize() {
+//     Serializer* serializer = new Serializer();
+//     Column()
+// }
+
 int main(int argc, char **argv) {
     testStringSerialize();
     testStringArrSerialize();

@@ -55,7 +55,8 @@ public:
   Array **vals_;
   char type_;
   String *colName_;
-  size_t currentChunk;
+  size_t currentChunk_;
+  size_t currentSize_;
 
   Column() {}
 
@@ -107,12 +108,11 @@ public:
   /** Returns the number of elements in the column. */
   virtual size_t size()
   {
-    return vals_[currentChunk]->length();
+    return vals_[currentChunk_]->length();
   };
 
   virtual void set(size_t idx, int val)
   {
-    printf("desgostang\n");
     return;
   }
   virtual void set(size_t index_, bool val) {}
@@ -141,14 +141,25 @@ public:
     return nullptr;
   }
 
-  virtual char *serialize(Serializer *ser) {
+  virtual char* serialize(Serializer *ser) {
     ser->write(type_);
-    ser->write(colName_);
-    // vals_->serialize(ser);
-    return ser->getSerChar();
   };
 
-  Column *deserialize(Deserializer *dser);
+  virtual size_t calculateCurrentChunk(size_t idx)
+  {
+    if (idx == NULL)
+    {
+      idx = currentSize_;
+    }
+    size_t chunkNum = idx / CHUNK_SIZE;
+    if (chunkNum > currentChunk_)
+    {
+      currentChunk_ = chunkNum;
+    }
+    return chunkNum;
+  }
+
+  static Column *deserialize(Deserializer *dser);
 };
 
 /*************************************************************************
@@ -158,16 +169,22 @@ public:
 class IntColumn : public Column
 {
 public:
-  IntArray *vals_;
-  char type_;
+  IntArray **vals_;
   String *colName_;
-  int currentChunk;
+  size_t currentChunk_;
+  size_t currentSize_;
 
   IntColumn()
   {
     type_ = 'I';
     colName_ = nullptr;
-    vals_ = new IntArray();
+    vals_ = new IntArray*[CHUNK_SIZE];
+    for (size_t i = 0; i < CHUNK_SIZE; i++)
+    {
+      vals_[i] = new IntArray();
+    }
+    currentChunk_ = 0;
+    currentSize_ = 0;
   }
 
   ~IntColumn()
@@ -179,13 +196,19 @@ public:
   {
     type_ = 'I';
     va_list args;
-    vals_ = new IntArray();
-
+    vals_ = new IntArray *[CHUNK_SIZE];
+    currentChunk_ = n / CHUNK_SIZE;
+    currentSize_ = 0;
     va_start(args, n);
 
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
-      vals_->append(va_arg(args, int));
+      vals_[i] = new IntArray();
+    }
+    for (size_t i = 0; i < n; i++)
+    {
+      size_t chunkNum = i / CHUNK_SIZE;
+      vals_[chunkNum]->append(va_arg(args, int));
     }
 
     va_end(args);
@@ -195,14 +218,14 @@ public:
   {
     type_ = d->readChar();
     colName_ = d->readString();
-    vals_ = vals_->deserializeIntArray(d);
+    // vals_ = vals_->deserializeIntArray(d);
   }
 
   char *serialize(Serializer *ser)
   {
     ser->write(type_);
     ser->write(colName_);
-    vals_->serialize(ser);
+    // vals_->serialize(ser);
     return ser->getSerChar();
   }
 
@@ -213,13 +236,14 @@ public:
 
   void push_back(int val)
   {
-    vals_->append(val);
+    vals_[calculateCurrentChunk(currentSize_)]->append(val);
+    currentSize_ += 1;
   }
 
   int get(size_t idx)
   {
-    int val = vals_->get(idx);
-    return val;
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    return vals_[calculateCurrentChunk(idx)]->get(idx_in_val);
   }
 
   IntColumn *as_int()
@@ -227,15 +251,30 @@ public:
     return this;
   }
 
+  size_t calculateCurrentChunk(size_t idx)
+  {
+    if (idx == NULL)
+    {
+      idx = currentSize_;
+    }
+    size_t chunkNum = idx / CHUNK_SIZE;
+    if (chunkNum > currentChunk_)
+    {
+      currentChunk_ = chunkNum;
+    }
+    return chunkNum;
+  }
+
   /** Set value at idx. An out of bound idx is undefined.  */
   void set(size_t idx, int val)
   {
-    vals_->set(idx, val);
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    vals_[calculateCurrentChunk(idx)]->set(idx_in_val, val);
   }
 
   size_t size()
   {
-    return vals_->length();
+    return currentSize_;
   }
 
   char get_type()
@@ -255,12 +294,12 @@ public:
   // gets the string representation of the ith element
   char *get_char(size_t i)
   {
-    if (i >= size() || vals_->get(i) == NULL)
+    if (i >= size() || vals_[calculateCurrentChunk(i)]->get(i) == NULL)
     {
       return nullptr;
     }
     char *ret = new char[512];
-    sprintf(ret, "%d", vals_->get(i));
+    sprintf(ret, "%i", vals_[calculateCurrentChunk(i)]->get(i));
     return ret;
   }
 };
@@ -275,32 +314,43 @@ public:
 class StringColumn : public Column
 {
 public:
-  StringArray *vals_;
-  char type_;
+  StringArray **vals_;
   String *colName_;
+  size_t currentChunk_;
+  size_t currentSize_;
 
   StringColumn()
   {
     type_ = 'S';
     colName_ = nullptr;
-    vals_ = new StringArray();
+    vals_ = new StringArray*[CHUNK_SIZE];
+    for (size_t i = 0; i < CHUNK_SIZE; i++)
+    {
+      vals_[i] = new StringArray();
+    }
+    currentChunk_ = 0;
+    currentSize_ = 0;
   }
 
   StringColumn(int n, ...)
   {
     type_ = 'S';
     va_list args;
-    vals_ = new StringArray();
-    String *valueString;
+    vals_ = new StringArray *[CHUNK_SIZE];
+    currentChunk_ = n / CHUNK_SIZE;
+    currentSize_ = 0;
+      String *valueString = new String((va_arg(args, char *)));
 
     va_start(args, n);
 
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
-      String *newString = new String((va_arg(args, char *)));
-      valueString = newString;
-      vals_->append(valueString);
-      delete newString;
+      vals_[i] = new StringArray();
+    }
+    for (size_t i = 0; i < n; i++)
+    {
+      size_t chunkNum = i / CHUNK_SIZE;
+      vals_[chunkNum]->append(valueString);
     }
 
     va_end(args);
@@ -310,12 +360,26 @@ public:
   {
     type_ = d->readChar();
     colName_ = d->readString();
-    vals_ = vals_->deserializeStringArray(d);
+    // vals_ = vals_->deserializeStringArray(d);
   }
 
   ~StringColumn()
   {
     delete vals_;
+  }
+
+  size_t calculateCurrentChunk(size_t idx)
+  {
+    if (idx == NULL)
+    {
+      idx = currentSize_;
+    }
+    size_t chunkNum = idx / CHUNK_SIZE;
+    if (chunkNum > currentChunk_)
+    {
+      currentChunk_ = chunkNum;
+    }
+    return chunkNum;
   }
 
   void setColName(String *name)
@@ -325,13 +389,15 @@ public:
 
   void push_back(String *val)
   {
-    vals_->append(val);
+    vals_[calculateCurrentChunk(currentSize_)]->append(val);
+    currentSize_ += 1;
   }
 
   /** Returns the string at idx; undefined on invalid idx.*/
   String *get(size_t idx)
   {
-    return vals_->get(idx);
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    return vals_[calculateCurrentChunk(idx)]->get(idx_in_val);
   }
 
   StringColumn *as_string()
@@ -342,12 +408,13 @@ public:
   /** Out of bound idx is undefined. */
   void set(size_t idx, String *val)
   {
-    vals_->set(idx, val);
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    vals_[calculateCurrentChunk(idx)]->set(idx_in_val, val);
   }
 
   size_t size()
   {
-    return vals_->length();
+    return currentSize_;
   }
 
   char get_type()
@@ -363,16 +430,16 @@ public:
   // returns the string representation of the element at the ith index
   char *get_char(size_t i)
   {
-    if (i >= size() || vals_->get(i) == nullptr)
+    if (i >= size() || vals_[calculateCurrentChunk(i)]->get(i) == NULL)
     {
       return nullptr;
     }
-    size_t str_len = vals_->get(i)->size();
+    size_t str_len = vals_[calculateCurrentChunk(i)]->get(i)->size();
     char *ret = new char[str_len + 3];
     ret[0] = '"';
     for (size_t j = 0; j < str_len; j++)
     {
-      ret[j + 1] = vals_->get(i)->c_str()[j];
+      ret[j + 1] = vals_[calculateCurrentChunk(i)]->get(i)->c_str()[j];
     }
     ret[str_len + 1] = '"';
     ret[str_len + 2] = '\0';
@@ -388,17 +455,16 @@ class FloatColumn : public Column
 {
 public:
   FloatArray **vals_;
-  char type_;
   String *colName_;
-  int currentChunk_;
-  int currentSize_;
+  size_t currentChunk_;
+  size_t currentSize_;
 
   FloatColumn()
   {
     type_ = 'F';
     colName_ = nullptr;
     vals_ = new FloatArray*[CHUNK_SIZE];
-    for (int i = 0; i < CHUNK_SIZE; i++)
+    for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
       vals_[i] = new FloatArray();
     }
@@ -420,9 +486,9 @@ public:
     {
       vals_[i] = new FloatArray();
     }
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
-      int chunkNum = i / CHUNK_SIZE;
+      size_t chunkNum = i / CHUNK_SIZE;
       vals_[chunkNum]->append(va_arg(args, double));
     }
 
@@ -434,13 +500,13 @@ public:
     delete[] vals_;
   }
 
-  int calculateCurrentChunk(size_t idx)
+  size_t calculateCurrentChunk(size_t idx)
   {
     if (idx == NULL)
     {
       idx = currentSize_;
     }
-    int chunkNum = idx / CHUNK_SIZE;
+    size_t chunkNum = idx / CHUNK_SIZE;
     if (chunkNum > currentChunk_)
     {
       currentChunk_ = chunkNum;
@@ -479,7 +545,7 @@ public:
 
   size_t size()
   {
-    return (size_t)currentSize_;
+    return currentSize_;
   }
 
   char get_type()
@@ -516,28 +582,42 @@ public:
 class BoolColumn : public Column
 {
 public:
-  BoolArray *vals_;
-  char type_;
+  BoolArray **vals_;
   String *colName_;
+  size_t currentChunk_;
+  size_t currentSize_;
 
   BoolColumn()
   {
     type_ = 'B';
     colName_ = nullptr;
-    vals_ = new BoolArray();
+    vals_ = new BoolArray*[CHUNK_SIZE];
+    for (size_t i = 0; i < CHUNK_SIZE; i++)
+    {
+      vals_[i] = new BoolArray();
+    }
+    currentChunk_ = 0;
+    currentSize_ = 0;
   }
 
   BoolColumn(bool n, ...)
   {
     type_ = 'B';
     va_list args;
-    vals_ = new BoolArray();
+    vals_ = new BoolArray *[CHUNK_SIZE];
+    currentChunk_ = n / CHUNK_SIZE;
+    currentSize_ = 0;
 
     va_start(args, n);
 
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
-      vals_->append(va_arg(args, bool));
+      vals_[i] = new BoolArray();
+    }
+    for (size_t i = 0; i < n; i++)
+    {
+      size_t chunkNum = i / CHUNK_SIZE;
+      vals_[chunkNum]->append(va_arg(args, int));
     }
 
     va_end(args);
@@ -547,10 +627,12 @@ public:
   {
     type_ = d->readChar();
     colName_ = d->readString();
-    vals_ = vals_->deserializeBoolArray(d);
+    // vals_ = vals_->deserializeBoolArray(d);
   }
 
-  ~BoolColumn() {}
+  ~BoolColumn() {
+    delete[] vals_;
+  }
 
   void setColName(String *name)
   {
@@ -559,12 +641,14 @@ public:
 
   void push_back(bool val)
   {
-    vals_->append(val);
+    vals_[calculateCurrentChunk(currentSize_)]->append(val);
+    currentSize_ += 1;
   }
 
   bool get(size_t idx)
   {
-    return vals_->get(idx);
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    return vals_[calculateCurrentChunk(idx)]->get(idx_in_val);
   }
 
   BoolColumn *as_bool()
@@ -572,15 +656,30 @@ public:
     return this;
   }
 
+  size_t calculateCurrentChunk(size_t idx)
+  {
+    if (idx == NULL)
+    {
+      idx = currentSize_;
+    }
+    size_t chunkNum = idx / CHUNK_SIZE;
+    if (chunkNum > currentChunk_)
+    {
+      currentChunk_ = chunkNum;
+    }
+    return chunkNum;
+  }
+
   /** Set value at idx. An out of bound idx is undefined.  */
   void set(size_t idx, bool val)
   {
-    vals_->set(idx, val);
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    vals_[calculateCurrentChunk(idx)]->set(idx_in_val, val);
   }
 
   size_t size()
   {
-    return vals_->length();
+    return currentSize_;
   }
 
   char get_type()
@@ -600,12 +699,12 @@ public:
   // get str representation of ith element
   char *get_char(size_t i)
   {
-    if (i >= size() || vals_->get(i) == NULL)
+    if (i >= size() || vals_[calculateCurrentChunk(i)]->get(i) == NULL)
     {
       return nullptr;
     }
     char *ret = new char[512];
-    sprintf(ret, "%d", vals_->get(i));
+    sprintf(ret, "%d", vals_[calculateCurrentChunk(i)]->get(i));
     return ret;
   }
 };
