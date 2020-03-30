@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <cassert>
 #include "string.h"
 #include "object.h"
 #include "array.h"
@@ -35,7 +36,6 @@ class KVStore : public Object {
 	public:
 		size_t index;
 		Map* kvstore;
-		// Array of keys?
 
 	KVStore(size_t nodes) {
 		index = nodes;
@@ -46,10 +46,17 @@ class KVStore : public Object {
 		delete kvstore;
 	}
 
+	Value* get_(Key key) {
+		return kvstore->get(key); // returns nullptr if key is not in map
+	}
+
 	
 	DataFrame* get(Key key) {
-		
-		return; //ds.readDataFrame();
+		Value* df_v = get_(key);
+		assert(df_v);
+		Deserializer des;
+		DataFrame* df = df_v->deserialize(des);
+		return df;
 	}
 
 	void put(Key* key, Value* value) {
@@ -57,10 +64,15 @@ class KVStore : public Object {
 	}
 
 	DataFrame* waitAndGet(Key* key) {
-		// somehow wait for all threads to finish
-		// when threads are finished, get value
-		// create DataFrame after values are gotten
-		// return the dataframe
+		Value* df_v = get_(key);
+		if (df_v) {
+			Deserializer des;
+			DataFrame* df = df_v->deserialize(des);
+			return df;
+		}
+		else {
+			// request get from other kvstores	
+		}
 	}
 };
 
