@@ -8,6 +8,7 @@
 #include "array.h"
 #include "dataframe.h"
 #include "map.h"
+#include "network.h"
 
 class Key : public Object
 {

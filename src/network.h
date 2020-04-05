@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#include "network_ifc.h"
 
 class NodeInfo : public Object {
 	public:
@@ -111,4 +111,4 @@ class NetworkIP : public NetworkIfc {
 		Message* msg = Message::deserialize(s, sender);
 		return msg;
 	}	
-}
+};

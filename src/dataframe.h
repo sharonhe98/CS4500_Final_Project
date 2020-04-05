@@ -151,7 +151,6 @@ public:
     default:
       c = new Column();
     }
-    c->setColName(name);
     Column **newCols = new Column *[scm.width()];
     for (size_t i = 0; i < scm.width() - 1; i++)
     {

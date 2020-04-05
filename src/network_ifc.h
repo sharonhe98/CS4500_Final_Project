@@ -6,4 +6,4 @@ class NetworkIfc : public Object {
 		virtual size_t index() { assert(false); }
 		virtual void send_m(Message* msg) = 0;
 		virtual Message* recv_m() = 0;
-}
+};
