@@ -51,10 +51,14 @@ public:
 
   ~DataFrame()
   {
+    for (size_t i = 0; i < scm.width(); i++)
+      {
+        delete cols[i];
+      }
     delete[] cols;
   }
 
-  char* serialize(Serializer* ser) {
+  void serialize(Serializer* ser) {
     scm.serialize(ser);
     for (size_t i = 0; i < ncols(); i++) {
       cols[i]->serialize(ser);
@@ -68,7 +72,7 @@ public:
       cols[i]->deserialize(d);
       add_column(cols[i], s->col_names->get(i));
     }
-    DataFrame* df = new DataFrame();
+    DataFrame* df = new DataFrame(*s);
     return df;
   }
 
@@ -357,39 +361,6 @@ public:
     return ndf;
   }
 
-  static DataFrame *fromArray(Key key, KVStore kv, size_t SZ, double *vals)
-  {
-    Schema s("F");
-    DataFrame* df = new DataFrame(s);
-    FloatColumn* fc = new FloatColumn();
-    for (size_t i = 0; i < SZ; i++) {
-      fc->push_back(vals[i]);
-    }
-    df->add_column(fc, key.key);
-    Serializer* serializer;
-    df->serialize(serializer);
-    Value* df_v = new Value(serializer->getSerChar());
-    kv.put(&key, df_v);
-    return df;
-  }
-
-  // basic implementation of fromScalar using only doubles
-  static DataFrame *fromScalar(Key key, KVStore kv, double val)
-  {
-    Schema s("F");
-    DataFrame* df = new DataFrame(s);
-    FloatColumn* fc = new FloatColumn();
-    fc->push_back(val);
-    df->add_column(fc, key.key);
-    Serializer* serializer;
-    df->serialize(serializer);
-    Value* df_v = new Value(serializer->getSerChar());
-    kv.put(&key, df_v);
-    return df;
-  }
-
-
-
     /** Print the dataframe in SoR format to standard output. */
   void print()
   {
@@ -408,10 +379,7 @@ public:
           printf("\t");
         }
         if (cols[j]->get_type() == 'F')
-        {
-          printf("< %d >", cols[j]->as_float()->get(i));
-          printf("\t");
-        }
+          p("< ").p(cols[j]->as_float()->get(i)).p(" >\t");
         if (cols[j]->get_type() == 'S')
         {
           String *s = cols[j]->as_string()->get(i);

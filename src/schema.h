@@ -361,19 +361,20 @@ public:
   Schema(Schema &from) : Object(from)
   {
     track_types = from.track_types;
-    col_names = from.col_names;
-    row_names = from.row_names;
     col_size = from.col_size;
     row_size = from.row_size;
+    col_names = from.col_names;
+    row_names = from.row_names;
   }
 
   /** Create an empty schema **/
   Schema()
   {
-    row_names = new StringArray();
-    col_names = new StringArray();
     track_types = nullptr;
     col_size = 0;
+    row_size = 0;
+    row_names = new StringArray();
+    col_names = new StringArray();
   }
 
   Schema(Deserializer *d)

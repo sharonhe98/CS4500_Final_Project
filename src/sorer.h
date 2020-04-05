@@ -63,24 +63,6 @@ public:
         return cols_[index]->get_type();
     }
 
-    // What is the value for the given column index and row index?
-    // If the coluumn or row index are too large a nullptr is returned
-    char *get_value(size_t col_index, size_t row_index)
-    {
-        if (col_index >= len_)
-        {
-            return nullptr;
-        }
-        return cols_[col_index]->get_char(row_index);
-    }
-
-    // Is there a value at the given column and row index.
-    // If the indexes are too large, true is returned.
-    bool is_missing(size_t col_index, size_t row_index)
-    {
-        return get_value(col_index, row_index) == nullptr;
-    }
-
     // Reads in the data from the file starting at the from byte
     // and reading at most len bytes
     void read(FILE *f, size_t from, size_t len)
@@ -224,7 +206,6 @@ public:
             Row r(s);
             size_t num_fields;
             char **row = parse_row_(buf, &num_fields);
-            size_t row_count = 0;
             for (size_t i = 0; i < df->ncols(); i++)
             {
                 if (i >= num_fields)
@@ -390,6 +371,7 @@ public:
     // read the rows from the starting byte up to len bytes into Columns.
     void parse_(FILE *f, size_t from, size_t len)
     {
+        printf("PARSE CALLED HERE!\n");
         seek_(f, from);
         char buf[buff_len];
 
@@ -416,8 +398,10 @@ public:
             bool skip = false;
             for (size_t i = 0; i < len_; i++)
             {
+                printf("FOR LOOP CALLED HERE!\n");
                 if (!cols_[i]->can_add(row[i]))
                 {
+                    printf("CALLED HERE!\n");
                     skip = true;
                     break;
                 }

@@ -39,22 +39,22 @@ class KVStore : public Object
 {
 public:
 	size_t index;
-	Map *kvstore;
+	Map *kv;
 
 	KVStore(size_t nodes)
 	{
 		index = nodes;
-		kvstore = new Map();
+		kv = new Map();
 	}
 
 	~KVStore()
 	{
-		delete kvstore;
+		delete kv;
 	}
 
 	Value *get_(Key *key)
 	{
-		return dynamic_cast<Value *>(kvstore->get(key)); // returns nullptr if key is not in map
+		return dynamic_cast<Value *>(kv->get(key)); // returns nullptr if key is not in map
 	}
 
 	DataFrame *get(Key *key)
@@ -70,7 +70,7 @@ public:
 
 	void put(Key *key, Value *value)
 	{
-		kvstore->set(key, value);
+		kv->set(key, value);
 	}
 
 	DataFrame *waitAndGet(Key *key)
@@ -96,3 +96,34 @@ public:
 		return df;
 	}
 };
+
+DataFrame *fromArray(Key &key, KVStore &kv, size_t SZ, double *vals)
+  {
+    Schema s("F");
+    DataFrame* df = new DataFrame(s);
+    FloatColumn* fc = new FloatColumn();
+    for (size_t i = 0; i < SZ; i++) {
+      fc->push_back(vals[i]);
+    }
+    df->add_column(fc, key.key);
+    Serializer serializer;
+    df->serialize(&serializer);
+    Value* df_v = new Value(serializer.getSerChar());
+    kv.put(&key, df_v);
+    return df;
+  }
+
+  // basic implementation of fromScalar using only doubles
+  DataFrame *fromScalar(Key &key, KVStore &kv, double val)
+  {
+    Schema s("F");
+    DataFrame* df = new DataFrame(s);
+    FloatColumn* fc = new FloatColumn();
+    fc->push_back(val);
+    df->add_column(fc, key.key);
+    Serializer serializer;
+    df->serialize(&serializer);
+    Value* df_v = new Value(serializer.getSerChar());
+    kv.put(&key, df_v);
+    return df;
+  }

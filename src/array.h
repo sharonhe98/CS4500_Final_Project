@@ -593,8 +593,7 @@ public:
 
     for (size_t i = 0; i < sizeArr; i++)
     {
-      // get the new position offset
-      size_t current_offset = d->getPos();
+
       // deserialize string at the offset position
       double deserDouble = d->readDouble();
       // add string to result array
@@ -822,8 +821,6 @@ public:
 
     for (size_t i = 0; i < sizeArr; i++)
     {
-      // get the new position offset
-      size_t current_offset = d->getPos();
       // deserialize string at the offset position
       bool deserBool = d->readBool();
       // add string to result array
@@ -851,13 +848,12 @@ public:
   {
     // serialize size of array
     ser->write(length());
+    printf("length is %zu\n", length());
     // for every string, serialize
     for (size_t i = 0; i < length(); i++)
     {
-      String *str = (String *)get_(i);
-      pln(str->c_str());
+      String *str = dynamic_cast<String *>(get_(i));
       ser->write(str);
-      ser->getPos();
     }
     return ser->getSerChar();
   };
@@ -873,8 +869,6 @@ public:
 
     for (size_t i = 0; i < sizeArr; i++)
     {
-      // get the new position offset
-      size_t current_offset = d->getPos();
       // deserialize string at the offset position
       String *deserStr = d->readString();
       // add string to result array

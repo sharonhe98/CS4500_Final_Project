@@ -64,7 +64,6 @@ public:
 
   void write(String *s)
   {
-    s->c_str();
     memcpy(buf + pos, s->c_str(), s->allocateSize());
     pos += s->allocateSize();
   }

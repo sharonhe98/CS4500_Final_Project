@@ -16,30 +16,13 @@ class BoolColumn;
 // returns the inferred typing of the char*
 char inferred_type(char *c)
 {
-  // missing values
-  if (c == nullptr)
+  if (c == nullptr || ((strlen(c) == 1) && ((*c == '0') || (*c == '1')))) 
   {
     return 'B';
-  }
-  // check boolean
-  if (strlen(c) == 1)
-  {
-    if ((*c == '0') || (*c == '1'))
-    {
-      return 'B';
-    }
-  }
-  // check int
-  if (is_int(c))
-  {
-    return 'I';
-  }
-  // check float
-  if (is_float(c))
-  {
-    return 'F';
-  }
-  return 'S';
+  } 
+  if (is_int(c)) {return 'I';}
+  if (is_float(c)) {return 'F';}
+  else {return 'S';}
 }
 
 /**************************************************************************
@@ -64,7 +47,7 @@ public:
   /** Type converters: Return the same column under its actual type, or
  *    *  nullptr if of the wrong type.  */
 
-  virtual void setColName(String *name)
+  void setColName(String *name)
   {
     colName_ = name;
   }
@@ -120,7 +103,7 @@ public:
   virtual void set(size_t index_, String *val) {}
 
   /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'.*/
-  virtual char get_type()
+  char get_type()
   {
     return type_;
   };
@@ -133,12 +116,6 @@ public:
       return true;
     }
     return false;
-  }
-
-  // returns the string representation of the object at the ith index
-  virtual char *get_char(size_t i)
-  {
-    return nullptr;
   }
 
   virtual size_t calculateCurrentChunk(size_t idx)
@@ -168,7 +145,6 @@ class IntColumn : public Column
 {
 public:
   IntArray **vals_;
-  String *colName_;
   size_t currentChunk_;
   size_t currentSize_;
 
@@ -187,29 +163,10 @@ public:
 
   ~IntColumn()
   {
-    delete vals_;
-  }
-
-  IntColumn(int n, ...)
-  {
-    type_ = 'I';
-    va_list args;
-    vals_ = new IntArray *[CHUNK_SIZE];
-    currentChunk_ = n / CHUNK_SIZE;
-    currentSize_ = 0;
-    va_start(args, n);
-
-    for (size_t i = 0; i < CHUNK_SIZE; i++)
-    {
-      vals_[i] = new IntArray();
+    for (size_t i = 0; i < size(); i++) {
+      delete vals_[i];
     }
-    for (size_t i = 0; i < n; i++)
-    {
-      size_t chunkNum = i / CHUNK_SIZE;
-      vals_[chunkNum]->append(va_arg(args, int));
-    }
-
-    va_end(args);
+    delete [] vals_;
   }
 
   IntColumn(Deserializer *d)
@@ -237,11 +194,6 @@ public:
       vals_[i]->serialize(ser);
     }
     return ser->getSerChar();
-  }
-
-  void setColName(String *name)
-  {
-    colName_ = name;
   }
 
   void push_back(int val)
@@ -277,7 +229,7 @@ public:
     // We assume that the arrays we add as chunks
     // will only have length 1000
     // which we arbitrarily set in the kv store
-    if (ia->length == CHUNK_SIZE)
+    if (ia->length() == CHUNK_SIZE)
     {
       currentChunk_ += 1;
     }
@@ -295,11 +247,6 @@ public:
     return currentSize_;
   }
 
-  char get_type()
-  {
-    return type_;
-  }
-
   bool can_add(char *c)
   {
     if (c == nullptr || inferred_type(c) == 'I' || inferred_type(c) == 'B')
@@ -309,17 +256,6 @@ public:
     return false;
   }
 
-  // gets the string representation of the ith element
-  char *get_char(size_t i)
-  {
-    if (i >= size() || vals_[calculateCurrentChunk(i)]->get(i) == NULL)
-    {
-      return nullptr;
-    }
-    char *ret = new char[512];
-    sprintf(ret, "%i", vals_[calculateCurrentChunk(i)]->get(i));
-    return ret;
-  }
 };
 
 // Other primitive column classes similar...
@@ -333,7 +269,6 @@ class StringColumn : public Column
 {
 public:
   StringArray **vals_;
-  String *colName_;
   size_t currentChunk_;
   size_t currentSize_;
 
@@ -348,30 +283,6 @@ public:
     }
     currentChunk_ = 0;
     currentSize_ = 0;
-  }
-
-  StringColumn(int n, ...)
-  {
-    type_ = 'S';
-    va_list args;
-    vals_ = new StringArray *[CHUNK_SIZE];
-    currentChunk_ = n / CHUNK_SIZE;
-    currentSize_ = 0;
-    String *valueString = new String((va_arg(args, char *)));
-
-    va_start(args, n);
-
-    for (size_t i = 0; i < CHUNK_SIZE; i++)
-    {
-      vals_[i] = new StringArray();
-    }
-    for (size_t i = 0; i < n; i++)
-    {
-      size_t chunkNum = i / CHUNK_SIZE;
-      vals_[chunkNum]->append(valueString);
-    }
-
-    va_end(args);
   }
 
   StringColumn(Deserializer *d)
@@ -394,7 +305,7 @@ public:
     // We assume that the arrays we add as chunks
     // will only have length 1000
     // which we arbitrarily set in the kv store
-    if (sa->length == CHUNK_SIZE)
+    if (sa->length() == CHUNK_SIZE)
     {
       currentChunk_ += 1;
     }
@@ -415,7 +326,10 @@ public:
 
   ~StringColumn()
   {
-    delete vals_;
+    for (size_t i = 0; i < size(); i++) {
+      delete vals_[i];
+    }
+    delete [] vals_;
   }
 
   size_t calculateCurrentChunk(size_t idx)
@@ -426,11 +340,6 @@ public:
       currentChunk_ = chunkNum;
     }
     return chunkNum;
-  }
-
-  void setColName(String *name)
-  {
-    colName_ = name;
   }
 
   void push_back(String *val)
@@ -461,11 +370,6 @@ public:
   size_t size()
   {
     return currentSize_;
-  }
-
-  char get_type()
-  {
-    return type_;
   }
 
   bool can_add(char *c)
@@ -501,7 +405,6 @@ class FloatColumn : public Column
 {
 public:
   FloatArray **vals_;
-  String *colName_;
   size_t currentChunk_;
   size_t currentSize_;
 
@@ -518,32 +421,12 @@ public:
     currentSize_ = 0;
   }
 
-  FloatColumn(double n, ...)
-  {
-    type_ = 'F';
-    va_list args;
-    vals_ = new FloatArray *[CHUNK_SIZE];
-    currentChunk_ = n / CHUNK_SIZE;
-    currentSize_ = 0;
-
-    va_start(args, n);
-
-    for (size_t i = 0; i < CHUNK_SIZE; i++)
-    {
-      vals_[i] = new FloatArray();
-    }
-    for (size_t i = 0; i < n; i++)
-    {
-      size_t chunkNum = i / CHUNK_SIZE;
-      vals_[chunkNum]->append(va_arg(args, double));
-    }
-
-    va_end(args);
-  }
-
   ~FloatColumn()
   {
-    delete[] vals_;
+    for (size_t i = 0; i < size(); i++) {
+      delete vals_[i];
+    }
+    delete [] vals_;
   }
 
   FloatColumn(Deserializer *d)
@@ -566,7 +449,7 @@ public:
     // We assume that the arrays we add as chunks
     // will only have length 1000
     // which we arbitrarily set in the kv store
-    if (fa->length == CHUNK_SIZE)
+    if (fa->length() == CHUNK_SIZE)
     {
       currentChunk_ += 1;
     }
@@ -587,10 +470,7 @@ public:
 
   size_t calculateCurrentChunk(size_t idx)
   {
-    if (idx == NULL)
-    {
-      idx = currentSize_;
-    }
+
     size_t chunkNum = idx / CHUNK_SIZE;
     if (chunkNum > currentChunk_)
     {
@@ -598,11 +478,6 @@ public:
     }
 
     return chunkNum;
-  }
-
-  void setColName(String *name)
-  {
-    colName_ = name;
   }
 
   void push_back(double val)
@@ -634,11 +509,6 @@ public:
     return currentSize_;
   }
 
-  char get_type()
-  {
-    return type_;
-  }
-
   bool can_add(char *c)
   {
     if (c == nullptr || inferred_type(c) == 'F' || inferred_type(c) == 'B' || inferred_type(c) == 'I')
@@ -648,16 +518,6 @@ public:
     return false;
   }
 
-  // get string rep of element at ith index
-  char *get_char(size_t i)
-  {
-    if (i >= size() || vals_[calculateCurrentChunk(i)]->get(i) == NULL)
-    {
-      return nullptr;
-    }
-    char *ret = new char[512];
-    return ret;
-  }
 };
 
 /*************************************************************************
@@ -668,7 +528,6 @@ class BoolColumn : public Column
 {
 public:
   BoolArray **vals_;
-  String *colName_;
   size_t currentChunk_;
   size_t currentSize_;
 
@@ -683,29 +542,6 @@ public:
     }
     currentChunk_ = 0;
     currentSize_ = 0;
-  }
-
-  BoolColumn(bool n, ...)
-  {
-    type_ = 'B';
-    va_list args;
-    vals_ = new BoolArray *[CHUNK_SIZE];
-    currentChunk_ = n / CHUNK_SIZE;
-    currentSize_ = 0;
-
-    va_start(args, n);
-
-    for (size_t i = 0; i < CHUNK_SIZE; i++)
-    {
-      vals_[i] = new BoolArray();
-    }
-    for (size_t i = 0; i < n; i++)
-    {
-      size_t chunkNum = i / CHUNK_SIZE;
-      vals_[chunkNum]->append(va_arg(args, int));
-    }
-
-    va_end(args);
   }
 
   BoolColumn(Deserializer *d)
@@ -724,7 +560,10 @@ public:
 
   ~BoolColumn()
   {
-    delete[] vals_;
+    for (size_t i = 0; i < size(); i++) {
+      delete vals_[i];
+    }
+    delete [] vals_;
   }
 
   void add_chunk(BoolArray *ba, size_t idx)
@@ -733,7 +572,7 @@ public:
     // We assume that the arrays we add as chunks
     // will only have length 1000
     // which we arbitrarily set in the kv store
-    if (ba->length == CHUNK_SIZE)
+    if (ba->length() == CHUNK_SIZE)
     {
       currentChunk_ += 1;
     }
@@ -750,12 +589,6 @@ public:
       vals_[i]->serialize(ser);
     }
     return ser->getSerChar();
-  }
-
-  
-  void setColName(String *name)
-  {
-    colName_ = name;
   }
 
   void push_back(bool val)
@@ -797,11 +630,6 @@ public:
     return currentSize_;
   }
 
-  char get_type()
-  {
-    return type_;
-  }
-
   bool can_add(char *c)
   {
     if (c == nullptr || inferred_type(c) == 'B')
@@ -811,16 +639,6 @@ public:
     return false;
   }
 
-  // get str representation of ith element
-  char *get_char(size_t i)
-  {
-    if (i >= size() || vals_[calculateCurrentChunk(i)]->get(i) == NULL)
-    {
-      return nullptr;
-    }
-    char *ret = new char[512];
-    return ret;
-  }
 };
 
 Column *Column::deserialize(Deserializer *dser)

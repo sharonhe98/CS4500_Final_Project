@@ -5,6 +5,7 @@
 #include "../src/helper.h"
 #include "../src/array.h"
 #include "../src/schema.h"
+#include "../src/message.h"
 
 #define LOG(...) fprintf(stderr, "(" __FILE__ ") " __VA_ARGS__);
 
@@ -43,8 +44,9 @@ void testStringArrSerialize()
     assert(s1->equals(sa->get(0)));
     String *s2 = dsa->get(1);
     assert(s2->equals(sa->get(1)));
+    
     delete serializer;
-    delete[] sa;
+    //delete [] sa;
     delete strfoo;
     delete strbar;
     delete deserializer;
@@ -74,7 +76,7 @@ void testIntArrSerialize()
     int i3 = dia->get(2);
     assert(i3 == ia->get(2));
     delete serializer;
-    delete[] ia;
+    // delete[] ia;
     delete deserializer;
     printf("test IntArray de/serialize passed!\n");
 }
@@ -102,7 +104,7 @@ void testBoolArrSerialize()
     bool b3 = dba->get(2);
     assert(b3 == ba->get(2));
     delete serializer;
-    delete ba;
+    // delete ba;
     delete deserializer;
     printf("test BoolArray de/serialize passed!\n");
 }
@@ -120,18 +122,46 @@ void testCharStar()
     assert(types[1] == deChar[1]);
     delete serializer;
     delete deserializer;
-    printf("huh?\n");
+    printf("test char passed\n");
 }
 
 void testSchemaSerialize()
 {
     Serializer *serializer = new Serializer();
     Schema *isfb = new Schema("ISFB");
-    isfb->serialize(serializer);
-    Deserializer *deserializer;
-    Schema *deSchema = Schema::deserialize(deserializer);
+    char* result = isfb->serialize(serializer);
+    Deserializer *deserializer = new Deserializer(result);
+    Schema *deSchema = Schema::deserialize(deserializer); // cannot deserialize nullptr string
     assert(isfb->track_types == deSchema->track_types);
+    delete serializer;
+    delete deserializer;
     printf("Schema serialize success!\n");
+}
+
+void testMessageSerialize()
+{
+    String *good = new String("good");
+    printf("string char is %s\n", good->c_str());
+    Status *status = new Status(MsgKind::Status, 1, 2, 3, good);
+    Serializer *ser = new Serializer();
+    printf("serialize msg successfully??\n");
+    status->serialize(ser);
+    char *result = ser->getSerChar();
+    printf("serialize msg successfully\n");
+    assert(result);
+    Deserializer *dser = new Deserializer(result);
+    Message *msg = Message::deserializeMsg(dser);
+    printf("what is it? %i, %i\n", msg->kind_,status->kind_);
+    assert(msg->kind_ == status->kind_);
+    assert((int)msg->kind_ == 6);
+    assert(msg->sender_ == status->sender_);
+    assert(msg->target_ == status->target_);
+    assert(msg->id_ == status->id_);
+    // assert(msg->msg_);
+    printf("deserialize msg successfully\n");
+    delete good;
+    delete status;
+    delete ser;
 }
 
 int main(int argc, char **argv)
@@ -141,7 +171,8 @@ int main(int argc, char **argv)
     testIntArrSerialize();
     testBoolArrSerialize();
     testCharStar();
-    testSchemaSerialize();
+    //testSchemaSerialize();
+    testMessageSerialize();
 
     LOG("Done.\n");
     return 0;
