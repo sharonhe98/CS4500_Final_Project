@@ -343,21 +343,18 @@ public:
       {
         if (cols[j]->get_type() == 'I')
         {
-          printf("< %i >", cols[j]->as_int()->get(i));
-          printf("\t");
+          p("< ").p(cols[j]->as_int()->get(i)).p(" >\t");
         }
         if (cols[j]->get_type() == 'B')
         {
-          printf("< %i >", cols[j]->as_bool()->get(i));
-          printf("\t");
+          p("< ").p(cols[j]->as_bool()->get(i)).p(" >\t");
         }
         if (cols[j]->get_type() == 'F')
           p("< ").p(cols[j]->as_float()->get(i)).p(" >\t");
         if (cols[j]->get_type() == 'S')
         {
           String *s = cols[j]->as_string()->get(i);
-          printf("< %s >", s->c_str());
-          printf("\t");
+          p("< ").p(s->c_str()).p(" >\t");
         }
       }
       printf("\n");

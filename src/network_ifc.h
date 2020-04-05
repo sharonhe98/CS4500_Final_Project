@@ -1,4 +1,6 @@
 #pragma once
+#include "message.h"
+#include "object.h"
 
 class NetworkIfc : public Object {
 	public:

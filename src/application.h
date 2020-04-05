@@ -6,7 +6,7 @@
 #include "kvstore.h"
 #include "dataframe.h"
 
-class Application
+class Application : public Object
 {
 public:
   KVStore *kv;

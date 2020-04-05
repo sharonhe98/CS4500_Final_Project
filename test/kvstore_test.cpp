@@ -14,7 +14,9 @@ void testGet()
 	Key *key = new Key("df_key", 0);
 	assert(!kv->get(key));
 	Serializer *ser;
-	Value *v = new Value(df->serialize(ser));
+	df->serialize(ser);
+	char* result = ser->getSerChar();
+	Value *v = new Value(result);
 
 	kv->put(key, v);
 	assert(kv->get(key)->equals(v));
@@ -27,7 +29,9 @@ void testWaitAndGet()
 	DataFrame *df = new DataFrame(s);
 	Key *key = new Key("df_key", 0);
 	Serializer *ser;
-	Value v(df->serialize(ser));
+	df->serialize(ser);
+	char* result = ser->getSerChar();
+	Value v(result);
 
 	KVStore **all_nodes = new KVStore *[3];
 	for (size_t i = 0; i < 3; i++)

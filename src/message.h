@@ -189,12 +189,12 @@ class Directory : public Message
 public:
   size_t client_;
 
-  size_t *ports_; // owned
+  IntArray *ports_; // owned
 
   // String ** addresses;  // owned; strings owned
   StringArray *addresses_;
 
-  Directory(MsgKind kind_, size_t sender_, size_t target_, size_t id_, size_t client, size_t *ports, StringArray *addresses) : Message(kind_, sender_, target_, id_)
+  Directory(MsgKind kind_, size_t sender_, size_t target_, size_t id_, size_t client, IntArray *ports, StringArray *addresses) : Message(kind_, sender_, target_, id_)
   {
     client_ = client;
     ports_ = ports;
@@ -204,7 +204,7 @@ public:
   Directory(Deserializer *d) : Message(d, MsgKind::Directory)
   {
     client_ = d->readSizeT();
-    *ports_ = d->readSizeT();
+    ports_ = ports_->deserializeIntArray(d);
     addresses_ = addresses_->deserializeStringArray(d);
   }
 
@@ -212,7 +212,7 @@ public:
   {
     Message::serialize(ser);
     ser->write(client_);
-    ser->write(*ports_);
+    ports_->serialize(ser);
     addresses_->serialize(ser);
   }
 };

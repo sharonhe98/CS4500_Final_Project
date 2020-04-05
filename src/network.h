@@ -1,114 +1,141 @@
 #pragma once
-#include "message.h"
+#include "network_ifc.h"
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "network_ifc.h"
 
-class NodeInfo : public Object {
-	public:
-		unsigned id;
-		sockaddr_in address;
+class NodeInfo : public Object
+{
+public:
+	size_t id;
+	sockaddr_in address;
 };
 
-class NetworkIP : public NetworkIfc {
-	public:
-		NodeInfo* nodes_; // a collection of all the nodes in the network
-		size_t num_nodes;
-		size_t current_node; // current node index
-		int sock_; // the socket
-		sockaddr_in ip_; // the current ip address
+class NetworkIP : public NetworkIfc
+{
+public:
+	NodeInfo *nodes_; // a collection of all the nodes in the network
+	size_t num_nodes;
+	size_t current_node; // current node index
+	int sock_;			 // the socket
+	sockaddr_in ip_;	 // the current ip address
+	IntArray* ports;
+	StringArray* addresses;
 
-	NetworkIP() {
+	NetworkIP()
+	{
+		ports = new IntArray();
 		nodes_ = new NodeInfo[0];
 		num_nodes = 0;
 		current_node = 0;
+		addresses = new StringArray();
 	}
 
-	~NetworkIP() { close(sock_); }
+	~NetworkIP() {
+		delete [] ports;
+		delete [] addresses;
+		close(sock_); 
+	}
 
-	size_t index() override {return current_node; }
+	size_t index() override { return current_node; }
 
-	void init_sock_(size_t port) {
-		assert((sock_ = sock(AF_INET, SOCK_STREAM, 0)) >= 0);
+	void init_sock_(size_t port)
+	{
+		assert((sock_ = socket(AF_INET, SOCK_STREAM, 0)) >= 0);
 		int opt = 1;
 		assert(setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == 0);
 		ip_.sin_family = AF_INET;
 		ip_.sin_addr.s_addr = INADDR_ANY;
 		ip_.sin_port = htons(port);
-		assert(bind(sock_, (sockaddr*)&ip_, sizeof(ip_)) >= 0);
-		assert(listen(sock_, 100) >= 0);	
+		assert(bind(sock_, (sockaddr *)&ip_, sizeof(ip_)) >= 0);
+		assert(listen(sock_, 100) >= 0);
 	}
 
 	// initializes the server/registration node to node 0
-	void server_init(unsigned idx, unsigned port) {
+	void server_init(unsigned idx, unsigned port)
+	{
 		current_node = idx;
 		init_sock_(port);
-		if (num_nodes > 0) { // assume we only add client nodes to the directory
-			Directory ipd(ports, addresses);
-			for (size_t i = 1; i < num_nodes; i++) {
+		if (num_nodes > 0)
+		{ // assume we only add client nodes to the directory
+			
+			for (size_t i = 1; i < num_nodes; i++)
+			{
+				Directory ipd(MsgKind::Directory, current_node, i, nodes_[i].id, i, ports, addresses);
 				ipd.target_ = i;
 				send_m(&ipd);
+				
 			}
 		}
 	}
 
-	void client_init(unsigned idx, unsigned port, char* server_addr, unsigned server_port) {
+	void client_init(unsigned idx, unsigned port, char *server_addr, unsigned server_port)
+	{
 		current_node = idx;
-		init_sock(port);
+		init_sock_(port);
 		nodes_ = new NodeInfo[num_nodes + 1];
 		nodes_[num_nodes].id = 0;
 		nodes_[num_nodes].address.sin_family = AF_INET;
 		nodes_[num_nodes].address.sin_port = htons(server_port);
-		if (inet_pton(AF_INET, server_adr, &nodes_[num_nodes].address.sin_addr) <= 0) {
+		if (inet_pton(AF_INET, server_addr, &nodes_[num_nodes].address.sin_addr) <= 0)
+		{
 			assert(false && "Invalid server IP address format");
 		}
-		Register msg(idx, port);
+		Register msg(MsgKind::Register, current_node, 0, num_nodes, ip_, port);
 		send_m(&msg);
-		Directory* ipd = dynamic_cast<Directory*>(recv_m());
+		num_nodes++;
+		ports->append(port);
+		Directory *ipd = dynamic_cast<Directory *>(recv_m());
 		//ipd->log();
-		for (size_t i = 0; i < ipd->clients; i++) {
+		for (size_t i = 0; i < ipd->addresses_->length(); i++)
+		{
 			nodes_[i].id = i + 1;
 			nodes_[i].address.sin_family = AF_INET;
-			nodes_[i].address.sin_port = htons(ipd->ports[i]);
-			if (inet_pton(AF_INET, ipd->addresses[i]->c_str(), &nodes_[i].address.sin_addr) <= 0) {
+			nodes_[i].address.sin_port = htons(ipd->ports_->get(i));
+			if (inet_pton(AF_INET, ipd->addresses_->get(i)->c_str(), &nodes_[i].address.sin_addr) <= 0)
+			{
 				printf("Invalid IP directory-addr for node %zu", (i + 1));
 				exit(1);
 			}
 		}
 	}
 
-	void send_m(Message* msg) override {
+	void send_m(Message *msg) override
+	{
 		NodeInfo &target = nodes_[msg->getTarget()];
 		int connected = socket(AF_INET, SOCK_STREAM, 0);
 		assert(connected >= 0 && "Unable to create client socket");
-		if (connect(connected, (sockaddr*)&target.address, sizeof(target.address)) < 0) {
+		if (connect(connected, (sockaddr *)&target.address, sizeof(target.address)) < 0)
+		{
 			perror("Unable to connect to remote node :(");
 		}
 		Serializer ser;
-		char* buffer = msg->serialize(ser);
-		size_t size = ser.size();
-		send(connected, &size, sizeof(size_t), 0);
+		msg->serialize(&ser);
+		char *buffer = ser.getSerChar();
+		size_t size = ser.getPos();
 		send(connected, buffer, size, 0);
 	}
 
-	Message* recv_m() override {
+	Message *recv_m() override
+	{
 		sockaddr_in sender;
 		socklen_t addrlen = sizeof(sender);
-		int req = accept(sock_, (sockaddr*)&sender, &addrlen);
+		int req = accept(sock_, (sockaddr *)&sender, &addrlen);
 		size_t size = 0;
-		if (read(req, &size, sizeof(size_t)) == 0) {
+		if (read(req, &size, sizeof(size_t)) == 0)
+		{
 			perror("failed to read");
 			exit(1);
 		}
-		char* buffer = new char[size];
+		char *buffer = new char[size];
 		int rd = 0;
-		while (rd != size) {
+		while (rd != size)
+		{
 			rd += read(req, buffer + rd, size - rd);
 		}
-		Deserializer des(buffer, size);
-		Message* msg = Message::deserialize(s, sender);
+		Deserializer* des = new Deserializer(buffer);
+		Message *msg = Message::deserializeMsg(des);
 		return msg;
-	}	
+	}
 };
