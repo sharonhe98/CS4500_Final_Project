@@ -37,7 +37,6 @@ class Column : public Object
 public:
   Array **vals_;
   char type_;
-  String *colName_;
   size_t currentChunk_;
   size_t currentSize_;
 
@@ -46,11 +45,6 @@ public:
   ~Column() {}
   /** Type converters: Return the same column under its actual type, or
  *    *  nullptr if of the wrong type.  */
-
-  void setColName(String *name)
-  {
-    colName_ = name;
-  }
 
   virtual IntColumn *as_int()
   {
@@ -151,7 +145,6 @@ public:
   IntColumn()
   {
     type_ = 'I';
-    colName_ = nullptr;
     vals_ = new IntArray *[CHUNK_SIZE];
     for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
@@ -172,7 +165,6 @@ public:
   IntColumn(Deserializer *d)
   {
     type_ = d->readChar();
-    colName_ = d->readString();
     currentChunk_ = d->readSizeT();
     currentSize_ = d->readSizeT();
     vals_ = new IntArray *[CHUNK_SIZE];
@@ -186,7 +178,6 @@ public:
   char *serialize(Serializer *ser)
   {
     Column::serialize(ser);
-    ser->write(colName_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
     for (size_t i = 0; i < currentChunk_; i++)
@@ -275,7 +266,6 @@ public:
   StringColumn()
   {
     type_ = 'S';
-    colName_ = nullptr;
     vals_ = new StringArray *[CHUNK_SIZE];
     for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
@@ -288,7 +278,6 @@ public:
   StringColumn(Deserializer *d)
   {
     type_ = d->readChar();
-    colName_ = d->readString();
     currentChunk_ = d->readSizeT();
     currentSize_ = d->readSizeT();
     vals_ = new StringArray *[CHUNK_SIZE];
@@ -314,11 +303,11 @@ public:
   char *serialize(Serializer *ser)
   {
     Column::serialize(ser);
-    ser->write(colName_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
     for (size_t i = 0; i < currentChunk_; i++)
     {
+      printf("i is: %zu vals_[i] length is: %zu\n",i, vals_[i]->length());
       vals_[i]->serialize(ser);
     }
     return ser->getSerChar();
@@ -411,7 +400,6 @@ public:
   FloatColumn()
   {
     type_ = 'F';
-    colName_ = nullptr;
     vals_ = new FloatArray *[CHUNK_SIZE];
     for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
@@ -432,7 +420,6 @@ public:
   FloatColumn(Deserializer *d)
   {
     type_ = d->readChar();
-    colName_ = d->readString();
     currentChunk_ = d->readSizeT();
     currentSize_ = d->readSizeT();
     vals_ = new FloatArray *[CHUNK_SIZE];
@@ -458,7 +445,6 @@ public:
   char *serialize(Serializer *ser)
   {
     Column::serialize(ser);
-    ser->write(colName_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
     for (size_t i = 0; i < currentChunk_; i++)
@@ -534,7 +520,6 @@ public:
   BoolColumn()
   {
     type_ = 'B';
-    colName_ = nullptr;
     vals_ = new BoolArray *[CHUNK_SIZE];
     for (size_t i = 0; i < CHUNK_SIZE; i++)
     {
@@ -547,7 +532,6 @@ public:
   BoolColumn(Deserializer *d)
   {
     type_ = d->readChar();
-    colName_ = d->readString();
     currentChunk_ = d->readSizeT();
     currentSize_ = d->readSizeT();
     vals_ = new BoolArray *[CHUNK_SIZE];
@@ -581,7 +565,6 @@ public:
   char *serialize(Serializer *ser)
   {
     Column::serialize(ser);
-    ser->write(colName_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
     for (size_t i = 0; i < currentChunk_; i++)

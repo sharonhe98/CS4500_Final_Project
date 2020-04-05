@@ -853,6 +853,7 @@ public:
     for (size_t i = 0; i < length(); i++)
     {
       String *str = dynamic_cast<String *>(get_(i));
+      printf("str is : %s at i: %zu\n", str->c_str(), i);
       ser->write(str);
     }
     return ser->getSerChar();

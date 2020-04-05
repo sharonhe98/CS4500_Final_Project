@@ -352,8 +352,6 @@ class Schema : public Object
 {
 public:
   char *track_types;
-  StringArray *col_names;
-  StringArray *row_names;
   size_t col_size;
   size_t row_size;
 
@@ -363,8 +361,6 @@ public:
     track_types = from.track_types;
     col_size = from.col_size;
     row_size = from.row_size;
-    col_names = from.col_names;
-    row_names = from.row_names;
   }
 
   /** Create an empty schema **/
@@ -373,8 +369,6 @@ public:
     track_types = nullptr;
     col_size = 0;
     row_size = 0;
-    row_names = new StringArray();
-    col_names = new StringArray();
   }
 
   Schema(Deserializer *d)
@@ -382,8 +376,6 @@ public:
     track_types = d->readChars();
     row_size = d->readSizeT();
     col_size = d->readSizeT();
-    row_names->deserializeStringArray(d);
-    col_names->deserializeStringArray(d);
   }
 
   /** Create a schema from a string of types. A string that contains
@@ -395,8 +387,6 @@ public:
     track_types = (char *)types;
     row_size = 0;
     col_size = 0;
-    row_names = new StringArray();
-    col_names = new StringArray();
 
     for (size_t i = 0; i < strlen(track_types); i++)
     {
@@ -404,19 +394,13 @@ public:
     }
   }
 
-  ~Schema()
-  {
-    delete row_names;
-    delete col_names;
-  }
+  ~Schema() {}
 
   char *serialize(Serializer *ser)
   {
     ser->write(track_types);
     ser->write(row_size);
     ser->write(col_size);
-    row_names->serialize(ser);
-    col_names->serialize(ser);
     return ser->getSerChar();
   }
 
@@ -427,46 +411,13 @@ public:
 
   void add_column(char typ, String *name)
   {
-    col_names->append(name);
-
     col_size += 1;
   }
 
   /** Add a row with a name (possibly nullptr), name is external. */
   void add_row(String *name)
   {
-    row_names->append(name);
     row_size += 1;
-  }
-
-  /** Return name of row at idx; nullptr indicates no name. An idx >= width
-    * is undefined. */
-  String *row_name(size_t idx)
-  {
-    if (idx >= row_size)
-    {
-      printf("out of bounds\n");
-      exit(1);
-    }
-    else
-    {
-      return row_names->get(idx);
-    }
-  }
-
-  /** Return name of column at idx; nullptr indicates no name given.
-    *  An idx >= width is undefined.*/
-  String *col_name(size_t idx)
-  {
-    if (idx >= col_size)
-    {
-      printf("out of bounds\n");
-      exit(1);
-    }
-    else
-    {
-      return col_names->get(idx);
-    }
   }
 
   /** Return type of column at idx. An idx >= width is undefined. */
@@ -481,40 +432,6 @@ public:
       return track_types[idx];
     }
   };
-
-  /** Given a column name return its index, or -1. */
-  int col_idx(const char *name)
-  {
-    for (size_t i = 0; i < col_size; i++)
-    {
-      String *nam = col_names->get(i);
-      if (strcmp(nam->c_str(), name) == 0)
-      {
-        return i;
-      }
-      else
-      {
-        return -1;
-      }
-    }
-  };
-
-  /** Given a row name return its index, or -1. */
-  int row_idx(const char *name)
-  {
-    for (size_t i = 0; i < row_size; i++)
-    {
-      String *nam = row_names->get(i);
-      if (strcmp(nam->c_str(), (char *)name) == 0)
-      {
-        return i;
-      }
-      else
-      {
-        return -1;
-      }
-    }
-  }
 
   /** The number of columns */
   size_t width()

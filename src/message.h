@@ -41,9 +41,7 @@ public:
 
   Message(Deserializer *d, MsgKind k)
   {
-    printf("kind is %i\n", (int)kind_);
     kind_ = k;
-    printf("Message msgkind is %i\n", (int)kind_);
     sender_ = d->readSizeT();
     target_ = d->readSizeT();
     id_ = d->readSizeT();
@@ -60,14 +58,6 @@ public:
   // function declaration
   static Message *deserializeMsg(Deserializer *dser);
 
-  // virtual Message* deserializeMessage(Deserializer* dser) {
-  //   char* serArr = dser->getSerChar();
-  //   int msgkind = dser->readInt();
-  //   size_t sender = dser->readSizeT();
-  //   size_t target = dser->readSizeT();
-  //   size_t id = dser->readSizeT();
-  //   return new Message((MsgKind)msgkind, sender, target, id);
-  // }
 };
 
 class Ack : public Message
@@ -76,6 +66,46 @@ public:
   Ack(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
 
   Ack(Deserializer *d) : Message(d, MsgKind::Ack) {}
+};
+
+class Nack : public Message
+{
+public:
+  Nack(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
+
+  Nack(Deserializer *d) : Message(d, MsgKind::Nack) {}
+};
+
+class Put : public Message
+{
+public:
+  Put(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
+
+  Put(Deserializer *d) : Message(d, MsgKind::Put) {}
+};
+
+class Reply : public Message
+{
+public:
+  Reply(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
+
+  Reply(Deserializer *d) : Message(d, MsgKind::Reply) {}
+};
+
+class Get : public Message
+{
+public:
+  Get(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
+
+  Get(Deserializer *d) : Message(d, MsgKind::Get) {}
+};
+
+class WaitAndGet : public Message
+{
+public:
+  WaitAndGet(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
+
+  WaitAndGet(Deserializer *d) : Message(d, MsgKind::WaitAndGet) {}
 };
 
 class Status : public Message
@@ -97,15 +127,19 @@ public:
   void serialize(Serializer *ser)
   {
     Message::serialize(ser);
-    printf("pos after msg serial is %i\n", ser->getPos());
     ser->write(msg_);
-    printf("pos after msg serial is %i\n", ser->getPos());
   }
 
-  // Status* deserialize(Deserializer* dser) {
-  //   Message::deserializeMsg(dser);
-  // }
 };
+
+class Kill : public Message
+{
+public:
+  Kill(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
+
+  Kill(Deserializer *d) : Message(d, MsgKind::Kill) {}
+};
+
 
 class Register : public Message
 {
@@ -163,7 +197,6 @@ public:
     Message::serialize(ser);
     ser->write(client_);
     ser->write(*ports_);
-    // use stringArray??
     addresses_->serialize(ser);
   }
 };
@@ -172,17 +205,34 @@ Message *Message::deserializeMsg(Deserializer *dser)
 {
   Message *result = nullptr;
   MsgKind msgkind = (MsgKind)dser->readInt();
-  printf("msgKind is: %i\n", (int)msgkind);
   switch (msgkind)
   {
   case MsgKind::Ack:
-    result = new Ack(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT());
+    result = new Ack(dser);
+    break;
+  case MsgKind::Nack:
+    result = new Nack(dser);
+    break;
+  case MsgKind::Put:
+    result = new Put(dser);
+    break;  
+  case MsgKind::Reply:
+    result = new Reply(dser);
+    break;
+  case MsgKind::Get:
+    result = new Get(dser);
+    break;
+  case MsgKind::WaitAndGet:
+    result = new WaitAndGet(dser);
     break;
   case MsgKind::Status:
     result = new Status(dser);
     break;
+  case MsgKind::Kill:
+    result = new Kill(dser);
+    break;
   case MsgKind::Register:
-    result = new Register(msgkind, dser->readSizeT(), dser->readSizeT(), dser->readSizeT(), dser->readSockAddrIn(), dser->readSizeT());
+    result = new Register(dser);
     break;
   case MsgKind::Directory:
     result = new Directory(dser);

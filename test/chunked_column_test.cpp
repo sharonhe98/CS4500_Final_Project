@@ -34,6 +34,7 @@ void test_int_column() {
 	}
 	assert(ic->currentChunk_ == 99);
 	assert(ic->get(2001) == 23);
+	assert(ic->get(0) == 23);
 	ic->set(2001, 1);
 	assert(ic->get(2001) == 1);
 	printf("test_int_column succeeded!\n");
@@ -48,6 +49,7 @@ void test_str_column() {
 	}
 	assert(sc->currentChunk_ == 99);
 	assert(sc->get(2001)->c_str() == hello->c_str());
+	assert(sc->get(0)->c_str() == hello->c_str());
 	sc->set(2001, world);
 	assert(sc->get(2001)->c_str() == world->c_str());
 	printf("test_str_column succeeded!\n");

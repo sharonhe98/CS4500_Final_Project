@@ -28,7 +28,6 @@ public:
     for (size_t i = 0; i < scm.width(); i++)
     {
       cols[i] = new Column();
-      cols[i]->setColName(scm.col_names->get(i));
       for (size_t j = 0; j < scm.length(); j++)
       {
         cols[i]->push_back(nullptr);
@@ -45,7 +44,6 @@ public:
     for (size_t i = 0; i < scm.width(); i++)
     {
       cols[i] = createNewColumn(scm.track_types[i]);
-      cols[i]->setColName(scm.col_names->get(i));
     }
   }
 
@@ -70,7 +68,6 @@ public:
     cols = new Column *[scm.width()];
     for (size_t i = 0; i < s->width(); i++) {
       cols[i]->deserialize(d);
-      add_column(cols[i], s->col_names->get(i));
     }
     DataFrame* df = new DataFrame(*s);
     return df;
@@ -202,29 +199,6 @@ public:
     }
   }
 
-  /** Return the offset of the given column name or -1 if no such col. */
-  int get_col(String &col)
-  {
-    for (size_t i = 0; i < scm.width(); i++)
-    {
-      if (scm.col_names->get(i)->equals(&col))
-      {
-        return i;
-      }
-    }
-  }
-
-  /** Return the offset of the given row name or -1 if no such row. */
-  int get_row(String &col)
-  {
-    for (size_t i = 0; i < scm.length(); i++)
-    {
-      if (scm.row_names->get(i)->equals(&col))
-      {
-        return i;
-      }
-    }
-  }
 
   /** Set the value at the given column and row to the given value.
     * If the column is not  of the right type or the indices are out of
@@ -335,7 +309,7 @@ public:
   {
     for (size_t i = 0; i < nrows(); i++)
     {
-      Row *ro = new Row(scm.row_names->get(i));
+      Row *ro = new Row(scm);
       fill_row(i, *ro);
       r.accept(*ro);
     }
@@ -348,12 +322,12 @@ public:
     Schema *s = new Schema();
     for (size_t i = 0; i < nrows(); i++)
     {
-      Row *ro = new Row(scm.row_names->get(i));
+      Row *ro = new Row(*s);
       fill_row(i, *ro);
 
       if (r.accept(*ro))
       {
-        s->add_row(scm.row_names->get(i));
+        s->add_row(nullptr);
       }
     }
 

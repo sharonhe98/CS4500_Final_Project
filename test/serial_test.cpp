@@ -1,9 +1,10 @@
+#include <cstdlib>
 #include <unistd.h>
 #include "string.h"
 #include <string.h>
 #include <assert.h>
 #include "../src/helper.h"
-#include "../src/array.h"
+#include "../src/column.h"
 #include "../src/schema.h"
 #include "../src/message.h"
 
@@ -131,11 +132,35 @@ void testSchemaSerialize()
     Schema *isfb = new Schema("ISFB");
     char* result = isfb->serialize(serializer);
     Deserializer *deserializer = new Deserializer(result);
-    Schema *deSchema = Schema::deserialize(deserializer); // cannot deserialize nullptr string
+    Schema *deSchema = Schema::deserialize(deserializer);
     assert(isfb->track_types == deSchema->track_types);
     delete serializer;
     delete deserializer;
     printf("Schema serialize success!\n");
+}
+
+void testColumnSerialize()
+{
+    Serializer *serializer = new Serializer();
+    StringColumn* sc = new StringColumn();
+	String* hello = new String("hello");
+	for (size_t i = 0; i < 1000 * 10; i++) {
+		sc->push_back(hello);
+	}
+    printf("current chunk is:%zu\n", sc->currentChunk_);
+	assert(sc->currentChunk_ == 9);
+	assert(sc->get(2001)->c_str() == hello->c_str());
+    assert(sc->get(0)->c_str() == hello->c_str());
+    printf("Value at 0!\n");
+
+    char* result = sc->serialize(serializer);
+    Deserializer *deserializer = new Deserializer(result);
+    Column *c = Column::deserialize(deserializer);
+    assert(c->type_ == sc->type_);
+    assert(c->currentChunk_ == 99);
+    delete serializer;
+    delete deserializer;
+    printf("Column serialize success!\n");
 }
 
 void testMessageSerialize()
@@ -171,7 +196,8 @@ int main(int argc, char **argv)
     testIntArrSerialize();
     testBoolArrSerialize();
     testCharStar();
-    //testSchemaSerialize();
+    testSchemaSerialize();
+    testColumnSerialize();
     testMessageSerialize();
 
     LOG("Done.\n");
