@@ -58,6 +58,22 @@ public:
   // function declaration
   static Message *deserializeMsg(Deserializer *dser);
 
+  MsgKind getKind() {
+	return kind_;
+  }
+
+  size_t getSender() {
+	return sender_;
+  }
+
+  size_t getTarget() {
+	return target_;
+  }
+
+  size_t getId() {
+	return id_;
+  }
+
 };
 
 class Ack : public Message
