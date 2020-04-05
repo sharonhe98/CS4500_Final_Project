@@ -40,7 +40,10 @@ public:
   size_t currentChunk_;
   size_t currentSize_;
 
-  Column() {}
+  Column() {
+    currentChunk_ = 1;
+    currentSize_ = 0;
+  }
 
   ~Column() {}
   /** Type converters: Return the same column under its actual type, or
@@ -150,7 +153,7 @@ public:
     {
       vals_[i] = new IntArray();
     }
-    currentChunk_ = 0;
+    currentChunk_ = 1;
     currentSize_ = 0;
   }
 
@@ -271,7 +274,7 @@ public:
     {
       vals_[i] = new StringArray();
     }
-    currentChunk_ = 0;
+    currentChunk_ = 1;
     currentSize_ = 0;
   }
 
@@ -305,6 +308,7 @@ public:
     Column::serialize(ser);
     ser->write(currentChunk_);
     ser->write(currentSize_);
+    printf("failing here?\n");
     for (size_t i = 0; i < currentChunk_; i++)
     {
       printf("i is: %zu vals_[i] length is: %zu\n",i, vals_[i]->length());
@@ -405,7 +409,7 @@ public:
     {
       vals_[i] = new FloatArray();
     }
-    currentChunk_ = 0;
+    currentChunk_ = 1;
     currentSize_ = 0;
   }
 
@@ -525,7 +529,7 @@ public:
     {
       vals_[i] = new BoolArray();
     }
-    currentChunk_ = 0;
+    currentChunk_ = 1;
     currentSize_ = 0;
   }
 

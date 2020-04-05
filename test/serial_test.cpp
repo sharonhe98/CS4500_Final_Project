@@ -1,12 +1,12 @@
+#pragma once
 #include <cstdlib>
 #include <unistd.h>
 #include "string.h"
 #include <string.h>
 #include <assert.h>
 #include "../src/helper.h"
-#include "../src/column.h"
-#include "../src/schema.h"
-#include "../src/message.h"
+#include "../src/kvstore.h"
+#include "../src/sorer.h"
 
 #define LOG(...) fprintf(stderr, "(" __FILE__ ") " __VA_ARGS__);
 
@@ -132,7 +132,7 @@ void testSchemaSerialize()
     Schema *isfb = new Schema("ISFB");
     char* result = isfb->serialize(serializer);
     Deserializer *deserializer = new Deserializer(result);
-    Schema *deSchema = Schema::deserialize(deserializer);
+    Schema *deSchema = isfb->deserialize(deserializer);
     assert(isfb->track_types == deSchema->track_types);
     delete serializer;
     delete deserializer;
@@ -144,14 +144,15 @@ void testColumnSerialize()
     Serializer *serializer = new Serializer();
     StringColumn* sc = new StringColumn();
 	String* hello = new String("hello");
-	for (size_t i = 0; i < 1000 * 10; i++) {
+	for (size_t i = 0; i < 100 * 10; i++) {
 		sc->push_back(hello);
 	}
     printf("current chunk is:%zu\n", sc->currentChunk_);
-	assert(sc->currentChunk_ == 9);
-	assert(sc->get(2001)->c_str() == hello->c_str());
+	assert(sc->currentChunk_ == 1);
+	assert(sc->get(467)->c_str() == hello->c_str());
+    assert(sc->get(468)->c_str() == hello->c_str());
     assert(sc->get(0)->c_str() == hello->c_str());
-    printf("Value at 0!\n");
+    printf("Value at 0, 468!\n");
 
     char* result = sc->serialize(serializer);
     Deserializer *deserializer = new Deserializer(result);
@@ -161,6 +162,27 @@ void testColumnSerialize()
     delete serializer;
     delete deserializer;
     printf("Column serialize success!\n");
+}
+
+void testDFSerialize()
+{
+	FILE *f = fopen("../src/data.sor", "r");
+	SOR *sor = new SOR();
+	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
+	Schema s(schemaFromFile);
+
+	DataFrame *df = sor->setDataFrame(f, 0, 100000);
+	df->print();
+	printf("Build DF from file passed!\n");
+    Serializer *ser = new Serializer();
+    df->serialize(ser);
+    char* result = ser->getSerChar();
+    Deserializer* dser = new Deserializer(result);
+    DataFrame* deDF = df->deserialize(dser);
+    assert(df->scm.track_types == deDF->scm.track_types);
+    deDF->print();
+    printf("Serialize DF from file passed!\n");
+
 }
 
 void testMessageSerialize()
@@ -197,7 +219,8 @@ int main(int argc, char **argv)
     testBoolArrSerialize();
     testCharStar();
     testSchemaSerialize();
-    testColumnSerialize();
+    //testColumnSerialize();
+    testDFSerialize();
     testMessageSerialize();
 
     LOG("Done.\n");

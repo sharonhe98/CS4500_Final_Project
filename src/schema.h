@@ -404,7 +404,7 @@ public:
     return ser->getSerChar();
   }
 
-  static Schema *deserialize(Deserializer *d)
+  Schema *deserialize(Deserializer *d)
   {
     return new Schema(d);
   }
