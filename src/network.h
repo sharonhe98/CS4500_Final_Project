@@ -19,12 +19,14 @@ public:
 	size_t num_nodes;
 	size_t current_node; // current node index
 	int sock_;			 // the socket
-	sockaddr_in ip_;	 // the current ip address
+	char* ipstring;		// the current ip address string
+	struct sockaddr_in ip_;	 // the current ip address
 	IntArray* ports;
 	StringArray* addresses;
 
-	NetworkIP()
+	NetworkIP(char* ip)
 	{
+		ipstring = ip;
 		ports = new IntArray();
 		nodes_ = new NodeInfo[0];
 		num_nodes = 0;
@@ -48,7 +50,8 @@ public:
 		ip_.sin_family = AF_INET;
 		ip_.sin_addr.s_addr = INADDR_ANY;
 		ip_.sin_port = htons(port);
-		assert(bind(sock_, (sockaddr *)&ip_, sizeof(ip_)) >= 0);
+		assert(bind(sock_, (struct sockaddr *)&ip_, sizeof(ip_)) >= 0);
+		//if (bind(sock_, (struct sockaddr *)&ip_, sizeof(ip_)) < 0); perror("bind failed!\n");
 		assert(listen(sock_, 100) >= 0);
 	}
 
@@ -68,6 +71,12 @@ public:
 				
 			}
 		}
+		printf("Server has been initialized!\n");
+
+		while (true) {
+			recv_m();
+		}
+
 	}
 
 	void client_init(unsigned idx, unsigned port, char *server_addr, unsigned server_port)
@@ -84,6 +93,9 @@ public:
 		}
 		Register msg(MsgKind::Register, current_node, 0, num_nodes, ip_, port);
 		send_m(&msg);
+
+		printf("Client has registered!\n");
+
 		num_nodes++;
 		ports->append(port);
 		Directory *ipd = dynamic_cast<Directory *>(recv_m());
@@ -114,7 +126,7 @@ public:
 		msg->serialize(&ser);
 		char *buffer = ser.getSerChar();
 		size_t size = ser.getPos();
-		send(connected, buffer, size, 0);
+		int status = send(connected, buffer, size, 0);
 	}
 
 	Message *recv_m() override
@@ -129,11 +141,14 @@ public:
 			exit(1);
 		}
 		char *buffer = new char[size];
-		int rd = 0;
+		size_t rd = 0;
 		while (rd != size)
 		{
 			rd += read(req, buffer + rd, size - rd);
 		}
+
+		printf("buffer: %s\n", buffer);
+
 		Deserializer* des = new Deserializer(buffer);
 		Message *msg = Message::deserializeMsg(des);
 		return msg;

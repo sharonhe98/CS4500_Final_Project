@@ -41,15 +41,18 @@ class KVStore : public Object
 public:
 	size_t index;
 	Map *kv;
+	NetworkIP* node;
 
-	KVStore(size_t nodes)
+	KVStore(size_t nodes, char* ip)
 	{
 		index = nodes;
 		kv = new Map();
+		node = new NetworkIP(ip);
 	}
 
 	~KVStore()
 	{
+		delete node;
 		delete kv;
 	}
 
