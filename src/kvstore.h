@@ -82,12 +82,14 @@ public:
 	{
 		Value *df_v = get_(key);
 		DataFrame *df;
+		Message* sent = node->recv_m();
 		if (key->home_node_ == index)
 		{
 			df = get(key);
 		}
-		else if (node->recv_m()->getKind() == MsgKind::WaitAndGet) {
-			// send a status?
+		else if (sent->getKind() == MsgKind::WaitAndGet) {
+			Message* m = new Message(MsgKind::Status, index, sent->getTarget(), 500);
+			node->send_m(m);
 		}
 		else
 		{

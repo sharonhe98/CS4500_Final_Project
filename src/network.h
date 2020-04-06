@@ -128,6 +128,7 @@ public:
 		char *buffer = ser->getSerChar();
 		size_t size = ser->getPos();
 		int status = send(connected, buffer, size, 0);
+		assert(status >= 0);
 	}
 
 	Message *recv_m() override
