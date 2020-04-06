@@ -21,9 +21,9 @@ df_from:
 
 start_server:
 	g++ -g -Wall -pedantic -std=c++11 -o server test/server.cpp
-	./server 127.0.0.1 3000 0
+	./server 127.0.0.1 8000 0
 
 start_client:
 	g++ -g -Wall -pedantic -std=c++11 -o client1 test/client.cpp
-	./client1 127.0.0.1 3000 127.0.0.2 3001 1
+	./client1 127.0.0.1 8000 127.0.0.1 8001 1
 	
