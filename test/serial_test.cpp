@@ -227,7 +227,7 @@ void testDFSerialize()
     df->serialize(ser);
     char* result = ser->getSerChar();
     Deserializer* dser = new Deserializer(result);
-    DataFrame* deDF = df->deserialize(dser);
+    DataFrame* deDF = new DataFrame(dser);
     assert(df->scm.track_types == deDF->scm.track_types);
     deDF->print();
     printf("Serialize DF from file passed!\n");

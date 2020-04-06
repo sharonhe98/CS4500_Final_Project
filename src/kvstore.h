@@ -65,10 +65,9 @@ public:
 	{
 		Value *df_v = get_(key);
 		assert(df_v);
-	//	Deserializer des;
-	//	DataFrame* df = df_v->deserialize(des);
-		// return df;
-		//return df;
+		Deserializer *des = new Deserializer(df_v->data_);
+		DataFrame* df = new DataFrame(des);
+		return df;
 	}
 
 	void put(Key *key, Value *value)
@@ -82,12 +81,10 @@ public:
 	DataFrame *waitAndGet(Key *key)
 	{
 		Value *df_v = get_(key);
-		//Deserializer des;
-
+		DataFrame *df;
 		if (key->home_node_ == index)
 		{
-			//DataFrame* df = df_v->deserialize(des);
-	//		return df;
+			df = get(key);
 		}
 		else if (node->recv_m()->getKind() == MsgKind::WaitAndGet) {
 			// send a status?
@@ -99,9 +96,10 @@ public:
 			{
 				df_v = get_(key);
 			}
-			// return df_v->deserialize(des);
+			Deserializer *des = new Deserializer(df_v->data_);
+			df = new DataFrame(des);
 		}
-		DataFrame *df;
+		
 		return df;
 	}
 };

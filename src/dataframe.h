@@ -47,6 +47,14 @@ public:
     }
   }
 
+  DataFrame(Deserializer* d) {
+    Schema* s = scm.deserialize(d);
+    cols = new Column *[scm.width()];
+    for (size_t i = 0; i < s->width(); i++) {
+      cols[i]->deserialize(d);
+    }
+  }
+
   ~DataFrame()
   {
     for (size_t i = 0; i < scm.width(); i++)
@@ -61,16 +69,6 @@ public:
     for (size_t i = 0; i < ncols(); i++) {
       cols[i]->serialize(ser);
     }
-  }
-
-  DataFrame* deserialize(Deserializer* d) {
-    Schema* s = scm.deserialize(d);
-    cols = new Column *[scm.width()];
-    for (size_t i = 0; i < s->width(); i++) {
-      cols[i]->deserialize(d);
-    }
-    DataFrame* df = new DataFrame(*s);
-    return df;
   }
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe

@@ -82,8 +82,6 @@ public:
 		current_node = idx;
 		init_sock_(port);
 
-		std::cout << num_nodes << "\n";
-
 		nodes_[0].id = 0;
 		nodes_[0].address.sin_family = AF_INET;
 		nodes_[0].address.sin_port = htons(server_port);
@@ -102,8 +100,6 @@ public:
 		//addresses->append(new String(inet_ntoa(ip_.sin_addr.s_addr)));
 		Directory *ipd = dynamic_cast<Directory *>(recv_m());
 
-		std::cout << ipd->getSender() << "\n";
-		//ipd->log();
 		for (size_t i = 0; i < ipd->addresses_->length(); i++)
 		{
 			nodes_[i+1].id = i + 1;
@@ -128,27 +124,18 @@ public:
 			perror("Unable to connect to remote node :(");
 		}
 		Serializer* ser = new Serializer();
-		std::cout << "in send before serial\n";
 		msg->serialize(ser);
 		char *buffer = ser->getSerChar();
-		std::cout << "buffer in send post serial: " << buffer << "\n";
 		size_t size = ser->getPos();
 		int status = send(connected, buffer, size, 0);
 	}
 
 	Message *recv_m() override
 	{
-
-		std::cout << "recv\n";
-
 		sockaddr_in sender;
 		socklen_t addrlen = sizeof(sender);
-		std::cout << &sender << "\n";
-		std::cout << &addrlen << "\n";
-		std::cout << sock_ << "\n";
 		int req = accept(sock_, (sockaddr *)&sender, &addrlen);
 		size_t size = 0;
-		std::cout << req << "\n";
 		if (read(req, &size, sizeof(size_t)) == 0)
 		{
 			perror("failed to read");
@@ -159,10 +146,7 @@ public:
 		while (rd != size)
 		{
 			rd += read(req, buffer + rd, size - rd);
-			std::cout << rd << "\n";
 		}
-
-		printf("buffer: %s\n", buffer);
 
 		Deserializer* des = new Deserializer(buffer);
 		Message *msg = Message::deserializeMsg(des);

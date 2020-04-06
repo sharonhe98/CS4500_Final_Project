@@ -47,9 +47,6 @@ public:
   }
   Column(Deserializer* d, char typ) {
     type_ = typ;
-    currentChunk_ = 0;
-    currentSize_ = 0;
-    vals_ = new Array*[CHUNK_SIZE];
   }
 
   ~Column() {}
@@ -298,6 +295,7 @@ class StringColumn2 : public Column {
     for (size_t i = 0; i < numStr; i++) {
       push_back(d->readString());
     }
+    size_ = numStr;
   }
 
   String *get(size_t idx)
@@ -359,19 +357,10 @@ public:
     pln(type_);
     currentChunk_ = d->readSizeT();
     currentSize_ = d->readSizeT();
-    printf("currentChunk: %zu currentSize: %zu\n", currentChunk_, currentSize_);
     vals_ = new StringArray *[CHUNK_SIZE];
     for (size_t i = 0; i < currentChunk_; i++)
     {
       vals_[i]->deserializeStringArray(d);
-      // size_t arraySize = d->readSizeT();
-      // vals_[i] = new StringArray();
-      // printf("array size %zu\n", arraySize);
-      // for (size_t j = 0; j < arraySize; j++) {
-      //   String* s = d->readString();
-      //   printf("string is %s\n", s->c_str());
-      //   vals_[i]->append(s);
-      // }
     }
   }
 
@@ -389,7 +378,6 @@ public:
 
   void serialize(Serializer *ser)
   {
-    printf("type is %c currentchunk is %zu currentSize is %zu\n", type_, currentChunk_, currentSize_);
     ser->write(type_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
