@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 class NodeInfo : public Object
 {
@@ -24,13 +25,13 @@ public:
 	IntArray* ports;
 	StringArray* addresses;
 
-	NetworkIP(char* ip)
+	NetworkIP(char* ip, size_t total_nodes, size_t idx)
 	{
 		ipstring = ip;
 		ports = new IntArray();
-		nodes_ = new NodeInfo[0];
-		num_nodes = 0;
-		current_node = 0;
+		nodes_ = new NodeInfo[num_nodes];
+		num_nodes = total_nodes;
+		current_node = idx;
 		addresses = new StringArray();
 	}
 
@@ -60,22 +61,19 @@ public:
 	{
 		current_node = idx;
 		init_sock_(port);
-		if (num_nodes > 0)
-		{ // assume we only add client nodes to the directory
-			
-			for (size_t i = 1; i < num_nodes; i++)
-			{
-				Directory ipd(MsgKind::Directory, current_node, i, nodes_[i].id, i, ports, addresses);
-				ipd.target_ = i;
-				send_m(&ipd);
-				
-			}
+		// server knows how many nodes	
+		for (size_t i = 1; i < num_nodes; i++)
+		{
+			recv_m();
+		}
+		for (size_t i = 1; i < num_nodes; i++) {
+			Directory ipd(MsgKind::Directory, current_node, i, nodes_[i].id, i, ports, addresses);
+			ipd.target_ = i;
+			send_m(&ipd);
+		
 		}
 		printf("Server has been initialized!\n");
 
-		while (true) {
-			recv_m();
-		}
 
 	}
 
@@ -83,29 +81,35 @@ public:
 	{
 		current_node = idx;
 		init_sock_(port);
-		nodes_ = new NodeInfo[num_nodes + 1];
-		nodes_[num_nodes].id = 0;
-		nodes_[num_nodes].address.sin_family = AF_INET;
-		nodes_[num_nodes].address.sin_port = htons(server_port);
-		if (inet_pton(AF_INET, server_addr, &nodes_[num_nodes].address.sin_addr) <= 0)
+
+		std::cout << num_nodes << "\n";
+
+		nodes_[0].id = 0;
+		nodes_[0].address.sin_family = AF_INET;
+		nodes_[0].address.sin_port = htons(server_port);
+
+		if (inet_pton(AF_INET, server_addr, &nodes_[0].address.sin_addr) <= 0)
 		{
 			assert(false && "Invalid server IP address format");
 		}
-		Register msg(MsgKind::Register, current_node, 0, num_nodes, ip_, port);
-		send_m(&msg);
+		Register* msg = new Register(MsgKind::Register, idx, 0, 42, ip_, port);
+		send_m(msg);
 
 		printf("Client has registered!\n");
 
-		num_nodes++;
 		ports->append(port);
+
+		//addresses->append(new String(inet_ntoa(ip_.sin_addr.s_addr)));
 		Directory *ipd = dynamic_cast<Directory *>(recv_m());
+
+		std::cout << ipd->getSender() << "\n";
 		//ipd->log();
 		for (size_t i = 0; i < ipd->addresses_->length(); i++)
 		{
-			nodes_[i].id = i + 1;
-			nodes_[i].address.sin_family = AF_INET;
-			nodes_[i].address.sin_port = htons(ipd->ports_->get(i));
-			if (inet_pton(AF_INET, ipd->addresses_->get(i)->c_str(), &nodes_[i].address.sin_addr) <= 0)
+			nodes_[i+1].id = i + 1;
+			nodes_[i+1].address.sin_family = AF_INET;
+			nodes_[i+1].address.sin_port = htons(ipd->ports_->get(i));
+			if (inet_pton(AF_INET, ipd->addresses_->get(i)->c_str(), &nodes_[i+1].address.sin_addr) <= 0)
 			{
 				printf("Invalid IP directory-addr for node %zu", (i + 1));
 				exit(1);
@@ -116,25 +120,35 @@ public:
 	void send_m(Message *msg) override
 	{
 		NodeInfo &target = nodes_[msg->getTarget()];
+
 		int connected = socket(AF_INET, SOCK_STREAM, 0);
 		assert(connected >= 0 && "Unable to create client socket");
 		if (connect(connected, (sockaddr *)&target.address, sizeof(target.address)) < 0)
 		{
 			perror("Unable to connect to remote node :(");
 		}
-		Serializer ser;
-		msg->serialize(&ser);
-		char *buffer = ser.getSerChar();
-		size_t size = ser.getPos();
+		Serializer* ser = new Serializer();
+		std::cout << "in send before serial\n";
+		msg->serialize(ser);
+		char *buffer = ser->getSerChar();
+		std::cout << "buffer in send post serial: " << buffer << "\n";
+		size_t size = ser->getPos();
 		int status = send(connected, buffer, size, 0);
 	}
 
 	Message *recv_m() override
 	{
+
+		std::cout << "recv\n";
+
 		sockaddr_in sender;
 		socklen_t addrlen = sizeof(sender);
+		std::cout << &sender << "\n";
+		std::cout << &addrlen << "\n";
+		std::cout << sock_ << "\n";
 		int req = accept(sock_, (sockaddr *)&sender, &addrlen);
 		size_t size = 0;
+		std::cout << req << "\n";
 		if (read(req, &size, sizeof(size_t)) == 0)
 		{
 			perror("failed to read");
@@ -145,6 +159,7 @@ public:
 		while (rd != size)
 		{
 			rd += read(req, buffer + rd, size - rd);
+			std::cout << rd << "\n";
 		}
 
 		printf("buffer: %s\n", buffer);

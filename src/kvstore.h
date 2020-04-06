@@ -43,11 +43,11 @@ public:
 	Map *kv;
 	NetworkIP* node;
 
-	KVStore(size_t nodes, char* ip)
+	KVStore(size_t idx, char* ip, size_t total_nodes)
 	{
-		index = nodes;
+		index = idx;
 		kv = new Map();
-		node = new NetworkIP(ip);
+		node = new NetworkIP(ip, total_nodes, idx);
 	}
 
 	~KVStore()
@@ -65,27 +65,32 @@ public:
 	{
 		Value *df_v = get_(key);
 		assert(df_v);
-		// Deserializer des;
-		// DataFrame* df = df_v->deserialize(des);
+	//	Deserializer des;
+	//	DataFrame* df = df_v->deserialize(des);
 		// return df;
-		DataFrame *df;
-		return df;
+		//return df;
 	}
 
 	void put(Key *key, Value *value)
 	{
-		kv->set(key, value);
+		size_t idx = key->home_node_;
+		if (idx == index || node->recv_m()->getKind() == MsgKind::Put) { kv->set(key, value); }
+		Put* msg = new Put(MsgKind::Put, index, idx, index);
+		node->send_m(msg);
 	}
 
 	DataFrame *waitAndGet(Key *key)
 	{
 		Value *df_v = get_(key);
-		// Deserializer des;
+		//Deserializer des;
 
-		if (df_v)
+		if (key->home_node_ == index)
 		{
-			// DataFrame* df = df_v->deserialize(des);
-			// return df;
+			//DataFrame* df = df_v->deserialize(des);
+	//		return df;
+		}
+		else if (node->recv_m()->getKind() == MsgKind::WaitAndGet) {
+			// send a status?
 		}
 		else
 		{
