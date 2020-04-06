@@ -399,12 +399,6 @@ public:
             for (size_t i = 0; i < len_; i++)
             {
                 printf("FOR LOOP CALLED HERE!\n");
-                if (!cols_[i]->can_add(row[i]))
-                {
-                    printf("CALLED HERE!\n");
-                    skip = true;
-                    break;
-                }
             }
             if (skip)
             {

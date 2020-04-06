@@ -16,6 +16,7 @@ public:
   // the number of items stored in the array
   size_t size_;
 
+
   // constructor
   Array()
   {
@@ -32,23 +33,15 @@ public:
     // allocate memory for result array with larger size
     Object **res = new Object *[size_ + 1];
     // if not empty array, put item to end of array
-    if (size_ != 0)
-    {
-      for (size_t i = 0; i < size_; i++)
-      {
+    if (size_ != 0) {
+      for (size_t i = 0; i < size_; i++) {
         res[i] = elements_[i];
       }
       res[size_] = oo;
-    }
-    else
-    {
+    } else {
       res[0] = oo;
     }
-
-    // set elements to the new result array
     elements_ = res;
-
-    // increase size of array
     size_ += 1;
   }
 
@@ -57,40 +50,6 @@ public:
   {
     assert(nn < size_);
     return elements_[nn];
-  }
-
-  // remove the n'th item in the array
-  // returning the removed item to the caller
-  Object *remove(size_t nn)
-  {
-    // if size not within bounds, return nullptr
-    if (size_ == 0 || nn >= size_)
-    {
-      return nullptr;
-    }
-    // else remove the item at given index
-    else
-    {
-      Object *removed;
-      Object **res = new Object *[size_ - 1];
-      // copy the elements up to nn in result array
-      for (size_t i = 0; i < nn; i++)
-      {
-        res[i] = elements_[i];
-      }
-      // set remove to the last element
-      removed = elements_[nn];
-      // copy elements after nn to result array
-      for (size_t j = nn + 1; j < size_; j++)
-      {
-        res[j - 1] = elements_[j];
-      }
-      // set elements to result array
-      elements_ = res;
-      // decrease size of array
-      size_ -= 1;
-      return removed;
-    }
   }
 
   // returns the length of the array.
@@ -104,11 +63,6 @@ public:
   virtual Object *set(size_t nn, Object *oo)
   {
     assert(size_ == 0 || nn < size_);
-
-    if (size_ == 0)
-    {
-      append(oo);
-    }
 
     Object *res = elements_[nn];
     elements_[nn] = oo;
@@ -136,20 +90,6 @@ public:
       return size_ + 500;
     }
   }
-
-  // reset and delete every element in the array
-  virtual void clear()
-  {
-    // if anything in array, remove it
-    if (size_ > 0)
-    {
-      for (size_t i = 0; i < size_; i++)
-      {
-        remove(i);
-      }
-    }
-    size_ = 0;
-  };
 
   // Compares other with this array for equality.
   bool equals(Object *oo)

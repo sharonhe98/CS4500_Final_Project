@@ -98,26 +98,6 @@ public:
 		}
 	}
 
-	// Removes value at the specified key and returns the removed object
-	Object *remove(Object *key)
-	{
-		// if the key doesn't exist, there is no Object to remove
-		size_t index = keys_->index_of(key);
-		if (size_ == 0 || index > size_)
-		{
-			return nullptr;
-		}
-		else
-		{
-			Object *val = values_->get_(index);
-			// if the key exists, remove both the key and value pair
-			keys_->remove(index);
-			values_->remove(index);
-			size_ -= 1;
-			return val;
-		}
-	}
-
 	// Gets all the keys of this map
 	Object **getKeys()
 	{
@@ -239,26 +219,6 @@ public:
 		{
 			// else set the value at the given key
 			values_->set(index, value);
-		}
-	}
-
-	// Removes value at the specified key and returns the removed object
-	String *remove(String *key)
-	{
-		size_t index = keys_->index_of(key);
-		if (size_ == 0 || index > size_)
-		{
-			// nothing to remove if the key-value pair doesn't exist
-			return nullptr;
-		}
-		else
-		{
-			String *val = values_->get(index);
-			// if key exists, remove key-value pair
-			keys_->remove(index);
-			values_->remove(index);
-			size_ -= 1;
-			return val;
 		}
 	}
 

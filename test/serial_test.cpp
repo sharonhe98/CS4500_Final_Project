@@ -187,7 +187,7 @@ void testSchemaSerialize()
 void testColumnSerialize()
 {
     Serializer *serializer = new Serializer();
-    StringColumn2* sc = new StringColumn2();
+    StringColumn* sc = new StringColumn();
 	String* hello = new String("hello");
 	for (size_t i = 0; i < 1000 * 2; i++) {
 		sc->push_back(hello);
@@ -197,17 +197,15 @@ void testColumnSerialize()
     sc->serialize(serializer);
     char* result = serializer->getSerChar();
     printf("serialized!\n");
-    printf("pos is at: %zu\n", serializer->getPos());
     Deserializer *deserializer = new Deserializer(result);
     Column *c = Column::deserialize(deserializer);
     // printf("type %c sctype %c\n", c->type_, sc->type_);
     assert(c->type_ == sc->type_);
     // printf("chunk %zu\n", c->currentChunk_);
-    // assert(c->currentChunk_ == 1);
     // Sys sys;
-    // printf("String is %s Hello is %s\n", c->get(0)->c_str(), hello->c_str());
-    // assert(c->get(0)->c_str() == hello->c_str());
-    //assert(c->get(1999));
+    StringColumn *sc2 = dynamic_cast<StringColumn*>(c);
+    assert(strcmp(sc2->get(0)->c_str(), hello->c_str()) == 0);
+    assert(strcmp(sc2->get(1999)->c_str(), hello->c_str()) == 0);
     delete serializer;
     delete deserializer;
     printf("Column serialize success!\n");
