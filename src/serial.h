@@ -13,10 +13,11 @@ class Serializer
 public:
   char *buf;
   size_t pos;
+  size_t capacity;
 
   Serializer()
   {
-    buf = new char[1024];
+    buf = new char[capacity = 1024];
     pos = 0;
   }
 
@@ -25,8 +26,22 @@ public:
     delete[] buf;
   }
 
+  // resize buffer when capacity is reached
+  void resize(size_t sizeOf) {
+
+    if (pos + sizeOf >= capacity) {
+      capacity *= 2;
+      char *oldV = buf;
+      buf = new char[capacity];
+      memcpy(buf, oldV, pos);
+      delete[] oldV;
+    }
+    
+  }
+
   void write(size_t size)
   {
+    resize(sizeof(size_t));
     // copy the size t to buf
     memcpy(buf + pos, &size, sizeof(size_t));
     pos += sizeof(size_t);
@@ -34,42 +49,49 @@ public:
 
   void write(double d)
   {
+    resize(sizeof(double));
     memcpy(buf + pos, &d, sizeof(double));
     pos += sizeof(double);
   }
 
   void write(int i)
   {
+    resize(sizeof(int));
     memcpy(buf + pos, &i, sizeof(int));
     pos += sizeof(int);
   }
 
   void write(bool b)
   {
+    resize(sizeof(bool));
     memcpy(buf + pos, &b, sizeof(bool));
     pos += sizeof(bool);
   }
 
   void write(char c)
   {
+    resize(sizeof(char));
     memcpy(buf + pos, &c, sizeof(char));
     pos += sizeof(char);
   }
 
   void write(char *c)
   {
+    resize(sizeof(char *));
     memcpy(buf + pos, &c, sizeof(char *));
     pos += sizeof(char *);
   }
 
   void write(String *s)
   {
+    resize(s->allocateSize());
     memcpy(buf + pos, s->c_str(), s->allocateSize());
     pos += s->allocateSize();
   }
 
   void write(sockaddr_in s)
   {
+    resize(sizeof(sockaddr_in));
     memcpy(buf + pos, &s, sizeof(sockaddr_in));
     pos += sizeof(sockaddr_in);
   }

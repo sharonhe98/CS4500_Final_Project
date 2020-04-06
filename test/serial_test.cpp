@@ -144,15 +144,12 @@ void testColumnSerialize()
     Serializer *serializer = new Serializer();
     StringColumn* sc = new StringColumn();
 	String* hello = new String("hello");
-	for (size_t i = 0; i < 100 * 10; i++) {
+	for (size_t i = 0; i < 1000 * 10; i++) {
 		sc->push_back(hello);
 	}
     printf("current chunk is:%zu\n", sc->currentChunk_);
-	assert(sc->currentChunk_ == 1);
-	assert(sc->get(467)->c_str() == hello->c_str());
-    assert(sc->get(468)->c_str() == hello->c_str());
+	assert(sc->currentChunk_ == 9);
     assert(sc->get(0)->c_str() == hello->c_str());
-    printf("Value at 0, 468!\n");
 
     char* result = sc->serialize(serializer);
     Deserializer *deserializer = new Deserializer(result);
@@ -219,7 +216,7 @@ int main(int argc, char **argv)
     testBoolArrSerialize();
     testCharStar();
     testSchemaSerialize();
-    //testColumnSerialize();
+    testColumnSerialize();
     testDFSerialize();
     testMessageSerialize();
 

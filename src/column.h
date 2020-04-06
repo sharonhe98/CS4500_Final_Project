@@ -308,10 +308,8 @@ public:
     Column::serialize(ser);
     ser->write(currentChunk_);
     ser->write(currentSize_);
-    printf("failing here?\n");
     for (size_t i = 0; i < currentChunk_; i++)
     {
-      printf("i is: %zu vals_[i] length is: %zu\n",i, vals_[i]->length());
       vals_[i]->serialize(ser);
     }
     return ser->getSerChar();
