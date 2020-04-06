@@ -41,8 +41,15 @@ public:
   size_t currentSize_;
 
   Column() {
-    currentChunk_ = 1;
+    currentChunk_ = 0;
     currentSize_ = 0;
+    vals_ = new Array*[CHUNK_SIZE];
+  }
+  Column(Deserializer* d, char typ) {
+    type_ = typ;
+    currentChunk_ = 0;
+    currentSize_ = 0;
+    vals_ = new Array*[CHUNK_SIZE];
   }
 
   ~Column() {}
@@ -125,11 +132,7 @@ public:
     return chunkNum;
   }
 
-  char *serialize(Serializer *ser)
-  {
-    ser->write(type_);
-    return ser->getSerChar();
-  };
+  virtual void serialize(Serializer *ser) {}
 
   static Column *deserialize(Deserializer *dser);
 };
@@ -153,7 +156,7 @@ public:
     {
       vals_[i] = new IntArray();
     }
-    currentChunk_ = 1;
+    currentChunk_ = 0;
     currentSize_ = 0;
   }
 
@@ -178,16 +181,15 @@ public:
     }
   }
 
-  char *serialize(Serializer *ser)
+  void serialize(Serializer *ser)
   {
-    Column::serialize(ser);
+    ser->write(type_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
     for (size_t i = 0; i < currentChunk_; i++)
     {
       vals_[i]->serialize(ser);
     }
-    return ser->getSerChar();
   }
 
   void push_back(int val)
@@ -252,7 +254,82 @@ public:
 
 };
 
+class ArrayStringArray : public Array {
+  public:
+
+  ArrayStringArray() {
+
+  }
+
+  ArrayStringArray(size_t size) {
+    
+  }
+
+  ArrayStringArray(Deserializer* d) {
+
+  }
+
+  static void serialize(Serializer* s ) {
+    
+  }
+
+  StringArray* get(size_t i) {
+    return dynamic_cast<StringArray *>(Array::get_(i));
+  }
+};
+
 // Other primitive column classes similar...
+
+class StringColumn2 : public Column {
+  public:
+  ArrayStringArray chunks_;
+  size_t size_;
+
+  StringColumn2() {
+    type_ = 'S';
+    size_ = 0;
+    chunks_.append(new StringArray());
+  }
+
+  StringColumn2(Deserializer *d) : Column(d, 'S')
+  {
+    size_ = 0;
+    size_t numStr = d->readSizeT();
+    for (size_t i = 0; i < numStr; i++) {
+      push_back(d->readString());
+    }
+  }
+
+  String *get(size_t idx)
+  {
+    size_t idx_in_val = idx % CHUNK_SIZE;
+    return chunks_.get(idx/CHUNK_SIZE)->get(idx_in_val);
+  }
+
+  void push_back(String *val)
+  {
+    size_t chunk_id = size_ / CHUNK_SIZE;
+    if (chunk_id >= size_) {
+      chunks_.append(new StringArray());
+       pln("chunks_.size");
+       pln(chunks_.size_);
+    }
+    pln(chunk_id);
+    pln(chunks_.size_);
+    chunks_.get(chunk_id)->append(val);
+    size_++;
+    pln(size_);
+  }
+
+  void serialize(Serializer* s) {
+    s->write(type_); 
+    s->write(size_);
+    for (size_t i = 0; i < size_; i++) {
+      s->write(chunks_.get(i));
+    }
+  }
+
+};
 
 /*************************************************************************
  * StringColumn::
@@ -263,8 +340,6 @@ class StringColumn : public Column
 {
 public:
   StringArray **vals_;
-  size_t currentChunk_;
-  size_t currentSize_;
 
   StringColumn()
   {
@@ -274,20 +349,29 @@ public:
     {
       vals_[i] = new StringArray();
     }
-    currentChunk_ = 1;
+    currentChunk_ = 0;
     currentSize_ = 0;
   }
 
-  StringColumn(Deserializer *d)
+  StringColumn(Deserializer *d) : Column(d, 'S')
   {
-    type_ = d->readChar();
+    //type_ = d->readChar();
+    pln(type_);
     currentChunk_ = d->readSizeT();
     currentSize_ = d->readSizeT();
+    printf("currentChunk: %zu currentSize: %zu\n", currentChunk_, currentSize_);
     vals_ = new StringArray *[CHUNK_SIZE];
     for (size_t i = 0; i < currentChunk_; i++)
     {
       vals_[i]->deserializeStringArray(d);
-      add_chunk(vals_[i], i);
+      // size_t arraySize = d->readSizeT();
+      // vals_[i] = new StringArray();
+      // printf("array size %zu\n", arraySize);
+      // for (size_t j = 0; j < arraySize; j++) {
+      //   String* s = d->readString();
+      //   printf("string is %s\n", s->c_str());
+      //   vals_[i]->append(s);
+      // }
     }
   }
 
@@ -303,16 +387,20 @@ public:
     }
   }
 
-  char *serialize(Serializer *ser)
+  void serialize(Serializer *ser)
   {
-    Column::serialize(ser);
+    printf("type is %c currentchunk is %zu currentSize is %zu\n", type_, currentChunk_, currentSize_);
+    ser->write(type_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
     for (size_t i = 0; i < currentChunk_; i++)
     {
       vals_[i]->serialize(ser);
     }
-    return ser->getSerChar();
+  }
+
+  static StringColumn * deserialize(Deserializer* d) {
+    Column::deserialize(d);
   }
 
   ~StringColumn()
@@ -407,7 +495,7 @@ public:
     {
       vals_[i] = new FloatArray();
     }
-    currentChunk_ = 1;
+    currentChunk_ = 0;
     currentSize_ = 0;
   }
 
@@ -444,16 +532,15 @@ public:
     }
   }
 
-  char *serialize(Serializer *ser)
+  void serialize(Serializer *ser)
   {
-    Column::serialize(ser);
+    ser->write(type_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
     for (size_t i = 0; i < currentChunk_; i++)
     {
       vals_[i]->serialize(ser);
     }
-    return ser->getSerChar();
   }
 
   size_t calculateCurrentChunk(size_t idx)
@@ -527,7 +614,7 @@ public:
     {
       vals_[i] = new BoolArray();
     }
-    currentChunk_ = 1;
+    currentChunk_ = 0;
     currentSize_ = 0;
   }
 
@@ -564,16 +651,15 @@ public:
     }
   }
 
-  char *serialize(Serializer *ser)
+  void serialize(Serializer *ser)
   {
-    Column::serialize(ser);
+    ser->write(type_);
     ser->write(currentChunk_);
     ser->write(currentSize_);
     for (size_t i = 0; i < currentChunk_; i++)
     {
       vals_[i]->serialize(ser);
     }
-    return ser->getSerChar();
   }
 
   void push_back(bool val)
@@ -629,8 +715,8 @@ public:
 Column *Column::deserialize(Deserializer *dser)
 {
   Column *result = nullptr;
-  char colType = dser->readChar();
-  switch (colType)
+  char typ = dser->readChar();
+  switch (typ)
   {
   case 'I':
     result = new IntColumn(dser);
@@ -642,7 +728,7 @@ Column *Column::deserialize(Deserializer *dser)
     result = new FloatColumn(dser);
     break;
   case 'S':
-    result = new StringColumn(dser);
+    result = new StringColumn2(dser);
     break;
   }
   return result;
