@@ -215,19 +215,20 @@ void testDFSerialize()
 	FILE *f = fopen("../src/data.sor", "r");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
+    printf("schemaCHAR %s\n", schemaFromFile);
 	Schema s(schemaFromFile);
 
 	DataFrame *df = sor->setDataFrame(f, 0, 100000);
 	df->print();
-	printf("Build DF from file passed!\n");
-    Serializer *ser = new Serializer();
-    df->serialize(ser);
-    char* result = ser->getSerChar();
-    Deserializer* dser = new Deserializer(result);
-    DataFrame* deDF = new DataFrame(dser);
-    assert(df->scm.track_types == deDF->scm.track_types);
-    deDF->print();
-    printf("Serialize DF from file passed!\n");
+	// printf("Build DF from file passed!\n");
+    // Serializer *ser = new Serializer();
+    // df->serialize(ser);
+    // char* result = ser->getSerChar();
+    // Deserializer* dser = new Deserializer(result);
+    // DataFrame* deDF = new DataFrame(dser);
+    // assert(df->scm.track_types == deDF->scm.track_types);
+    // deDF->print();
+    // printf("Serialize DF from file passed!\n");
 
 }
 
@@ -262,8 +263,8 @@ int main(int argc, char **argv)
     testChar();
     testSchemaSerialize();
     testColumnSerialize();
-    //testDFSerialize();
     testMessageSerialize();
+    testDFSerialize();
 
     LOG("Done.\n");
     return 0;
