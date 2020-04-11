@@ -59,6 +59,11 @@ public:
 		size_ = 0;
 	}
 
+	// check if key exists in map
+	bool check_key_exists(Object* key) {
+		return keys_->index_of(key) < keys_->length();	
+	}
+
 	// Gets the value at a specific key
 	Object *get(Object *key)
 	{
