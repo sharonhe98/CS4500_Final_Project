@@ -1,4 +1,3 @@
-#pragma once
 #include <cstdlib>
 #include <unistd.h>
 #include "string.h"
@@ -212,7 +211,8 @@ void testColumnSerialize()
 
 void testDFSerialize()
 {
-	FILE *f = fopen("../src/data.sor", "r");
+	FILE *f = fopen("sor_test", "r");
+    printf("file read!\n");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
     printf("schemaCHAR %s\n", schemaFromFile);
