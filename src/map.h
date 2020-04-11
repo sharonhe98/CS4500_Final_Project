@@ -43,25 +43,10 @@ public:
 		return size_;
 	}
 
-	// Removes all entries in this map
-	void clear()
-	{
-		// if there is something to clear, we loop through
-		// and nullify both keys and values at the same time
-		if (keys_->length() > 0)
-		{
-			for (size_t i = 0; i < size_; i++)
-			{
-				keys_->set(i, nullptr);
-				values_->set(i, nullptr);
-			}
-		}
-		size_ = 0;
-	}
-
 	// check if key exists in map
-	bool check_key_exists(Object* key) {
-		return keys_->index_of(key) < keys_->length();	
+	bool check_key_exists(Object *key)
+	{
+		return keys_->index_of(key) < keys_->length();
 	}
 
 	// Gets the value at a specific key
@@ -137,8 +122,14 @@ public:
 		}
 		else
 		{
-			// delegate to the keys and values to check equality
-			return keys_->equals(m->keys_) && values_->equals(m->values_);
+			for (size_t i = 0; i < keys_->length(); i++)
+			{
+				if (m->get(keys_->get_(i)) == nullptr)
+					return false;
+				if (get(keys_->get_(i))->equals(m->get(keys_->get_(i))) != NULL)
+					return true;
+			}
+			return false;
 		}
 	}
 
@@ -152,123 +143,7 @@ public:
 class StringMap : public Map
 {
 public:
-	StringArray *keys_;
-	StringArray *values_;
-	size_t size_;
+	StringMap() {}
 
-	StringMap()
-	{
-		// Constructor for StringMap
-		size_ = 0;
-		keys_ = new StringArray();
-		values_ = new StringArray();
-	}
-
-	~StringMap()
-	{
-		// Destructor for StringMap
-		delete keys_;
-		delete values_;
-	}
-
-	// Returns the amount of entries in this map
-	size_t length()
-	{
-		return size_;
-	}
-
-	// Removes all entries in this map
-	void clear()
-	{
-		// only clear if there's something to clear
-		if (keys_->length() > 0)
-		{
-			for (size_t i = 0; i < size_; i++)
-			{
-				keys_->set(i, nullptr);
-				values_->set(i, nullptr);
-			}
-		}
-		size_ = 0;
-	}
-
-	// Gets the value at a specific key
-	String *get(String *key)
-	{
-		// find the key index, return the value if the key exists
-		size_t index = keys_->index_of(key);
-		if (size_ == 0 || index > size_)
-		{
-			return nullptr;
-		}
-		return values_->get(index);
-	}
-
-	// Sets the value at the specified key to the value
-	void set(String *key, String *value)
-	{
-		if (key == nullptr)
-		{
-			// don't set anything if key is null
-			return;
-		}
-		// of tje key doesn't exist, add a new key-value pair
-		size_t index = keys_->index_of(key);
-		if (size_ == 0 || index > size_)
-		{
-			keys_->append(key);
-			values_->append(value);
-			size_ += 1;
-		}
-		else
-		{
-			// else set the value at the given key
-			values_->set(index, value);
-		}
-	}
-
-	// Gets all the keys of this map
-	String **getKeys()
-	{
-		return (String**)(keys_->elements_);
-	}
-
-	// Gets all the values of this map
-	String **getValues()
-	{
-		return (String**)values_->elements_;
-	}
-
-	// Checks if this map is equal to another object
-	bool equals(Object *o)
-	{
-		// this map is not null, so if the other object/map is
-		// a nullptr, return false
-		// else if the length of the maps are unequal, the values are also unequal at some point, so return false then, too
-		if (o == nullptr)
-		{
-			return false;
-		}
-		StringMap *m = dynamic_cast<StringMap *>(o);
-		if (m == nullptr)
-		{
-			return false;
-		}
-		if (size_ != m->length())
-		{
-			return false;
-		}
-		else
-		{
-			// else let the keys and values check equality with each other
-			return keys_->equals(m->keys_) && values_->equals(m->values_);
-		}
-	}
-
-	// Returns the hash of this map
-	size_t hash()
-	{
-		// let keys handle their own hashing
-		return keys_->hash();
-	}
+	String *get(String *k) { return dynamic_cast<String *>(Map::get(k)); }
 };

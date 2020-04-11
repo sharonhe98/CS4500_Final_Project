@@ -4,6 +4,7 @@
 #include "string.h"
 #include "array.h"
 
+// enum list of message types
 enum class MsgKind
 {
   Ack,
@@ -20,6 +21,9 @@ enum class MsgKind
   Directory
 };
 
+/**
+ * A class that represents a message
+ */
 class Message : public Object
 {
 public:
@@ -31,6 +35,7 @@ public:
 
   size_t id_; // an id t unique within the node
 
+  // constructor
   Message(MsgKind m, size_t s, size_t t, size_t i)
   {
     kind_ = m;
@@ -39,6 +44,7 @@ public:
     id_ = i;
   }
 
+  // message constructor that constructs a message after deserializing a message
   Message(Deserializer *d, MsgKind k)
   {
     kind_ = k;
@@ -47,6 +53,7 @@ public:
     id_ = d->readSizeT();
   }
 
+  // serializes a message
   virtual void serialize(Serializer *ser)
   {
     ser->write((int)kind_);
@@ -58,82 +65,113 @@ public:
   // function declaration
   static Message *deserializeMsg(Deserializer *dser);
 
+  // returns the message kind/type
   MsgKind getKind() {
 	return kind_;
   }
 
+  // gets the message sender
   size_t getSender() {
 	return sender_;
   }
 
+  // returns the message target
   size_t getTarget() {
 	return target_;
   }
 
+  // returns the id
   size_t getId() {
 	return id_;
   }
 
 };
 
+/**
+ * A class that represents an Ack message
+ */
 class Ack : public Message
 {
 public:
+  // constructor
   Ack(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
-
+  // constructor based on the deserialized message
   Ack(Deserializer *d) : Message(d, MsgKind::Ack) {}
 };
 
+/**
+ * A class that represents a Nack message
+ */
 class Nack : public Message
 {
 public:
+  // constructor
   Nack(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
-
+  // constructor that builds a Nack message based on the deserialized message
   Nack(Deserializer *d) : Message(d, MsgKind::Nack) {}
 };
 
+/**
+ * A class that represents an Put message
+ */
 class Put : public Message
 {
 public:
+  // constructor
   Put(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
-
+  // constructor that builds a Put message based on the deserialized message
   Put(Deserializer *d) : Message(d, MsgKind::Put) {}
 };
 
+/**
+ * A class that represents an Reply message
+ */
 class Reply : public Message
 {
 public:
+  // constructor
   Reply(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
-
+  // constructor that builds a Reply message based on the deserialized message
   Reply(Deserializer *d) : Message(d, MsgKind::Reply) {}
 };
 
+/**
+ * A class that represents a Get message
+ */
 class Get : public Message
 {
 public:
+  // constructor
   Get(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
-
+  // constructor that builds a Get message based on the deserialized message
   Get(Deserializer *d) : Message(d, MsgKind::Get) {}
 };
 
+/**
+ * A class that represents a WaitAndGet message
+ */
 class WaitAndGet : public Message
 {
 public:
+  // constructor
   WaitAndGet(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
-
+  // constructor that builds a WaitAndGet message based on the deserialized message
   WaitAndGet(Deserializer *d) : Message(d, MsgKind::WaitAndGet) {}
 };
 
+/**
+ * A class that represents a Status message
+ */
 class Status : public Message
 {
 public:
   String *msg_; // owned
-
+  // constructor
   Status(MsgKind kind_, size_t sender_, size_t target_, size_t id_, String *m) : Message(kind_, sender_, target_, id_)
   {
     msg_ = m;
   }
-
+  // constructor that builds a Status message based on the deserialized message
   Status(Deserializer *d) : Message(d, MsgKind::Status)
   {
     msg_ = d->readString();
@@ -148,34 +186,42 @@ public:
 
 };
 
+/**
+ * A class that represents a Kill message
+ */
 class Kill : public Message
 {
 public:
+  // constructor
   Kill(MsgKind m, size_t sender_, size_t target_, size_t id_) : Message(m, sender_, target_, id_) {}
-
+  // constructor that builds a Kill message based on the deserialized message
   Kill(Deserializer *d) : Message(d, MsgKind::Kill) {}
 };
 
-
+/**
+ * A class that represents a Register message
+ */
 class Register : public Message
 {
 public:
+  // client sock address
   sockaddr_in client_;
-
+  // port number
   size_t port_;
 
+  // constructor
   Register(MsgKind kind_, size_t sender_, size_t target_, size_t id_, sockaddr_in client, size_t port) : Message(kind_, sender_, target_, id_)
   {
     client_ = client;
     port_ = port;
   }
-
+  // constructor that builds a Register message based on the deserialized message
   Register(Deserializer *d) : Message(d, MsgKind::Register)
   {
     client_ = d->readSockAddrIn();
     port_ = d->readSizeT();
   }
-
+  // serialize Register message
   void serialize(Serializer *ser)
   {
     Message::serialize(ser);
@@ -184,6 +230,9 @@ public:
   }
 };
 
+/**
+ * A class that represents a Directory message
+ */
 class Directory : public Message
 {
 public:
@@ -194,20 +243,21 @@ public:
   // String ** addresses;  // owned; strings owned
   StringArray *addresses_;
 
+  // constructor
   Directory(MsgKind kind_, size_t sender_, size_t target_, size_t id_, size_t client, IntArray *ports, StringArray *addresses) : Message(kind_, sender_, target_, id_)
   {
     client_ = client;
     ports_ = ports;
     addresses_ = addresses;
   }
-
+  // constructor that builds a Directory message based on the deserialized message
   Directory(Deserializer *d) : Message(d, MsgKind::Directory)
   {
     client_ = d->readSizeT();
     ports_ = ports_->deserializeIntArray(d);
     addresses_ = addresses_->deserializeStringArray(d);
   }
-
+  // serialize a Directory message
   void serialize(Serializer *ser)
   {
     Message::serialize(ser);
@@ -217,6 +267,7 @@ public:
   }
 };
 
+// deserialize message and return message by type
 Message *Message::deserializeMsg(Deserializer *dser)
 {
   Message *result = nullptr;
