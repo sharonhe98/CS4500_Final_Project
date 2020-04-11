@@ -75,7 +75,7 @@ public:
     // if empty array, return arbitrary large number
     if (size_ == 0)
     {
-      return 500;
+      return length() + 500;
     }
     // return a value greater than size if index not found
     else

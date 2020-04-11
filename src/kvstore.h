@@ -63,19 +63,29 @@ public:
 
 	DataFrame *get(Key *key)
 	{
-		Value *df_v = get_(key);
-		assert(df_v);
-		Deserializer *des = new Deserializer(df_v->data_);
-		DataFrame* df = new DataFrame(des);
-		return df;
+		if (kv->check_key_exists(key)) {
+		  Value *df_v = get_(key);
+		  assert(df_v);
+		  Deserializer *des = new Deserializer(df_v->data_);
+		  DataFrame* df = new DataFrame(des);
+		  return df;
+		}
+		else {
+		  size_t target = key->home_node_;
+		  Get *m = new Get(MsgKind::Get, index,target, 53);
+		  node->send_m(m);
+		}
 	}
 
 	void put(Key *key, Value *value)
 	{
 		size_t idx = key->home_node_;
-		if (idx == index || node->recv_m()->getKind() == MsgKind::Put) { kv->set(key, value); }
-		Put* msg = new Put(MsgKind::Put, index, idx, index);
-		node->send_m(msg);
+		Message *recvd = node->recv_m();
+		if (idx == index || recvd->getKind() == MsgKind::Put) { kv->set(key, value); }
+		else {
+		  Put* msg = new Put(MsgKind::Put, index, idx, index);
+		  node->send_m(msg);
+		}
 	}
 
 	DataFrame *waitAndGet(Key *key)
