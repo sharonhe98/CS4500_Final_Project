@@ -4,7 +4,6 @@
 // class KVStore;
 #include "column.h"
 #include "schema.h"
-#include "../kvstore/kvstore.h"
 
 /****************************************************************************
  * DataFrame::

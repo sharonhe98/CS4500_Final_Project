@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include "object.h"
 #include "string.h"
-#include "../network/serial.h"
+#include "network/serial.h"
 
 /**
  * Assuming an array is a java-style arraylist. Stores objects by index.
