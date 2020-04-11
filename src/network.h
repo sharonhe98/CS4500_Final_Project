@@ -29,8 +29,8 @@ public:
 	{
 		ipstring = ip;
 		ports = new IntArray();
-		nodes_ = new NodeInfo[num_nodes];
 		num_nodes = total_nodes;
+		nodes_ = new NodeInfo[num_nodes];
 		current_node = idx;
 		addresses = new StringArray();
 	}
@@ -93,12 +93,12 @@ public:
 		Register* msg = new Register(MsgKind::Register, idx, 0, 42, ip_, port);
 		send_m(msg);
 
-		printf("Client has registered!\n");
 
 		ports->append(port);
 
 		//addresses->append(new String(inet_ntoa(ip_.sin_addr.s_addr)));
 		Directory *ipd = dynamic_cast<Directory *>(recv_m());
+		printf("Client has registered!\n");
 
 		for (size_t i = 0; i < ipd->addresses_->length(); i++)
 		{
