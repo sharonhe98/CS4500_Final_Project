@@ -61,10 +61,24 @@ public:
 	{
 		current_node = idx;
 		init_sock_(port);
-		// server knows how many nodes	
-		for (size_t i = 1; i < num_nodes; i++)
+		// server knows how many nodes
+		for (size_t i = 0; i < num_nodes; i++) {
+			nodes_[0].address = ip_;
+			nodes_[0].id = 0;
+		}	
+		for (size_t i = 2; i <= num_nodes; ++i)
 		{
-			recv_m();
+			Register *msg = dynamic_cast<Register*>(recv_m());
+			size_t port = msg->port_;
+			size_t sender = msg->getSender();
+			nodes_[sender].id = sender;
+			nodes_[sender].address.sin_family = AF_INET;
+			nodes_[sender].address.sin_port = htons(port);
+		}
+		for (size_t i = 0; i < num_nodes - 1; ++i) {
+			ports->set(i, ntohs(nodes_[i+1].address.sin_port));
+			String* address = new String(inet_ntoa(nodes_[i+1].address.sin_addr));
+			addresses->set(i, address);
 		}
 		for (size_t i = 1; i < num_nodes; i++) {
 			Directory ipd(MsgKind::Directory, current_node, i, nodes_[i].id, i, ports, addresses);
@@ -94,23 +108,25 @@ public:
 		send_m(msg);
 
 
-		ports->append(port);
-
-		//addresses->append(new String(inet_ntoa(ip_.sin_addr.s_addr)));
 		Directory *ipd = dynamic_cast<Directory *>(recv_m());
-		printf("Client has registered!\n");
+		NodeInfo *nodes = new NodeInfo[num_nodes];
+		nodes[0] = nodes_[0];
 
-		for (size_t i = 0; i < ipd->addresses_->length(); i++)
+		for (size_t i = 0; i < ipd->addresses_->length(); ++i)
 		{
 			nodes_[i+1].id = i + 1;
 			nodes_[i+1].address.sin_family = AF_INET;
 			nodes_[i+1].address.sin_port = htons(ipd->ports_->get(i));
 			if (inet_pton(AF_INET, ipd->addresses_->get(i)->c_str(), &nodes_[i+1].address.sin_addr) <= 0)
 			{
-				printf("Invalid IP directory-addr for node %zu", (i + 1));
+				perror("Invalid IP directory-addr for node");
 				exit(1);
 			}
 		}
+		delete[] nodes_;
+		nodes_ = nodes;
+		printf("Client has registered!\n");
+
 	}
 
 	void send_m(Message *msg) override
