@@ -23,7 +23,11 @@ start_server:
 	g++ -g -Wall -pedantic -std=c++11 -o server test/server.cpp
 	./server 127.0.0.1 8000 0
 
-start_client:
+start_client1:
 	g++ -g -Wall -pedantic -std=c++11 -o client1 test/client.cpp
 	./client1 127.0.0.1 8000 127.0.0.1 8001 1
+
+start_client2:
+	g++ -g -Wall -pedantic -std=c++11 -o client2 test/client.cpp
+	./client2 127.0.0.1 8000 127.0.0.2 8002 2
 	
