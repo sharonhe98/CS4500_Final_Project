@@ -3,8 +3,8 @@
 #include <string.h>
 #include "object.h"
 #include "string.h"
-#include "kvstore.h"
-#include "dataframe.h"
+#include "../kvstore/kvstore.h"
+#include "../dataframe/dataframe.h"
 
 class Application : public Object
 {

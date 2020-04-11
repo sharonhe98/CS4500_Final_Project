@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cassert>
-#include "../src/kvstore.h"
+#include "../src/kvstore/kvstore.h"
 
 void test_from_array() {
 	size_t SZ = 100;

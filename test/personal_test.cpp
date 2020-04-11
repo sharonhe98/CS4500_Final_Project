@@ -1,7 +1,7 @@
 
 #include <assert.h>
-#include "../src/kvstore.h"
-#include "../src/sorer.h"
+#include "../src/kvstore/kvstore.h"
+#include "../src/dataframe/sorer.h"
 
 void testArray()
 {

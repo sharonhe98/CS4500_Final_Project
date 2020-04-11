@@ -5,8 +5,8 @@
 #include <string.h>
 #include <assert.h>
 #include "../src/helper.h"
-#include "../src/kvstore.h"
-#include "../src/sorer.h"
+#include "../src/kvstore/kvstore.h"
+#include "../src/dataframe/sorer.h"
 
 #define LOG(...) fprintf(stderr, "(" __FILE__ ") " __VA_ARGS__);
 

@@ -1,4 +1,4 @@
-#include "../src/kvstore.h"
+#include "../src/kvstore/kvstore.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>

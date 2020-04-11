@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <cassert>
 #include <thread>
-#include "../src/kvstore.h"
+#include "../src/kvstore/kvstore.h"
 
 using namespace std;
 

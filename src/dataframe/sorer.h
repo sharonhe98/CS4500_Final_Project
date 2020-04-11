@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "object.h"
-#include "column.h"
+#include "../object.h"
+#include "dataframe.h"
 #include "helpers.h"
 
 // The maximum length of a line buffer. No lines over 4095 bytes

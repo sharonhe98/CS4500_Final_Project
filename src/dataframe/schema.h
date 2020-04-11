@@ -1,8 +1,8 @@
-#include "object.h"
-#include "array.h"
+#include "../object.h"
+#include "../array.h"
 #include "column.h"
 #include <string.h>
-#include "string.h"
+#include "../string.h"
 
 class Row;
 class Fielder;

@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <netinet/in.h>
-#include "object.h"
-#include "string.h"
+#include "../object.h"
+#include "../string.h"
 
 // POSIX/BSD syscalls for file access
 #include <unistd.h>

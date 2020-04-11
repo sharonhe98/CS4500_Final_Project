@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "../src/column.h"
+#include "../src/dataframe/column.h"
 #define LOG(...) fprintf(stderr, "(" __FILE__ ") " __VA_ARGS__);
 
 void test_double_column() {

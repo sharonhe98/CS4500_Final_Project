@@ -1,6 +1,6 @@
 #pragma once
 
-#include "array.h"
+#include "../array.h"
 #include "helpers.h"
 #include <stdarg.h>
 // #include "serial.h"

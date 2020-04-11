@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <cassert>
-#include "string.h"
-#include "object.h"
-#include "array.h"
-#include "dataframe.h"
-#include "map.h"
-#include "network.h"
+#include "../string.h"
+#include "../object.h"
+#include "../array.h"
+#include "../dataframe/dataframe.h"
+#include "../map.h"
+#include "../network/network.h"
 
 class Key : public Object
 {

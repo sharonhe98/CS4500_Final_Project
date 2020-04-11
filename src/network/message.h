@@ -1,8 +1,8 @@
 #include <cstdlib>
 #include <netinet/in.h>
-#include "object.h"
-#include "string.h"
-#include "array.h"
+#include "../object.h"
+#include "../string.h"
+#include "../array.h"
 
 // enum list of message types
 enum class MsgKind
