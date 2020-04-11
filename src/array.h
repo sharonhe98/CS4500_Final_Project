@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include "object.h"
 #include "string.h"
-#include "serial.h"
+#include "../network/serial.h"
 
 /**
  * Assuming an array is a java-style arraylist. Stores objects by index.
@@ -75,7 +75,7 @@ public:
     // if empty array, return arbitrary large number
     if (size_ == 0)
     {
-      return length() + 500;
+      return 500;
     }
     // return a value greater than size if index not found
     else
