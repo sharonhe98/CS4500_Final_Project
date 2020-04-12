@@ -142,7 +142,8 @@ void testSchemaSerialize()
 {
     Serializer *serializer = new Serializer();
     Schema *isfb = new Schema("ISFB");
-    char* result = isfb->serialize(serializer);
+    isfb->serialize(serializer);
+    char* result = serializer->getSerChar();
     Deserializer *deserializer = new Deserializer(result);
     Schema *deSchema = Schema::deserialize(deserializer);
     assert(isfb->track_types == deSchema->track_types);
@@ -241,7 +242,7 @@ void testDFSerialize()
 
 }
 
-void testMessageSerialize()
+void testStatusMessageSerialize()
 {
     String *good = new String("good");
     Status *status = new Status(MsgKind::Status, 1, 2, 3, good);
@@ -256,9 +257,67 @@ void testMessageSerialize()
     assert(msg->sender_ == status->sender_);
     assert(msg->target_ == status->target_);
     assert(msg->id_ == status->id_);
-    printf("deserialize msg successfully\n");
+    printf("deserialize Status msg successfully\n");
     delete good;
     delete status;
+    delete ser;
+}
+
+void testRegisterMessageSerialize()
+{
+    size_t port = 8080;
+    sockaddr_in clientAddress;
+    clientAddress.sin_family = AF_INET; 
+    clientAddress.sin_addr.s_addr = INADDR_ANY; 
+    clientAddress.sin_port = htons( port );
+    Register *reg = new Register(MsgKind::Register, 0, 1, 0, clientAddress, port);
+    Serializer *ser = new Serializer();
+    reg->serialize(ser);
+    char *result = ser->getSerChar();
+    assert(result);
+    Deserializer *dser = new Deserializer(result);
+    Message *msg = Message::deserializeMsg(dser);
+    assert(msg->kind_ == reg->kind_);
+    assert((int)msg->kind_ == 8);
+    assert(msg->sender_ == reg->sender_);
+    assert(msg->target_ == reg->target_);
+    assert(msg->id_ == reg->id_);
+    Register *reg2 = dynamic_cast<Register*>(msg);
+    assert(reg->port_ == reg2->port_);
+    assert(reg2->client_.sin_port);
+    printf("deserialize Register msg successfully\n");
+    delete ser;
+}
+
+void testDirectoryMessageSerialize()
+{
+    size_t client = 2;
+    IntArray * ports = new IntArray();
+    ports->append(1);
+    ports->append(2);
+    assert(ports->length() == 2);
+    StringArray* addresses = new StringArray();
+    String * addr = new String("127.0.0.0");
+    addresses->append(addr);
+    addresses->append(addr);
+    assert(addresses->length() == 2);
+    Directory *dir = new Directory(MsgKind::Directory, 0, 1, 0, client, ports, addresses);
+    Serializer *ser = new Serializer();
+    dir->serialize(ser);
+    char *result = ser->getSerChar();
+    assert(result);
+    Deserializer *dser = new Deserializer(result);
+    Message *msg = Message::deserializeMsg(dser);
+    assert(msg->kind_ == dir->kind_);
+    assert((int)msg->kind_ == 9);
+    assert(msg->sender_ == dir->sender_);
+    assert(msg->target_ == dir->target_);
+    assert(msg->id_ == dir->id_);
+    Directory *dir2 = dynamic_cast<Directory*>(msg);
+    assert(dir2->client_ == client);
+    assert(dir2->ports_->length() == 2);
+    assert(dir2->addresses_->length() == 2);
+    printf("deserialize Directory msg successfully\n");
     delete ser;
 }
 
@@ -273,7 +332,9 @@ int main(int argc, char **argv)
     testSchemaSerialize();
     testStrColumnSerialize();
     testIntColumnSerialize();
-    testMessageSerialize();
+    testStatusMessageSerialize();
+    testRegisterMessageSerialize();
+    testDirectoryMessageSerialize();
     testDFSerialize();
 
     LOG("Done.\n");

@@ -254,8 +254,8 @@ public:
   Directory(Deserializer *d) : Message(d, MsgKind::Directory)
   {
     client_ = d->readSizeT();
-    ports_ = ports_->deserializeIntArray(d);
-    addresses_ = addresses_->deserializeStringArray(d);
+    ports_ = IntArray::deserializeIntArray(d);
+    addresses_ = StringArray::deserializeStringArray(d);
   }
   // serialize a Directory message
   void serialize(Serializer *ser)

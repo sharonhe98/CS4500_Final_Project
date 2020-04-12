@@ -104,6 +104,7 @@ public:
 
   char *getSerChar()
   {
+    printf("buf is %x\n", *((unsigned int*)buf));
     return buf;
   }
 };
@@ -174,7 +175,7 @@ public:
     return i;
   }
 
-  int readBool()
+  bool readBool()
   {
     bool b = 0;
     memcpy(&b, buf + pos, sizeof(bool));

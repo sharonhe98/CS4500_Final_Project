@@ -368,12 +368,11 @@ public:
 
   ~Schema() {}
 
-  char *serialize(Serializer *ser)
+  void serialize(Serializer *ser)
   {
     ser->write(track_types);
     ser->write(row_size);
     ser->write(col_size);
-    return ser->getSerChar();
   }
 
   static Schema *deserialize(Deserializer *d)
