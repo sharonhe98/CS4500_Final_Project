@@ -126,7 +126,7 @@ public:
 			{
 				if (m->get(keys_->get_(i)) == nullptr)
 					return false;
-				if (get(keys_->get_(i))->equals(m->get(keys_->get_(i))) != NULL)
+				if (get(keys_->get_(i))->equals(m->get(keys_->get_(i))))
 					return true;
 			}
 			return false;
