@@ -53,7 +53,7 @@ public:
 		ip_.sin_port = htons(port);
 		assert(bind(sock_, (struct sockaddr *)&ip_, sizeof(ip_)) >= 0);
 		//if (bind(sock_, (struct sockaddr *)&ip_, sizeof(ip_)) < 0); perror("bind failed!\n");
-		assert(listen(sock_, 100) >= 0);
+		assert(listen(sock_, num_nodes) >= 0);
 	}
 
 	// initializes the server/registration node to node 0
@@ -66,7 +66,7 @@ public:
 			nodes_[0].address = ip_;
 			nodes_[0].id = 0;
 		}	
-		for (size_t i = 2; i <= num_nodes; ++i)
+		for (size_t i = 1; i < num_nodes; i++)
 		{
 			Register *msg = dynamic_cast<Register*>(recv_m());
 			size_t port = msg->port_;
@@ -74,6 +74,7 @@ public:
 			nodes_[sender].id = sender;
 			nodes_[sender].address.sin_family = AF_INET;
 			nodes_[sender].address.sin_port = htons(port);
+			printf("node %zu is registering\n", i);
 		}
 		for (size_t i = 0; i < num_nodes - 1; ++i) {
 			ports->set(i, ntohs(nodes_[i+1].address.sin_port));
@@ -159,7 +160,7 @@ public:
 			exit(1);
 		}
 		char *buffer = new char[size];
-		size_t rd = 0;
+		int rd = 0;
 		while (rd != size)
 		{
 			rd += read(req, buffer + rd, size - rd);
