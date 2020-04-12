@@ -37,7 +37,7 @@ void testStringArrSerialize()
     assert(sa->length() == 2);
     char *result = sa->serialize(serializer);
     Deserializer *deserializer = new Deserializer(result);
-    StringArray *dsa = sa->deserializeStringArray(deserializer);
+    StringArray *dsa = StringArray::deserializeStringArray(deserializer);
     assert(dsa->length() == 2);
     String *s1 = dsa->get(0);
     assert(s1->equals(sa->get(0)));
@@ -66,7 +66,7 @@ void testIntArrSerialize()
     assert(ia->length() == 3);
     char *result = ia->serialize(serializer);
     Deserializer *deserializer = new Deserializer(result);
-    IntArray *dia = ia->deserializeIntArray(deserializer);
+    IntArray *dia = IntArray::deserializeIntArray(deserializer);
     assert(dia->length() == 3);
     int i1 = dia->get(0);
     assert(i1 == ia->get(0));
@@ -75,7 +75,6 @@ void testIntArrSerialize()
     int i3 = dia->get(2);
     assert(i3 == ia->get(2));
     delete serializer;
-    // delete[] ia;
     delete deserializer;
     printf("test IntArray de/serialize passed!\n");
 }
@@ -94,7 +93,7 @@ void testBoolArrSerialize()
     assert(ba->length() == 3);
     char *result = ba->serialize(serializer);
     Deserializer *deserializer = new Deserializer(result);
-    BoolArray *dba = ba->deserializeBoolArray(deserializer);
+    BoolArray *dba = BoolArray::deserializeBoolArray(deserializer);
     assert(dba->length() == 3);
     bool b1 = dba->get(0);
     assert(b1 == ba->get(0));
@@ -145,44 +144,14 @@ void testSchemaSerialize()
     Schema *isfb = new Schema("ISFB");
     char* result = isfb->serialize(serializer);
     Deserializer *deserializer = new Deserializer(result);
-    Schema *deSchema = isfb->deserialize(deserializer);
+    Schema *deSchema = Schema::deserialize(deserializer);
     assert(isfb->track_types == deSchema->track_types);
     delete serializer;
     delete deserializer;
     printf("Schema serialize success!\n");
 }
 
-// void testColumnSerialize()
-// {
-//     Serializer *serializer = new Serializer();
-//     StringColumn* sc = new StringColumn();
-// 	String* hello = new String("hello");
-// 	for (size_t i = 0; i < 1000 * 2; i++) {
-// 		sc->push_back(hello);
-// 	}
-// 	assert(sc->currentChunk_ == 1);
-//     assert(sc->get(0)->c_str() == hello->c_str());
-//     assert(sc->get(1999)->c_str() == hello->c_str());
-//     printf("current chunk is:%zu\n", sc->currentChunk_);
-//     sc->serialize(serializer);
-//     char* result = serializer->getSerChar();
-//     printf("serialized!\n");
-//     printf("pos is at: %zu\n", serializer->getPos());
-//     Deserializer *deserializer = new Deserializer(result);
-//     StringColumn *c = StringColumn::deserialize(deserializer);
-//     printf("type %c sctype %c\n", c->type_, sc->type_);
-//     assert(c->type_ == sc->type_);
-//     printf("chunk %zu\n", c->currentChunk_);
-//     assert(c->currentChunk_ == 1);
-//     printf("String is %s Hello is %s\n", c->get(0)->c_str(), hello->c_str());
-//     assert(c->get(0)->c_str() == hello->c_str());
-//     assert(c->get(1999));
-//     delete serializer;
-//     delete deserializer;
-//     printf("Column serialize success!\n");
-// }
-
-void testColumnSerialize()
+void testStrColumnSerialize()
 {
     Serializer *serializer = new Serializer();
     StringColumn* sc = new StringColumn();
@@ -204,31 +173,71 @@ void testColumnSerialize()
     StringColumn *sc2 = dynamic_cast<StringColumn*>(c);
     assert(strcmp(sc2->get(0)->c_str(), hello->c_str()) == 0);
     assert(strcmp(sc2->get(1999)->c_str(), hello->c_str()) == 0);
+    assert(sc2->get_type() == 'S');
+    assert(sc2->chunks_.length() == 2);
     delete serializer;
     delete deserializer;
-    printf("Column serialize success!\n");
+    printf("String Column serialize success!\n");
+}
+
+void testIntColumnSerialize()
+{
+    Serializer *serializer = new Serializer();
+    IntColumn* ic = new IntColumn();
+	for (size_t i = 0; i < 1000 * 2; i++) {
+		ic->push_back(2);
+	}
+    assert(ic->get(0) == 2);
+    assert(ic->get(1999) == 2);
+    ic->serialize(serializer);
+    char* result = serializer->getSerChar();
+    printf("serialized!\n");
+    Deserializer *deserializer = new Deserializer(result);
+    Column *c = Column::deserialize(deserializer);
+    assert(c->type_ == ic->type_);
+
+    IntColumn *ic2 = dynamic_cast<IntColumn*>(c);
+    assert(ic2->get(0) == 2);
+    assert(ic2->get(1999) == 2);
+    assert(ic2->get_type() == 'I');
+    assert(ic2->chunks_.length() == 2);
+    delete serializer;
+    delete deserializer;
+    printf("Int Column serialize success!\n");
 }
 
 void testDFSerialize()
 {
-	FILE *f = fopen("sor_test", "r");
-    printf("file read!\n");
+	FILE *f = fopen("test/data.sor", "r");
+    assert(f);
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
-    printf("schemaCHAR %s\n", schemaFromFile);
 	Schema s(schemaFromFile);
 
 	DataFrame *df = sor->setDataFrame(f, 0, 100000);
+    assert(df->cols[0]->get_type() == 'B');
+    assert(df->cols[1]->get_type() == 'I');
+    assert(df->cols[2]->get_type() == 'S');
+    assert(df->cols[3]->get_type() == 'F');
+    assert(df->cols[4]->get_type() == 'I');
+    assert(df->ncols() == 5);
+    assert(df->nrows() == 5);
 	df->print();
-	// printf("Build DF from file passed!\n");
-    // Serializer *ser = new Serializer();
-    // df->serialize(ser);
-    // char* result = ser->getSerChar();
-    // Deserializer* dser = new Deserializer(result);
-    // DataFrame* deDF = new DataFrame(dser);
-    // assert(df->scm.track_types == deDF->scm.track_types);
-    // deDF->print();
-    // printf("Serialize DF from file passed!\n");
+	printf("Build DF from file passed!\n");
+    Serializer *ser = new Serializer();
+    df->serialize(ser);
+    char* result = ser->getSerChar();
+    Deserializer* dser = new Deserializer(result);
+    DataFrame* deDF = DataFrame::deserialize(dser);
+    assert(deDF->cols[0]->get_type() == 'B');
+    assert(deDF->cols[1]->get_type() == 'I');
+    assert(deDF->cols[2]->get_type() == 'S');
+    assert(deDF->cols[3]->get_type() == 'F');
+    assert(deDF->cols[4]->get_type() == 'I');
+    assert(deDF->ncols() == 5);
+    assert(deDF->nrows() == 5);
+    deDF->print();
+    printf("Serialize DF from file passed!\n");
 
 }
 
@@ -262,7 +271,8 @@ int main(int argc, char **argv)
     testCharStar();
     testChar();
     testSchemaSerialize();
-    testColumnSerialize();
+    testStrColumnSerialize();
+    testIntColumnSerialize();
     testMessageSerialize();
     testDFSerialize();
 

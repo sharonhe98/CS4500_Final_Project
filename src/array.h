@@ -331,14 +331,13 @@ public:
     for (size_t i = 0; i < length(); i++)
     {
       int item = elements_[i];
-      pln(item);
       ser->write(item);
       ser->getPos();
     }
     return ser->getSerChar();
   };
 
-  IntArray *deserializeIntArray(Deserializer *d)
+  static IntArray *deserializeIntArray(Deserializer *d)
   {
     // new StringArray
     IntArray *deIntArray = new IntArray();
@@ -511,18 +510,17 @@ public:
   {
     // serialize size of array
     ser->write(length());
-    // for every string, serialize
+    // for every float, serialize
     for (size_t i = 0; i < length(); i++)
     {
-      int item = elements_[i];
-      pln(item);
+      double item = elements_[i];
       ser->write(item);
       ser->getPos();
     }
     return ser->getSerChar();
   };
 
-  FloatArray *deserializeFloatArray(Deserializer *d)
+  static FloatArray *deserializeFloatArray(Deserializer *d)
   {
     // new StringArray
     FloatArray *deFloatArray = new FloatArray();
@@ -743,14 +741,13 @@ public:
     for (size_t i = 0; i < length(); i++)
     {
       bool item = elements_[i];
-      pln(item);
       ser->write(item);
       ser->getPos();
     }
     return ser->getSerChar();
   };
 
-  BoolArray *deserializeBoolArray(Deserializer *d)
+  static BoolArray *deserializeBoolArray(Deserializer *d)
   {
     // new StringArray
     BoolArray *deBoolArray = new BoolArray();
@@ -777,8 +774,6 @@ public:
 class StringArray : public Array
 {
 public:
-  //String **elements_;
-
   String *get(size_t nn)
   {
     return dynamic_cast<String *>(get_(nn));
@@ -797,15 +792,12 @@ public:
     return ser->getSerChar();
   };
 
-  StringArray *deserializeStringArray(Deserializer *d)
+  static StringArray *deserializeStringArray(Deserializer *d)
   {
-    // new StringArray
     StringArray *deStrArray = new StringArray();
-
     // deserialize size at char buffer position 0
     // amount of bytes of the size field of array (8 bytes)
     size_t sizeArr = d->readSizeT();
-
     for (size_t i = 0; i < sizeArr; i++)
     {
       // deserialize string at the offset position
@@ -813,7 +805,6 @@ public:
       // add string to result array
       deStrArray->append(deserStr);
     }
-
     return deStrArray;
   }
 };

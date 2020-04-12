@@ -85,7 +85,7 @@ void testConcat()
 
 void testGetSchema()
 {
-	FILE *f = fopen("../src/data.sor", "r");
+	FILE *f = fopen("test/data.sor", "r");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
 	assert(strcmp(schemaFromFile, "BISFI") == 0);
@@ -94,7 +94,7 @@ void testGetSchema()
 
 void test4()
 {
-	FILE *f = fopen("../src/data.sor", "r");
+	FILE *f = fopen("test/data.sor", "r");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
 	Schema s(schemaFromFile);

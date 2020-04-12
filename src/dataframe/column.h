@@ -148,7 +148,8 @@ public:
   {
     size_t numStr = d->readSizeT();
     for (size_t i = 0; i < numStr; i++) {
-      push_back(d->readInt());
+      int ii = d->readInt();
+      push_back(ii);
     }
     size_ = numStr;
   }
@@ -162,6 +163,8 @@ public:
      ser->write(get(i));
     }
   }
+
+
 
   void push_back(int val)
   {
@@ -255,7 +258,7 @@ class StringColumn : public Column {
   }
 
   void serialize(Serializer* s) {
-    s->write(type_); 
+    s->write(type_);
     s->write(size_);
     for (size_t i = 0; i < size_; i++) {
       s->write(get(i));
@@ -334,6 +337,7 @@ public:
   void push_back(double val)
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
+
     if (chunk_id >= chunks_.length()) {
       chunks_.append(new FloatArray());
     }
@@ -394,11 +398,12 @@ public:
     chunks_.append(new BoolArray());
   }
 
-  BoolColumn(Deserializer *d)
+  BoolColumn(Deserializer *d) : Column(d, 'B')
   {
     size_t numStr = d->readSizeT();
     for (size_t i = 0; i < numStr; i++) {
-      push_back(d->readBool());
+      bool b = d->readBool();
+      push_back(b);
     }
     size_ = numStr;
   }
@@ -419,7 +424,7 @@ public:
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
     if (chunk_id >= chunks_.length()) {
-      chunks_.append(new IntArray());
+      chunks_.append(new BoolArray());
     }
     chunks_.get(chunk_id)->append(val);
     size_++;

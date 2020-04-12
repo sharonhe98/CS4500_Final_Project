@@ -163,80 +163,52 @@ public:
   /** Setters: set the given column with the given value. */
   void set(size_t col, int val)
   {
-    Column *c = nullptr;
-
-    if (columns[col] == nullptr)
-    {
-      c = new IntColumn();
-      columns[col] = c;
-    }
+    Column *c = columns[col] == nullptr ? new IntColumn() : columns[col];
+  
+    assert(c->get_type() == 'I');
+    IntColumn *ic = dynamic_cast<IntColumn *>(c);
+    if (ic->size() == 0)
+      ic->push_back(val);
     else
-    {
-      c = columns[col];
-    }
-    if (c->get_type() == 'I')
-    {
-      IntColumn *ic = dynamic_cast<IntColumn *>(c);
-
       ic->set(0, val);
-    }
   }
+
   void set(size_t col, double val)
   {
-    Column *c = nullptr;
-    if (columns[col] == nullptr)
-    {
-      c = new FloatColumn();
-      columns[col] = c;
-    }
+    Column *c = columns[col] == nullptr ? new FloatColumn() : columns[col];
+  
+    assert(c->get_type() == 'F');
+    FloatColumn *fc = dynamic_cast<FloatColumn *>(c);
+    if (fc->size() == 0)
+      fc->push_back(val);
     else
-    {
-      c = columns[col];
-    }
-    if (c->get_type() == 'F')
-    {
-
-      FloatColumn *fc = dynamic_cast<FloatColumn *>(c);
-
       fc->set(0, val);
-    }
   }
+
   void set(size_t col, bool val)
   {
-    Column *c = nullptr;
-    if (columns[col] == nullptr)
-    {
-      c = new BoolColumn();
-      columns[col] = c;
-    }
+    Column *c = columns[col] == nullptr ? new BoolColumn() : columns[col];
+  
+    assert(c->get_type() == 'B');
+    BoolColumn *bc = dynamic_cast<BoolColumn *>(c);
+    if (bc->size() == 0)
+      bc->push_back(val);
     else
-    {
-      c = columns[col];
-    }
-    if (c->get_type() == 'B')
-    {
-      BoolColumn *bc = dynamic_cast<BoolColumn *>(c);
       bc->set(0, val);
-    }
   }
+
   /** Acquire ownership of the string. */
   void set(size_t col, String *val)
   {
-    Column *c = nullptr;
-    if (columns[col] == nullptr)
-    {
-      c = new StringColumn();
-      columns[col] = c;
-    }
+    Column *c = columns[col] == nullptr ? new StringColumn() : columns[col];
+  
+    assert(c->get_type() == 'S');
+    StringColumn *sc = dynamic_cast<StringColumn *>(c);
+    if (sc->size() == 0)
+      sc->push_back(val);
     else
-    {
-      c = columns[col];
-    }
-    if (c->get_type() == 'S')
-    {
-      StringColumn *sc = dynamic_cast<StringColumn *>(c);
       sc->set(0, val);
-    }
+    
   }
 
   /** Set/get the index of this row (ie. its position in the dataframe. This is
@@ -404,7 +376,7 @@ public:
     return ser->getSerChar();
   }
 
-  Schema *deserialize(Deserializer *d)
+  static Schema *deserialize(Deserializer *d)
   {
     return new Schema(d);
   }

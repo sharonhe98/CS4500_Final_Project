@@ -47,10 +47,13 @@ public:
   }
 
   DataFrame(Deserializer* d) {
-    Schema* s = scm.deserialize(d);
+    Schema s(*Schema::deserialize(d));
+    scm = s;
     cols = new Column *[scm.width()];
-    for (size_t i = 0; i < s->width(); i++) {
-      cols[i]->deserialize(d);
+    
+    for (size_t i = 0; i < scm.width(); i++) {
+      cols[i] = Column::deserialize(d);
+      assert(cols[i]);
     }
   }
 
@@ -68,6 +71,11 @@ public:
     for (size_t i = 0; i < ncols(); i++) {
       cols[i]->serialize(ser);
     }
+  }
+
+  static DataFrame *deserialize(Deserializer *d)
+  {
+    return new DataFrame(d);
   }
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe

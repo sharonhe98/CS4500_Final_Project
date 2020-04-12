@@ -157,26 +157,21 @@ public:
                 }
                 char type = inferred_type(row[i]);
                 ColumnType colType = typeToEnum(type);
-
                 if (colType > typeToEnum(cols_[i]->get_type()))
                 {
                     delete cols_[i];
                     switch (colType)
                     {
                     case type_bool:
-                        printf("i %zu is type bool\n", i);
                         cols_[i] = new BoolColumn();
                         break;
                     case type_int:
-                        printf("i %zu is type int\n", i);
                         cols_[i] = new IntColumn();
                         break;
                     case type_float:
-                        printf("i %zu is type flaot\n", i);
                         cols_[i] = new FloatColumn();
                         break;
                     default:
-                        printf("i %zu is type string\n", i);
                         cols_[i] = new StringColumn();
                         break;
                     }
