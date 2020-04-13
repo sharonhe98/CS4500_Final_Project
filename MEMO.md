@@ -33,7 +33,31 @@ getAndWait(k) =>  DataFrame*		returns a deserialized DataFrame. First checks if 
 </p>
 <p>The Column class has been changed and implemented using chunks, which are essentially arrays of arrays, using our hand rolled Array classes. We have arbitrarily determined the size of each chunk (currently 1000, but can be changed), meaning each “element” in the column is an array of length <size of chunk>. This allows us to build a DataFrame from a column without becoming too large, and allows for more abstraction between the application and the payload.
 </p>
+<p><i>Use Cases:</i></p>
+```
+FILE *f = fopen("../src/data.sor", "r");
+   SOR* sor = new SOR();
+   char* schemaFromFile = sor->getSchema(f, 0, 1000000);
+   printf("schema is: %s\n", schemaFromFile);
+   Schema s(schemaFromFile);
+  
+   DataFrame* df = sor->setDataFrame(f, 0, 100000);
+   df->print();
+
+```
 <p></p>
+
+```
+start_server:
+        g++ -g -Wall -pedantic -std=c++11 -o server test/server.cpp
+        ./server 127.0.0.1 8000 0
+ 
+start_client:
+        g++ -g -Wall -pedantic -std=c++11 -o client1 test/client.cpp
+        ./client1 127.0.0.1 8000 127.0.0.1 8001 1
+
+
+```
 <p></p>
 <p></p>
 <p></p>
