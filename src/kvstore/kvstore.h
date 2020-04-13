@@ -21,6 +21,20 @@ public:
 		key = new String(search_key);
 		home_node_ = node_number;
 	}
+
+	Key(Deserializer* d) {
+		key = d->readString();
+		home_node_ = d->readSizeT();
+	}
+
+	void serialize(Serializer* s) {
+		s->write(key);
+		s->write(home_node_);
+	}
+
+	static Key* deserialize(Deserializer* d) {
+		return new Key(d);
+	}
 };
 
 class Value : public Object
