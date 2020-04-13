@@ -55,9 +55,8 @@ start_server:
 start_client:
         g++ -g -Wall -pedantic -std=c++11 -o client1 test/client.cpp
         ./client1 127.0.0.1 8000 127.0.0.1 8001 1
-
-
 ```
-<p></p>
-<p></p>
-<p></p>
+<p><i>Open Questions:</i></p>
+1. We would like to know how the chunking works when pushing to the KVStore. We have discussed with professor Vitek, but need some time to work out our implementation.
+<p><i>Status:</i></p>
+<p>We finally have our NetworkIP class running. We need to refactor our column and array classes in order to work in tandem with the KVStore. Serialization is now finished, and we have a better understanding of how we want to implement KVStore methods. Out of all the demo applications, Trivial is running at a small scale, with Demo soon to follow. We will continue working refactoring and implementation to get our application layer running and will add tests as we go.</p>
