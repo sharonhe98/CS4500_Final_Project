@@ -37,42 +37,15 @@ class Column : public Object
 public:
   Array **vals_;
   char type_;
-  size_t size_;
-  KVStore *kvs_;
 
   Column() {
-    size_ = 0;
     vals_ = new Array*[CHUNK_SIZE];
   }
   Column(Deserializer* d, char typ) {
     type_ = typ;
   }
 
-  Column(KVStore *kv) {
-    size_ = 0;
-    vals_ = new Array*[1];
-    kvs_ = kv;
-  }
-
-  ~Column() {
-     for (size_t i = 0; i < size_; i++) {
-        delete vals_[i];
-     }
-     delete[] vals_;
-  }
-
-
-  // generates a key given the chunk size
-  Key* generateKey() {
-        size_t num_nodes = kvs_->node->num_nodes;
-        size_t currentChunk = size_ / CHUNK_SIZE;
-	size_t home_node = currentChunk % num_nodes;
-        char name[100];
-        int n = sprintf(name, "%zu", currentChunk);
-        Key* k = new Key(name, home_node);
-        return k;
-  }
-
+  ~Column() {}
   /** Type converters: Return the same column under its actual type, or
  *    *  nullptr if of the wrong type.  */
 
@@ -113,10 +86,7 @@ public:
   };
 
   /** Returns the number of elements in the column. */
-  virtual size_t size()
-  {
-    return vals_[currentChunk_]->length();
-  };
+  virtual size_t size() {};
 
   virtual void set(size_t idx, int val)
   {
@@ -347,10 +317,6 @@ public:
     size_ = numStr;
   }
 
-  FloatColumn(KVStore *kv) : Column(kv) {
-    kvs_ = kv; 
-  }
-
   void serialize(Serializer *ser)
   {
     ser->write(type_);
@@ -366,15 +332,7 @@ public:
     size_t chunk_id = size_ / CHUNK_SIZE;
 
     if (chunk_id >= chunks_.length()) {
-      Key* key = generateKey();
-      Serializer* ser;
-      chunks_.get(chunk_id - 1)->serialize(ser);
-      char* data = ser->getSerChar();
-      Value* v = new Value(data);
-      kvs_->put(key, v);
-      for (size_t i = 0; i < CHUNK_SIZE; i++) {
-         delete chunks_.get(chunk_id)->elements_[i];
-      }
+      chunks_.append(new FloatArray());
     }
     chunks_.get(chunk_id)->append(val);
     size_++;

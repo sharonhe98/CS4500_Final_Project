@@ -31,5 +31,6 @@ start_client2:
 	g++ -g -Wall -pedantic -std=c++11 -o client2 test/client.cpp
 	./client2 127.0.0.1 8000 127.0.0.2 8002 2
 
-trivial:
+trivial_test:
 	g++ -g -Wall -pedantic -std=c++11 -o trivial test/trivial_test.cpp	
+	./trivial

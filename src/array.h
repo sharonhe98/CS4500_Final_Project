@@ -409,6 +409,7 @@ public:
   // get the n'th item in the array
   double get(size_t nn)
   {
+    printf("nn: %zu\n", nn);
     assert(nn < size_);
     return elements_[nn];
   }

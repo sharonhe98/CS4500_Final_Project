@@ -12,14 +12,13 @@ public:
   KVStore *kv;
   size_t node_idx_;
 
-
   Application(size_t idx, char* ip, size_t num_nodes)
   {
     kv = new KVStore(idx, ip, num_nodes);
     node_idx_ = idx;
   }
 
-  virtual void run_();
+  virtual void run_() {};
 
   size_t this_node() {
     return node_idx_;
