@@ -6,7 +6,7 @@ public:
   Trivial(size_t idx, char* ip, size_t num_nodes) : Application(idx, ip, num_nodes) {}
   void run_()
   {
-    size_t SZ = 1000 * 1000;
+    size_t SZ = 100 * 1000;
     double *vals = new double[SZ];
     double sum = 0;
     for (size_t i = 0; i < SZ; ++i)
