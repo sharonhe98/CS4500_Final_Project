@@ -11,6 +11,6 @@ int main(int argc, char** argv) {
 	size_t my_port = atoi(argv[4]);
 	size_t server_port = atoi(argv[2]);
 	printf("%zu, %zu, %s, %zu\n", idx, my_port, argv[1], server_port);
-	kv->node->client_init(1, my_port, argv[1], server_port);
+	kv->node->client_init(idx, my_port, argv[1], server_port);
 	return 0;
 }

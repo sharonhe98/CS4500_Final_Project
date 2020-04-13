@@ -12,9 +12,10 @@ public:
   KVStore *kv;
   size_t node_idx_;
 
-  Application(size_t idx)
+
+  Application(size_t idx, char* ip, size_t num_nodes)
   {
-    kv = new KVStore(idx);
+    kv = new KVStore(idx, ip, num_nodes);
     node_idx_ = idx;
   }
 
@@ -28,7 +29,7 @@ public:
 class Trivial : public Application
 {
 public:
-  Trivial(size_t idx) : Application(idx) {}
+  Trivial(size_t idx, char* ip, size_t num_nodes) : Application(idx, ip, num_nodes) {}
   void run_()
   {
     size_t SZ = 1000 * 1000;
@@ -54,7 +55,7 @@ public:
     Key *verify = new Key("verif", 0);
     Key *check = new Key("ck", 0);
 
-    Demo(size_t idx) : Application(idx) {}
+    Demo(size_t idx, char* ip, size_t num_nodes) : Application(idx, ip, num_nodes) {}
 
     void run_() override
     {

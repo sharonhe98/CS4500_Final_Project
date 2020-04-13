@@ -32,8 +32,6 @@ void test()
 		df.add_row(r);
 		printf("ADD ROW PASSED!\n");
 	}
-
-	exit(0);
 }
 
 void test2()
@@ -53,7 +51,6 @@ void test2()
 	}
 
 	df.print();
-	exit(0);
 }
 
 void test3()
@@ -70,7 +67,6 @@ void test3()
 	}
 
 	df.print();
-	//exit(0);
 }
 
 void testConcat()

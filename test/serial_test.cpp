@@ -167,10 +167,7 @@ void testStrColumnSerialize()
     printf("serialized!\n");
     Deserializer *deserializer = new Deserializer(result);
     Column *c = Column::deserialize(deserializer);
-    // printf("type %c sctype %c\n", c->type_, sc->type_);
     assert(c->type_ == sc->type_);
-    // printf("chunk %zu\n", c->currentChunk_);
-    // Sys sys;
     StringColumn *sc2 = dynamic_cast<StringColumn*>(c);
     assert(strcmp(sc2->get(0)->c_str(), hello->c_str()) == 0);
     assert(strcmp(sc2->get(1999)->c_str(), hello->c_str()) == 0);
