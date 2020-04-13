@@ -50,7 +50,7 @@ public:
     Schema s(*Schema::deserialize(d));
     scm = s;
     cols = new Column *[scm.width()];
-    
+    printf("schema width %zu\n",scm.width());
     for (size_t i = 0; i < scm.width(); i++) {
       cols[i] = Column::deserialize(d);
       assert(cols[i]);

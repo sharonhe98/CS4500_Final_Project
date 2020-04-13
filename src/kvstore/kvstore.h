@@ -81,7 +81,7 @@ public:
 		  Value *df_v = get_(key);
 		  assert(df_v);
 		  Deserializer *des = new Deserializer(df_v->data_);
-		  DataFrame* df = new DataFrame(des);
+		  DataFrame* df = DataFrame::deserialize(des);
 		  return df;
 		}
 		else {
@@ -99,7 +99,7 @@ public:
 			kv->set(key, value);
 			return;
 		}
-		
+
 		Message *recvd = node->recv_m();
 		if (idx == index || recvd->getKind() == MsgKind::Put) { kv->set(key, value); }
 		else {
@@ -145,9 +145,10 @@ DataFrame *fromArray(Key &key, KVStore &kv, size_t SZ, double *vals)
       fc->push_back(vals[i]);
     }
     df->cols[0] = fc;
-    Serializer serializer;
-    df->serialize(&serializer);
-    Value* df_v = new Value(serializer.getSerChar());
+	printf(df->scm.track_types);
+    Serializer* serializer = new Serializer();
+    df->serialize(serializer);
+    Value* df_v = new Value(serializer->getSerChar());
     kv.put(&key, df_v);
     return df;
   }
@@ -160,9 +161,9 @@ DataFrame *fromArray(Key &key, KVStore &kv, size_t SZ, double *vals)
     FloatColumn* fc = new FloatColumn();
     fc->push_back(val);
     df->add_column(fc, key.key);
-    Serializer serializer;
-    df->serialize(&serializer);
-    Value* df_v = new Value(serializer.getSerChar());
+    Serializer* serializer = new Serializer();
+    df->serialize(serializer);
+    Value* df_v = new Value(serializer->getSerChar());
     kv.put(&key, df_v);
     return df;
   }
