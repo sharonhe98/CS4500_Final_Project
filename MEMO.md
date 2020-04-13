@@ -126,7 +126,7 @@ int main() {
 >        g++ -g -Wall -pedantic -std=c++11 -o client1 test/client.cpp
 >        ./client1 127.0.0.1 8000 127.0.0.1 8001 1
 
-* Note: Certain use cases are not working at the moment due to issues with incomplete implementation*
+* Note: Certain use cases are not working at the moment due to issues with incomplete implementation
 
 <p><i>Open Questions:</i></p>
 1. We would like to know how the chunking works when pushing to the KVStore. We have discussed with professor Vitek, but need some time to work out our implementation.
