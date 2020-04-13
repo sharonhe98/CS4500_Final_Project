@@ -1,7 +1,7 @@
 <p>Jessica Cheng</p>
 <p>Sharon He</p>
 <br/>
-<p><i>Introduction:<i></p>
+<p><i>Introduction:</i></p>
 <p>The eau2 system is a distributed system that consists of three layers. At the bottom layer, there is a distributed KV store running on each node. The KV store is essentially a map that has get and put methods. The eau2 system is a distributed system so there will be multiple nodes. On top of each node, it will run a KV store. Each KV store has part of the data. There exists a network communication layer that connects KV stores together so KV stores talk to exchange data when needed. 
 </p>
 <p>The level above provides abstractions like distributed arrays and data frames. Calls to the KV store will implement these abstractions.
