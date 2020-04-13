@@ -3,7 +3,7 @@
 #include "../src/app/trivial.h"
 
 int main() {
-   Trivial* trivial = new Trivial(1, "", nullptr);
+   Trivial* trivial = new Trivial(0, "", 1);
    trivial->run_();
    return 0;
 }

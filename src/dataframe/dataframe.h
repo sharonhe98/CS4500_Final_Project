@@ -187,11 +187,9 @@ public:
 
   double get_double(size_t col, size_t row)
   {
-    if (cols[col]->get_type() != 'F' || col >= scm.width() || row >= scm.length())
-    {
-      printf("Index out of bounds or type incorrect!\n");
-      exit(1);
-    }
+    assert((cols[col]->get_type() != 'F' || col >= scm.width() || row >= scm.length()));
+    FloatColumn * fc = dynamic_cast<FloatColumn*>(cols[col]);
+    return fc->get(row);
   }
 
   String *get_string(size_t col, size_t row)

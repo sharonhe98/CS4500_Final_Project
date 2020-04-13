@@ -88,12 +88,18 @@ public:
 		  size_t target = key->home_node_;
 		  Get *m = new Get(MsgKind::Get, index,target, 53);
 		  node->send_m(m);
+		  return nullptr;
 		}
 	}
 
 	void put(Key *key, Value *value)
 	{
 		size_t idx = key->home_node_;
+		if (idx == index) {
+			kv->set(key, value);
+			return;
+		}
+		
 		Message *recvd = node->recv_m();
 		if (idx == index || recvd->getKind() == MsgKind::Put) { kv->set(key, value); }
 		else {
@@ -138,7 +144,7 @@ DataFrame *fromArray(Key &key, KVStore &kv, size_t SZ, double *vals)
     for (size_t i = 0; i < SZ; i++) {
       fc->push_back(vals[i]);
     }
-    df->add_column(fc, key.key);
+    df->cols[0] = fc;
     Serializer serializer;
     df->serialize(&serializer);
     Value* df_v = new Value(serializer.getSerChar());
