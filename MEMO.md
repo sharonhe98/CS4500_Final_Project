@@ -34,7 +34,8 @@ getAndWait(k) =>  DataFrame*		returns a deserialized DataFrame. First checks if 
 <p>The Column class has been changed and implemented using chunks, which are essentially arrays of arrays, using our hand rolled Array classes. We have arbitrarily determined the size of each chunk (currently 1000, but can be changed), meaning each “element” in the column is an array of length <size of chunk>. This allows us to build a DataFrame from a column without becoming too large, and allows for more abstraction between the application and the payload.
 </p>
 <p><i>Use Cases:</i></p>
-```c++
+
+```cpp
 FILE *f = fopen("../src/data.sor", "r");
    SOR* sor = new SOR();
    char* schemaFromFile = sor->getSchema(f, 0, 1000000);
@@ -43,19 +44,90 @@ FILE *f = fopen("../src/data.sor", "r");
   
    DataFrame* df = sor->setDataFrame(f, 0, 100000);
    df->print();
-
 ```
-<p></p>
+```cpp
+void testRegisterMessageSerialize()
+{
+    size_t port = 8080;
+    sockaddr_in clientAddress;
+    clientAddress.sin_family = AF_INET; 
+    clientAddress.sin_addr.s_addr = INADDR_ANY; 
+    clientAddress.sin_port = htons( port );
+    Register *reg = new Register(MsgKind::Register, 0, 1, 0, clientAddress, port);
+    Serializer *ser = new Serializer();
+    reg->serialize(ser);
+    char *result = ser->getSerChar();
+    assert(result);
+    Deserializer *dser = new Deserializer(result);
+    Message *msg = Message::deserializeMsg(dser);
+    assert(msg->kind_ == reg->kind_);
+    assert((int)msg->kind_ == 8);
+    assert(msg->sender_ == reg->sender_);
+    assert(msg->target_ == reg->target_);
+    assert(msg->id_ == reg->id_);
+    Register *reg2 = dynamic_cast<Register*>(msg);
+    assert(reg->port_ == reg2->port_);
+    assert(reg2->client_.sin_port);
+    printf("deserialize Register msg successfully\n");
+    delete ser;
+}
+```
 
-```c++
-start_server:
-        g++ -g -Wall -pedantic -std=c++11 -o server test/server.cpp
-        ./server 127.0.0.1 8000 0
+```cpp
+void testDFSerialize()
+{
+	FILE *f = fopen("test/data.sor", "r");
+        assert(f);
+	SOR *sor = new SOR();
+	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
+	Schema s(schemaFromFile);
+
+	DataFrame *df = sor->setDataFrame(f, 0, 100000);
+        assert(df->cols[0]->get_type() == 'B');
+        assert(df->cols[1]->get_type() == 'I');
+        assert(df->cols[2]->get_type() == 'S');
+        assert(df->cols[3]->get_type() == 'F');
+        assert(df->cols[4]->get_type() == 'I');
+        assert(df->ncols() == 5);
+        assert(df->nrows() == 5);
+	df->print();
+	printf("Build DF from file passed!\n");
+        Serializer *ser = new Serializer();
+        df->serialize(ser);
+        char* result = ser->getSerChar();
+        Deserializer* dser = new Deserializer(result);
+        DataFrame* deDF = DataFrame::deserialize(dser);
+        assert(deDF->cols[0]->get_type() == 'B');
+        assert(deDF->cols[1]->get_type() == 'I');
+        assert(deDF->cols[2]->get_type() == 'S');
+        assert(deDF->cols[3]->get_type() == 'F');
+        assert(deDF->cols[4]->get_type() == 'I');
+        assert(deDF->ncols() == 5);
+        assert(deDF->nrows() == 5);
+        deDF->print();
+        printf("Serialize DF from file passed!\n");
+
+}
+```
+```cpp
+int main() {
+   Trivial* trivial = new Trivial(0, "", 1);
+   trivial->run_();
+   printf("trivial finish running\n");
+   return 0;
+}
+```
+
+>start_server:
+>        g++ -g -Wall -pedantic -std=c++11 -o server test/server.cpp
+>        ./server 127.0.0.1 8000 0
  
-start_client:
-        g++ -g -Wall -pedantic -std=c++11 -o client1 test/client.cpp
-        ./client1 127.0.0.1 8000 127.0.0.1 8001 1
-```
+>start_client:
+>        g++ -g -Wall -pedantic -std=c++11 -o client1 test/client.cpp
+>        ./client1 127.0.0.1 8000 127.0.0.1 8001 1
+
+* Note: Certain use cases are not working at the moment due to issues with incomplete implementation*
+
 <p><i>Open Questions:</i></p>
 1. We would like to know how the chunking works when pushing to the KVStore. We have discussed with professor Vitek, but need some time to work out our implementation.
 <p><i>Status:</i></p>
