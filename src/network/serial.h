@@ -78,9 +78,11 @@ public:
 
   void write(char *c)
   {
-    resize(sizeof(char *));
-    memcpy(buf + pos, &c, sizeof(char *));
-    pos += sizeof(char *);
+    size_t length = strlen(c);
+    resize(length);
+    write(length);
+    memcpy(buf + pos, &c, length);
+    pos += length;
   }
 
   void write(String *s)
@@ -147,8 +149,9 @@ public:
   char *readChars()
   {
     char *res;
-    memcpy(&res, buf + pos, sizeof(char *));
-    pos += sizeof(char *);
+    size_t length = readSizeT();
+    memcpy(&res, buf + pos, length);
+    pos += length;
     return res;
   }
 
