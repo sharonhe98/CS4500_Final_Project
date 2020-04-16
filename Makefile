@@ -34,3 +34,17 @@ start_client2:
 trivial_test:
 	g++ -g -Wall -pedantic -std=c++11 -o trivial test/trivial_test.cpp	
 	./trivial
+
+demo_server:
+	g++ -g -Wall -pedantic -std=c++11 -o demo1 test/demo_server_test.cpp
+	./demo1 127.0.0.1 8000 0
+
+demo_client1:
+	g++ -g -Wall -pedantic -std=c++11 -o demo2 test/demo_client_test.cpp
+	./demo2 127.0.0.1 8000 127.0.0.2 8001 1
+
+demo_client2:
+	g++ -g -Wall -pedantic -std=c++11 -o demo3 test/demo_client_test.cpp
+	./demo2 127.0.0.1 8000 127.0.0.3 8002 2
+	
+	

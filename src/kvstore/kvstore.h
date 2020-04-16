@@ -97,19 +97,26 @@ public:
 		size_t idx = key->home_node_;
 		if (idx == index) {
 			kv->set(key, value);
+			std::cout << "hey there demons\n";
 			return;
 		}
 
 		Message *recvd = node->recv_m();
-		if (idx == index || recvd->getKind() == MsgKind::Put) { kv->set(key, value); }
+		if (idx == index || recvd->getKind() == MsgKind::Put) { 
+			kv->set(key, value);
+			std::cout << "it's me\n";
+		}
 		else {
 		  Put* msg = new Put(MsgKind::Put, index, idx, index);
 		  node->send_m(msg);
+		  std::cout << "ya boi\n";
 		}
 	}
 
 	DataFrame *waitAndGet(Key *key)
 	{
+		std::cout << "I am in kvwait and get!\n";
+		size_t idx = key->home_node_;
 		Value *df_v = get_(key);
 		DataFrame *df;
 		Message* sent = node->recv_m();
@@ -118,14 +125,19 @@ public:
 			df = get(key);
 		}
 		else if (sent->getKind() == MsgKind::WaitAndGet) {
-			Message* m = new Message(MsgKind::Status, index, sent->getTarget(), 500);
-			node->send_m(m);
+			node->send_v(df_v);
 		}
-		else
-		{
-			// request get from other kvstores
+		else {
+			
 			while (!df_v)
 			{
+				std::cout << "keep waiting!\n";
+				Value* val = recv_v();
+				if (val) {
+					String* newKeyName = key->key;
+					Key *newKey = new Key(newKeyName, index);
+					put(newKey, val);
+				}
 				df_v = get_(key);
 			}
 			Deserializer *des = new Deserializer(df_v->data_);

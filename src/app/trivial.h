@@ -11,7 +11,7 @@ public:
   }
   void run_()
   {
-    size_t SZ = 10 * 10;
+    size_t SZ = 1000 * 1000;
     double *vals = new double[SZ];
     double sum = 0;
     for (size_t i = 0; i < SZ; ++i)
