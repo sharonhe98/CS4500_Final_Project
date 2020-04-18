@@ -79,19 +79,27 @@ public:
 	{
 		std::cout << "I am in kvwait and get!\n";
 		size_t idx = key->home_node_;
+		std::cout << "home key node: " << idx << "\n";
 		Value *df_v = get_(key);
 		DataFrame *df;
 		Message* sent = node->recv_m();
 		if (key->home_node_ == index)
 		{
+			std::cout << "hi I'm home node!\n";
 			df = get(key);
 		}
 		else if (sent->getKind() == MsgKind::WaitAndGet) {
-			node->send_m(sent);
+			std::cout << "we've got mail!\n";
+			Data *data_m = new Data(MsgKind::Data, index, sent->getSender(), 11037, df_v);
+			node->send_m(data_m);
 		}
 		else {
 			WaitAndGet* wg = new WaitAndGet(MsgKind::WaitAndGet, index, idx, 2);
+			std::cout << "we're sending mail!\n";
 			node->send_m(wg);
+
+			std::cout << "please my crops are dying\n";
+			
 			while (!df_v)
 			{
 				std::cout << "keep waiting!\n";

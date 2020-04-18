@@ -103,6 +103,7 @@ public:
 			send_m(&ipd);
 		}
 		printf("Server has been initialized!\n");
+		
 	}
 
 	// Initializes a client Node
