@@ -18,7 +18,8 @@ enum class MsgKind
 
   Kill,
   Register,
-  Directory
+  Directory, 
+  Data
 };
 
 /**
@@ -264,6 +265,32 @@ public:
     ser->write(client_);
     ports_->serialize(ser);
     addresses_->serialize(ser);
+  }
+};
+
+/**
+ * A class that represents a Data message
+ */
+class Data : public Message
+{
+public:
+  Value * value;
+
+  // constructor
+  Data(MsgKind kind_, size_t sender_, size_t target_, size_t id_, Value * val_) : Message(kind_, sender_, target_, id_)
+  {
+    value = val_;
+  }
+  // constructor that builds a Directory message based on the deserialized message
+  Data(Deserializer *d) : Message(d, MsgKind::Data)
+  {
+    value = Value::deserialize(d);
+  }
+  // serialize a Directory message
+  void serialize(Serializer *ser)
+  {
+    Message::serialize(ser);
+    ser->write(value);
   }
 };
 

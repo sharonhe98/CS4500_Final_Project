@@ -1,3 +1,4 @@
+ 
 #pragma once
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,6 +48,20 @@ public:
 	{
 		data_ = data;
 		len_ = strlen(data);
+	}
+	
+	Value(Deserializer* d) {
+		data_ = d->readChars();
+		len_ = d->readSizeT();
+	}
+
+	void serialize(Serializer* s) {
+		s->write(data_);
+		s->write(len_);
+	}
+	
+	static Value* deserialize(Deserializer* d) {
+		return new Value(d);
 	}
 };
 
@@ -125,18 +140,19 @@ public:
 			df = get(key);
 		}
 		else if (sent->getKind() == MsgKind::WaitAndGet) {
-			node->send_v(df_v);
+			node->send_m(sent);
 		}
 		else {
-			
+			WaitAndGet* wg = new WaitAndGet(MsgKind::WaitAndGet, index, idx, 2);
+			node->send_m(wg);
 			while (!df_v)
 			{
 				std::cout << "keep waiting!\n";
-				Value* val = recv_v();
+				Message* val = node->recv_m();
+				assert(val->kind_ == MsgKind::Data);
+				Data* data = dynamic_cast<Data *>(val);
 				if (val) {
-					String* newKeyName = key->key;
-					Key *newKey = new Key(newKeyName, index);
-					put(newKey, val);
+					put(key, data->value);
 				}
 				df_v = get_(key);
 			}

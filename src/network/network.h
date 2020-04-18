@@ -176,27 +176,6 @@ public:
 	}
 
 
-	void send_v(Value *msg) override
-	{
-		NodeInfo &target = nodes_[msg->getTarget()];
-
-		int connected = socket(AF_INET, SOCK_STREAM, 0);
-		assert(connected >= 0 && "Unable to create client socket");
-		if (connect(connected, (sockaddr *)&target.address, sizeof(target.address)) < 0)
-		{
-			printf("Unable to connect to remote node :(\n");
-			perror("Unable to connect to remote node :(");
-		}
-		// send the serialized message
-		int status = send(connected, &msg->length, sizeof(size_t), 0);
-		assert(status >= 0);
-		int status2 = send(connected, msg->data, msg->length, 0);
-		assert(status2 >= 0);
-		printf("sent!\n");
-	}
-
-
-
 	// node receives a message
 	Message *recv_m() override
 	{
@@ -221,32 +200,6 @@ public:
 		Deserializer* des = new Deserializer(buffer);
 		Message *msg = Message::deserializeMsg(des);
 		printf("msg kind is %i\n", (int)msg->kind_);
-		return msg;
-	}
-
-
-	Value *recv_v() override
-	{
-		sockaddr_in sender;
-		socklen_t addrlen = sizeof(sender);
-		int req = accept(sock_, (sockaddr *)&sender, &addrlen);
-		size_t size = 0;
-		if (read(req, &size, sizeof(size_t)) == 0)
-		{
-			perror("failed to read");
-			exit(1);
-		}
-		char *buffer = new char[size];
-		size_t rd = 0;
-		// reads the serialized message
-		while (rd != size)
-		{
-			rd += read(req, buffer + rd, size - rd);
-		}
-
-		std::cout << "buffer from recv_v is " << buffer << "\n";
-
-		Value *msg = new Value(buffer);
 		return msg;
 	}
 
