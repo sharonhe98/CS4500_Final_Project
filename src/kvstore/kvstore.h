@@ -152,7 +152,7 @@ public:
 				assert(val->kind_ == MsgKind::Data);
 				Data* data = dynamic_cast<Data *>(val);
 				if (val) {
-					put(key, data->value);
+					put(key, data->value_);
 				}
 				df_v = get_(key);
 			}
