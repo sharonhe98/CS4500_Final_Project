@@ -1,9 +1,11 @@
+#pragma once
 #include <cstdlib>
 #include <netinet/in.h>
 #include "../object.h"
 #include "../string.h"
 #include "../array.h"
-#include "../kvstore/kvstore.h"
+#include "../kvstore/kv.h"
+
 
 // enum list of message types
 enum class MsgKind
@@ -275,23 +277,23 @@ public:
 class Data : public Message
 {
 public:
-  Value *value_;
+  Value * v_;
 
   // constructor
-  Data(MsgKind kind_, size_t sender_, size_t target_, size_t id_, Value *val_) : Message(kind_, sender_, target_, id_)
+  Data(MsgKind kind_, size_t sender_, size_t target_, size_t id_, Value * val_) : Message(kind_, sender_, target_, id_)
   {
-    value_ = val_;
+    v_ = val_;
   }
   // constructor that builds a Directory message based on the deserialized message
   Data(Deserializer *d) : Message(d, MsgKind::Data)
   {
-    value_ = Value::deserialize(d);
+    v_ = Value::deserialize(d);
   }
   // serialize a Directory message
   void serialize(Serializer *ser)
   {
     Message::serialize(ser);
-    ser->write(value);
+    ser->write(v_);
   }
 };
 
@@ -331,6 +333,9 @@ Message *Message::deserializeMsg(Deserializer *dser)
     break;
   case MsgKind::Directory:
     result = new Directory(dser);
+    break;
+  case MsgKind::Data:
+    result = new Data(dser);
     break;
   }
   return result;

@@ -11,59 +11,6 @@
 #include "../map.h"
 #include "../network/network.h"
 
-class Key : public Object
-{
-public:
-	String *key;
-	size_t home_node_;
-
-	Key(const char *search_key, size_t node_number)
-	{
-		key = new String(search_key);
-		home_node_ = node_number;
-	}
-
-	Key(Deserializer* d) {
-		key = d->readString();
-		home_node_ = d->readSizeT();
-	}
-
-	void serialize(Serializer* s) {
-		s->write(key);
-		s->write(home_node_);
-	}
-
-	static Key* deserialize(Deserializer* d) {
-		return new Key(d);
-	}
-};
-
-class Value : public Object
-{
-public:
-	char *data_;
-	size_t len_;
-
-	Value(char *data)
-	{
-		data_ = data;
-		len_ = strlen(data);
-	}
-	
-	Value(Deserializer* d) {
-		data_ = d->readChars();
-		len_ = d->readSizeT();
-	}
-
-	void serialize(Serializer* s) {
-		s->write(data_);
-		s->write(len_);
-	}
-	
-	static Value* deserialize(Deserializer* d) {
-		return new Value(d);
-	}
-};
 
 class KVStore : public Object
 {
@@ -152,7 +99,7 @@ public:
 				assert(val->kind_ == MsgKind::Data);
 				Data* data = dynamic_cast<Data *>(val);
 				if (val) {
-					put(key, data->value_);
+					put(key, data->v_);
 				}
 				df_v = get_(key);
 			}
