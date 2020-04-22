@@ -5,6 +5,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <thread>
+
 
 /** Class represents a Node*/
 class NodeInfo : public Object
@@ -62,6 +64,15 @@ public:
 		assert(listen(sock_, 100) >= 0);
 	}
 
+	// listens for messages
+	void listen_m() {
+		std::cout << "I am listening. do not mess this up\n";
+		while (recv_m()) {
+			
+		}
+		std::cout << "aaaaaa\n";
+	}
+
 	// Initializes the server/registration node to node 0.
 	// Initializes state and wait for connection Register messages from clients
 	// Once server receives all of clients' Register messages, we have a Directory message we can then send to the clients
@@ -103,7 +114,8 @@ public:
 			send_m(&ipd);
 		}
 		printf("Server has been initialized!\n");
-		
+		std::thread t1(listen_m);
+		t1.join();	
 	}
 
 	// Initializes a client Node
