@@ -28,6 +28,7 @@ public:
 	struct sockaddr_in ip_;	 // this node ip address
 	IntArray* ports;	// list of ports in the network system
 	StringArray* addresses;	// list of addresses in the network system
+	std::thread thread1;
 
 	// network constructor
 	NetworkIP(char* ip, size_t total_nodes, size_t idx)
@@ -114,9 +115,9 @@ public:
 			send_m(&ipd);
 		}
 		printf("Server has been initialized!\n");
-		std::thread t1(&NetworkIP::listen_m, this);
-		t1.join();
-		std::cout << "aaaa pls\n";	
+		thread1 = std::thread(&NetworkIP::listen_m, this);
+		// t1.join();
+		// std::cout << "aaaa pls\n";	
 	}
 
 	// Initializes a client Node

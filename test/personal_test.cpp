@@ -89,7 +89,7 @@ void testConcat()
 
 void testGetSchema()
 {
-	FILE *f = fopen("test/data.sor", "r");
+	FILE *f = fopen("data.sor", "r");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
 	assert(strcmp(schemaFromFile, "BISFI") == 0);
@@ -105,6 +105,7 @@ void test4()
 
 	DataFrame *df = sor->setDataFrame(f, 0, 100000);
 	df->print();
+	delete sor;
 	printf("Build DF from file passed!\n");
 }
 
@@ -126,6 +127,8 @@ void testFloatArray()
 	}
 	assert(fa->length() == 1000);
 	assert(fa->get(0) == 3.5);
+
+	delete fa;
 	printf("test float array functions pass!\n");
 }
 
@@ -139,6 +142,8 @@ void testFloatColumn()
 	}
 	assert(fa->size() == 1000);
 	assert(fa->get(0) == 3.5);
+
+	delete fa;
 	printf("test float col functions pass!\n");
 }
 
@@ -149,6 +154,8 @@ void testFloatsForRow()
 	assert(row->width() == 3);
 	row->set(0, (float)3.5);
 	assert(row->get_float(0) == 3.5);
+
+	delete row;
 	printf("testfloatsfor row passed!\n");
 }
 
@@ -162,6 +169,8 @@ void testBoolArray()
 	}
 	assert(fa->length() == 1000);
 	assert(fa->get(0) == 0);
+
+	delete fa;
 	printf("test bool array functions pass!\n");
 }
 
@@ -175,6 +184,8 @@ void testBoolColumn()
 	}
 	assert(fa->size() == 1000);
 	assert(fa->get(0) == 1);
+
+	delete fa;
 	printf("test bool col functions pass!\n");
 }
 
@@ -189,6 +200,9 @@ void testStringArray()
 	}
 	assert(fa->length() == 1000);
 	assert(dynamic_cast<String *>(fa->get_(0))->equals(s));
+
+	delete s;
+	delete fa;
 	printf("test str array functions pass!\n");
 }
 
@@ -203,6 +217,9 @@ void testStringColumn()
 	}
 	assert(fa->size() == 1000);
 	assert(fa->get(0)->equals(s));
+
+	delete s;
+	delete fa;
 	printf("test str col functions pass!\n");
 }
 
@@ -214,6 +231,8 @@ void testStringForRow()
 	assert(row->width() == 3);
 	row->set(0, (String *)str);
 	assert(row->get_string(0) == str);
+	delete row;
+	delete str;
 	printf("teststringsfor row passed!\n");
 }
 
@@ -224,6 +243,7 @@ void testBoolsForRow()
 	assert(row->width() == 3);
 	row->set(0, (bool)1);
 	assert(row->get_bool(0) == 1);
+	delete row;
 	printf("testboolsfor row passed!\n");
 }
 
@@ -233,15 +253,15 @@ int main(int argc, char **argv)
 	test();
 	test2();
 	testConcat();
-	// test4();
-	// testFloatArray();
-	// testFloatsForRow();
-	// testBoolArray();
-	// testBoolColumn();
-	// testBoolsForRow();
-	// testStringArray();
-	// testStringColumn();
-	// testStringForRow();
+	test4();
+	testFloatArray();
+	testFloatsForRow();
+	testBoolArray();
+	testBoolColumn();
+	testBoolsForRow();
+	testStringArray();
+	testStringColumn();
+	testStringForRow();
 	// testGetSchema();
 	// test5();
 }

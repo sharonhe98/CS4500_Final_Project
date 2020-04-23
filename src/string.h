@@ -102,7 +102,9 @@ public:
         char *array_s = new char[res_size];
         strcpy(array_s, cstr_);
         strcat(array_s, s->cstr_);
-        return new String(array_s);
+        delete [] cstr_;
+        cstr_ = array_s;
+        return new String(cstr_);
     }
 
     size_t allocateSize()

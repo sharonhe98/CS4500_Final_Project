@@ -195,7 +195,6 @@ public:
   void set(size_t col, bool val)
   {
     Column *c = columns[col] == nullptr ? new BoolColumn() : columns[col];
-  
     assert(c->get_type() == 'B');
     BoolColumn *bc = dynamic_cast<BoolColumn *>(c);
     if (bc->size() == 0)

@@ -57,22 +57,23 @@ public:
 	void put(Key *key, Value *value)
 	{
 		size_t idx = key->home_node_;
+		std::cout << "idx is: " << idx << "\n";
 		if (idx == index) {
 			kv->set(key, value);
 			std::cout << "hey there demons\n";
 			return;
 		}
 
-		/*Message *recvd = node->recv_m();
-		if (idx == index || recvd->getKind() == MsgKind::Put) { 
-			kv->set(key, value);
-			std::cout << "it's me\n";
-		}
+		// Message *recvd = node->recv_m();
+		// if (idx == index || recvd->getKind() == MsgKind::Put) { 
+		// 	kv->set(key, value);
+		// 	std::cout << "it's me\n";
+		// }
 		else {
 		  Put* msg = new Put(MsgKind::Put, index, idx, index);
 		  node->send_m(msg);
 		  std::cout << "ya boi\n";
-		}*/
+		}
 	}
 
 	DataFrame *waitAndGet(Key *key)

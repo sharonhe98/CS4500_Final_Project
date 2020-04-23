@@ -129,8 +129,8 @@ class IntColumn : public Column
 {
 public:
   ArrayIntArray chunks_;
-  IntArray * newChunk = new IntArray();
   size_t size_ = 0;
+  IntArray * newChunk = new IntArray();
 
   IntColumn()
   {
@@ -139,6 +139,9 @@ public:
   }
 
   ~IntColumn() {
+    for (size_t i = 0; i < chunks_.length(); i++) {
+      delete chunks_.get(i);
+    }
     delete newChunk;
   }
 
@@ -168,7 +171,8 @@ public:
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
     if (chunk_id >= chunks_.length()) {
-      chunks_.append(new IntArray());
+      IntArray * arr = new IntArray();
+      chunks_.append(arr);
     }
     chunks_.get(chunk_id)->append(val);
     size_++;
@@ -239,6 +243,9 @@ class StringColumn : public Column {
   }
 
   ~StringColumn() {
+    for (size_t i = 0; i < chunks_.length(); i++) {
+      delete chunks_.get(i);
+    }
     delete newChunk;
   }
 
@@ -252,7 +259,8 @@ class StringColumn : public Column {
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
     if (chunk_id >= chunks_.length()) {
-      chunks_.append(new StringArray());
+      StringArray * arr = new StringArray();
+      chunks_.append(arr);
     }
     chunks_.get(chunk_id)->append(val);
     size_++;
@@ -316,6 +324,9 @@ public:
   }
 
   ~FloatColumn() {
+    for (size_t i = 0; i < chunks_.length(); i++) {
+      delete chunks_.get(i);
+    }
     delete newChunk;
   }
 
@@ -341,9 +352,9 @@ public:
   void push_back(double val)
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
-
     if (chunk_id >= chunks_.length()) {
-      chunks_.append(new FloatArray());
+      FloatArray * arr = new FloatArray();
+      chunks_.append(arr);
     }
     chunks_.get(chunk_id)->append(val);
     size_++;
@@ -414,6 +425,9 @@ public:
   }
 
   ~BoolColumn() {
+    for (size_t i = 0; i < chunks_.length(); i++) {
+      delete chunks_.get(i);
+    }
     delete newChunk;
   }
 
@@ -431,7 +445,8 @@ public:
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
     if (chunk_id >= chunks_.length()) {
-      chunks_.append(new BoolArray());
+      BoolArray * arr = new BoolArray();
+      chunks_.append(arr);
     }
     chunks_.get(chunk_id)->append(val);
     size_++;
