@@ -76,7 +76,7 @@ public:
 		   if (Message *recvd = recv_m()) {
 		     std::cout << "in listen_m message sender: " << recvd->getSender() << "\n";
 		     pending_messages->append(recvd);
-		     std::cout << "message added to pending\n";
+		     std::cout << "message added to pending is msgkind: " << (int)recvd->kind_ << "\n";
 		   }
 		}
 	}

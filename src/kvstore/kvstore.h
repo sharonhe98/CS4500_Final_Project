@@ -72,12 +72,16 @@ public:
 			size_t len = node->pending_messages->length();
 			if (len > 0) {
 			   for (size_t i = 0; i < len; i++) {
+				   printf("Msg number: %zu\n", i);
 			      Message *m = dynamic_cast<Message*>(node->pending_messages->get_(i));
+				  printf("msgkind is: %i sender is: %zu\n", (int)m->getKind(), m->getSender());
 			      if (m->getKind() == MsgKind::Data) {
+					  printf("msgkind is data!\n");
 				Data *d = dynamic_cast<Data*>(m);
 				Value *v = d->v_;
 				Deserializer *des = new Deserializer(v->data_);
 				Key* wag = Key::deserialize(des);
+				printf("deserialzied key name is %s key is: %s\n", wag->key->c_str(), key->key->c_str());
 				if (key->equals(wag)) {
 		  		   Put* msg = new Put(MsgKind::Put, index, idx, index);
 		  		   node->send_m(msg);
