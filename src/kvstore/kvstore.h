@@ -63,7 +63,7 @@ public:
 			return;
 		}
 
-		Message *recvd = node->recv_m();
+		/*Message *recvd = node->recv_m();
 		if (idx == index || recvd->getKind() == MsgKind::Put) { 
 			kv->set(key, value);
 			std::cout << "it's me\n";
@@ -72,7 +72,7 @@ public:
 		  Put* msg = new Put(MsgKind::Put, index, idx, index);
 		  node->send_m(msg);
 		  std::cout << "ya boi\n";
-		}
+		}*/
 	}
 
 	DataFrame *waitAndGet(Key *key)
@@ -81,17 +81,31 @@ public:
 		size_t idx = key->home_node_;
 		std::cout << "home key node: " << idx << "\n";
 		Value *df_v = get_(key);
+
+
+		std::cout << "I beliiiiiieve\n";
+
+
 		DataFrame *df;
-		Message* sent = node->recv_m();
 		if (key->home_node_ == index)
 		{
 			std::cout << "hi I'm home node!\n";
 			df = get(key);
-		}
-		else if (sent->getKind() == MsgKind::WaitAndGet) {
-			std::cout << "we've got mail!\n";
-			Data *data_m = new Data(MsgKind::Data, index, sent->getSender(), 11037, df_v);
-			node->send_m(data_m);
+			int i = 0;
+			std::cout << i << "hooooow\n";	
+			while(i < 500) {
+			   std::cout << i << "aaaaa\n";
+			   if (Message *sent = node->recv_m()) {
+				std::cout << sent -> getSender() << "\n";	
+				if (sent->getKind() == MsgKind::WaitAndGet) {
+					std::cout << "we've got mail!\n";
+					Data *data_m = new Data(MsgKind::Data, index, sent->getSender(), 11037, df_v);
+					node->send_m(data_m);
+				}
+			   }
+			   i += 1;	
+			}
+			return df;
 		}
 		else {
 			WaitAndGet* wg = new WaitAndGet(MsgKind::WaitAndGet, index, idx, 2);
@@ -113,9 +127,8 @@ public:
 			}
 			Deserializer *des = new Deserializer(df_v->data_);
 			df = new DataFrame(des);
+			return df;
 		}
-		
-		return df;
 	}
 };
 

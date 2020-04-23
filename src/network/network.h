@@ -66,11 +66,11 @@ public:
 
 	// listens for messages
 	void listen_m() {
-		std::cout << "I am listening. do not mess this up\n";
-		while (recv_m()) {
-			
+		while (true) {
+		   if (Message *recvd = recv_m()) {
+		     std::cout << "eyyy message sender: " << recvd->getSender() << "\n";
+		   }
 		}
-		std::cout << "aaaaaa\n";
 	}
 
 	// Initializes the server/registration node to node 0.
@@ -114,8 +114,9 @@ public:
 			send_m(&ipd);
 		}
 		printf("Server has been initialized!\n");
-		std::thread t1(listen_m);
-		t1.join();	
+		std::thread t1(&NetworkIP::listen_m, this);
+		t1.join();
+		std::cout << "aaaa pls\n";	
 	}
 
 	// Initializes a client Node
@@ -175,6 +176,8 @@ public:
 			printf("Unable to connect to remote node :(\n");
 			perror("Unable to connect to remote node :(");
 		}
+
+		std::cout << "haha we're like sooo connected :)) like mushrooms\n";
 		// serialize the message
 		Serializer* ser = new Serializer();
 		msg->serialize(ser);
@@ -192,13 +195,19 @@ public:
 	// node receives a message
 	Message *recv_m() override
 	{
+		std::cout << "check if we receive\n";
 		sockaddr_in sender;
 		socklen_t addrlen = sizeof(sender);
+		
 		int req = accept(sock_, (sockaddr *)&sender, &addrlen);
+		if (req <= 0){
+			perror("failed to accept\n");
+			exit(1);
+		}
 		size_t size = 0;
 		if (read(req, &size, sizeof(size_t)) == 0)
 		{
-			perror("failed to read");
+			perror("failed to read\n");
 			exit(1);
 		}
 		char *buffer = new char[size];
