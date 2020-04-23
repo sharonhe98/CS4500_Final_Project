@@ -26,14 +26,13 @@
 
     void producer()
     {
+      std::cout << "in producer\n";
       size_t SZ = 100 * 1000;
       std::cout << "in producer!\n";
       double *vals = new double[SZ];
       double sum = 0;
       for (size_t i = 0; i < SZ; ++i)
         sum += vals[i] = i;
-
-      std::cout << "vals has been filled!\n";
 
       fromArray(*main, *kv, SZ, vals);
       std::cout << "from array was called!\n";

@@ -30,7 +30,6 @@ public:
   void resize(size_t sizeOf) {
 
     if (pos + sizeOf >= capacity) {
-      printf("sizeof %zu pos: %zu\n", capacity, pos);
       capacity *= 2;
       char *oldV = buf;
       buf = new char[capacity];
@@ -106,7 +105,6 @@ public:
 
   char *getSerChar()
   {
-    printf("buf is %x\n", *((unsigned int*)buf));
     return buf;
   }
 };

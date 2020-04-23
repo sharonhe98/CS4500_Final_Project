@@ -10,7 +10,9 @@
 #include "../dataframe/sorer.h"
 #include "../map.h"
 #include "../network/network.h"
-
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 class KVStore : public Object
 {
@@ -18,6 +20,8 @@ public:
 	size_t index;
 	Map *kv;
 	NetworkIP* node;
+	std::condition_variable_any cv;
+	std::mutex cv_mtx;
 
 	KVStore(size_t idx, char* ip, size_t total_nodes)
 	{
@@ -39,6 +43,10 @@ public:
 
 	DataFrame *get(Key *key)
 	{
+		cv.wait(cv_mtx);
+		std::cout << "done waiting\n";
+		cv_mtx.unlock();
+		std::cout << "mutex unlocked\n";
 		if (kv->check_key_exists(key)) {
 		  Value *df_v = get_(key);
 		  assert(df_v);
@@ -61,7 +69,24 @@ public:
 		if (idx == index) {
 			kv->set(key, value);
 			std::cout << "hey there demons\n";
-			return;
+			size_t len = node->pending_messages->length();
+			if (len > 0) {
+			   for (size_t i = 0; i < len; i++) {
+			      Message *m = dynamic_cast<Message*>(node->pending_messages->get_(i));
+			      if (m->getKind() == MsgKind::Data) {
+				Data *d = dynamic_cast<Data*>(m);
+				Value *v = d->v_;
+				Deserializer *des = new Deserializer(v->data_);
+				Key* wag = Key::deserialize(des);
+				if (key->equals(wag)) {
+		  		   Put* msg = new Put(MsgKind::Put, index, idx, index);
+		  		   node->send_m(msg);
+				   Data *response = new Data(MsgKind::Data, index, m->getSender(), m->id_, value);
+				   node->send_m(response);
+				}
+			      }
+			   }
+			}	
 		}
 
 		// Message *recvd = node->recv_m();
@@ -70,27 +95,21 @@ public:
 		// 	std::cout << "it's me\n";
 		// }
 		else {
-		  Put* msg = new Put(MsgKind::Put, index, idx, index);
-		  node->send_m(msg);
 		  std::cout << "ya boi\n";
 		}
+		cv.notify_all();
+		std::cout << "notified!\n";
 	}
 
 	DataFrame *waitAndGet(Key *key)
 	{
 		std::cout << "I am in kvwait and get!\n";
 		size_t idx = key->home_node_;
-		std::cout << "home key node: " << idx << "\n";
 		Value *df_v = get_(key);
-
-
-		std::cout << "I beliiiiiieve\n";
-
 
 		DataFrame *df;
 		if (key->home_node_ == index)
 		{
-			std::cout << "hi I'm home node!\n";
 			df = get(key);
 			int i = 0;
 			std::cout << i << "hooooow\n";	
@@ -112,7 +131,11 @@ public:
 			WaitAndGet* wg = new WaitAndGet(MsgKind::WaitAndGet, index, idx, 2);
 			std::cout << "we're sending mail!\n";
 			node->send_m(wg);
-
+			Serializer *s1 = new Serializer();
+			key->serialize(s1);
+			Value *v1 = new Value(s1->getSerChar());
+			Data *da = new Data(MsgKind::Data, index, idx, 2, v1);
+			node->send_m(da);
 			std::cout << "please my crops are dying\n";
 			
 			while (!df_v)

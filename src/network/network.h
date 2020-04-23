@@ -29,6 +29,8 @@ public:
 	IntArray* ports;	// list of ports in the network system
 	StringArray* addresses;	// list of addresses in the network system
 	std::thread thread1;
+	int msg_id;
+	Array *pending_messages;
 
 	// network constructor
 	NetworkIP(char* ip, size_t total_nodes, size_t idx)
@@ -39,12 +41,15 @@ public:
 		// nodes_ = new NodeInfo[num_nodes];
 		current_node = idx;
 		addresses = new StringArray();
+		msg_id = 0;
+		pending_messages = new Array();
 	}
 
 	// network destructor
 	~NetworkIP() {
 		delete [] ports;
 		delete [] addresses;
+		delete pending_messages;
 		close(sock_);	// close socket
 	}
 
@@ -69,7 +74,9 @@ public:
 	void listen_m() {
 		while (true) {
 		   if (Message *recvd = recv_m()) {
-		     std::cout << "eyyy message sender: " << recvd->getSender() << "\n";
+		     std::cout << "in listen_m message sender: " << recvd->getSender() << "\n";
+		     pending_messages->append(recvd);
+		     std::cout << "message added to pending\n";
 		   }
 		}
 	}
@@ -178,7 +185,6 @@ public:
 			perror("Unable to connect to remote node :(");
 		}
 
-		std::cout << "haha we're like sooo connected :)) like mushrooms\n";
 		// serialize the message
 		Serializer* ser = new Serializer();
 		msg->serialize(ser);
@@ -189,14 +195,12 @@ public:
 		assert(status >= 0);
 		int status2 = send(connected, buffer, size, 0);
 		assert(status2 >= 0);
-		printf("sent!\n");
 	}
 
 
 	// node receives a message
 	Message *recv_m() override
 	{
-		std::cout << "check if we receive\n";
 		sockaddr_in sender;
 		socklen_t addrlen = sizeof(sender);
 		
@@ -222,7 +226,6 @@ public:
 		// deserializes the message
 		Deserializer* des = new Deserializer(buffer);
 		Message *msg = Message::deserializeMsg(des);
-		printf("msg kind is %i\n", (int)msg->kind_);
 		return msg;
 	}
 
