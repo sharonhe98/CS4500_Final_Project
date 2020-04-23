@@ -1,11 +1,11 @@
 #pragma once
 #include "network_ifc.h"
+#include <thread>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
-#include <thread>
 
 
 /** Class represents a Node*/
@@ -114,8 +114,8 @@ public:
 			send_m(&ipd);
 		}
 		printf("Server has been initialized!\n");
-		std::thread t1(listen_m);
-		t1.join();	
+		//std::thread t1(&listen_m, this);
+		//t1.join();	
 	}
 
 	// Initializes a client Node

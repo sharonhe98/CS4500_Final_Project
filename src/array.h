@@ -25,7 +25,9 @@ public:
   }
 
   // destructor
-  ~Array() {}
+  ~Array() {
+    delete [] elements_;
+  }
 
   // putting an item at the end of the array
   virtual void append(Object *oo)
@@ -41,6 +43,7 @@ public:
     } else {
       res[0] = oo;
     }
+    delete [] elements_;
     elements_ = res;
     size_ += 1;
   }
@@ -159,7 +162,9 @@ public:
   }
 
   // destructor
-  ~IntArray() {}
+  ~IntArray() {
+    delete [] elements_;
+  }
 
   // putting an item at the end of the array
   void append(int oo)
@@ -180,6 +185,7 @@ public:
       }
       res[size_] = oo;
     }
+    delete [] elements_;
     // set elements field to result
     elements_ = res;
     // increase size
@@ -379,7 +385,9 @@ public:
   }
 
   // destructor
-  ~FloatArray() {}
+  ~FloatArray() {
+    delete [] elements_;
+  }
 
   // putting an item at the end of the array
   void append(double oo)
@@ -400,6 +408,7 @@ public:
       }
       res[size_] = oo;
     }
+    delete [] elements_;
     // set elements field to result
     elements_ = res;
     // increase size
@@ -563,7 +572,9 @@ public:
   }
 
   // destructor
-  ~BoolArray() {}
+  ~BoolArray() {
+    delete [] elements_;
+  }
 
   // putting an item at the end of the array
   void append(bool oo)
@@ -584,6 +595,7 @@ public:
       }
       res[size_] = oo;
     }
+    delete [] elements_;
     // set elements field to result
     elements_ = res;
     // increase size
@@ -774,6 +786,7 @@ public:
 class StringArray : public Array
 {
 public:
+
   String *get(size_t nn)
   {
     return dynamic_cast<String *>(get_(nn));

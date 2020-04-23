@@ -120,6 +120,13 @@ public:
     track_types = "";
   }
 
+  ~Row() {
+    for (size_t i = 0; i < width(); i++) {
+      delete columns[i];
+    }
+    delete [] columns;
+  }
+
   // helper to add column
   void add_column_to_row(char typ, String *name)
   {
