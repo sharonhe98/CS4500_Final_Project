@@ -16,16 +16,19 @@ void testArray()
 	sa->append(something);
 	assert(sa->length() == 3);
 	assert(sa->get(0)->c_str() == something->c_str());
+	
+	delete something;
+	
+	delete sa;
 	printf("test array passsed\n");
 }
 
 void test()
 {
 	Schema s("II");
-	// printf("schema cols %i rows %i\n", s.width(), s.length());
 	DataFrame df(s);
 	Row r(df.get_schema());
-	for (size_t i = 0; i < 100 * 1000; i++)
+	for (size_t i = 0; i < 10 * 10; i++)
 	{
 		r.set(0, (int)i);
 		r.set(1, (int)i + 1);
@@ -51,6 +54,7 @@ void test2()
 	}
 
 	df.print();
+	delete str;
 }
 
 void test3()
@@ -77,6 +81,10 @@ void testConcat()
 	String *expected = new String("helloworld");
 	assert(helloworld->equals(expected));
 	printf("test concat passed!\n");
+	delete hello;
+	delete world;
+	delete helloworld;
+	delete expected;
 }
 
 void testGetSchema()
@@ -222,18 +230,18 @@ void testBoolsForRow()
 int main(int argc, char **argv)
 {
 	testArray();
-	// test();
-	// test2();
+	test();
+	test2();
 	testConcat();
-	test4();
-	testFloatArray();
-	testFloatsForRow();
-	testBoolArray();
-	testBoolColumn();
-	testBoolsForRow();
-	testStringArray();
-	testStringColumn();
-	testStringForRow();
-	testGetSchema();
+	// test4();
+	// testFloatArray();
+	// testFloatsForRow();
+	// testBoolArray();
+	// testBoolColumn();
+	// testBoolsForRow();
+	// testStringArray();
+	// testStringColumn();
+	// testStringForRow();
+	// testGetSchema();
 	// test5();
 }

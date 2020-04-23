@@ -45,7 +45,9 @@ public:
     type_ = typ;
   }
 
-  ~Column() {}
+  ~Column() {
+    delete [] vals_;
+  }
   /** Type converters: Return the same column under its actual type, or
  *    *  nullptr if of the wrong type.  */
 
@@ -86,7 +88,7 @@ public:
   };
 
   /** Returns the number of elements in the column. */
-  virtual size_t size() {};
+  virtual size_t size() {return 0;};
 
   virtual void set(size_t idx, int val)
   {
@@ -127,15 +129,18 @@ class IntColumn : public Column
 {
 public:
   ArrayIntArray chunks_;
+  IntArray * newChunk = new IntArray();
   size_t size_ = 0;
 
   IntColumn()
   {
     type_ = 'I';
-    chunks_.append(new IntArray());
+    chunks_.append(newChunk);
   }
 
-  ~IntColumn() {}
+  ~IntColumn() {
+    delete newChunk;
+  }
 
   IntColumn(Deserializer *d) : Column(d, 'I')
   {
@@ -217,10 +222,11 @@ class StringColumn : public Column {
   public:
   ArrayStringArray chunks_;
   size_t size_ = 0;
+  StringArray * newChunk = new StringArray();
 
   StringColumn() {
     type_ = 'S';
-    chunks_.append(new StringArray());
+    chunks_.append(newChunk);
   }
 
   StringColumn(Deserializer *d) : Column(d, 'S')
@@ -232,7 +238,9 @@ class StringColumn : public Column {
     size_ = numStr;
   }
 
-  ~StringColumn() {}
+  ~StringColumn() {
+    delete newChunk;
+  }
 
   String *get(size_t idx)
   {
@@ -299,14 +307,17 @@ class FloatColumn : public Column
 public:
   ArrayFloatArray chunks_;
   size_t size_ = 0;
+  FloatArray * newChunk = new FloatArray();
 
   FloatColumn()
   {
     type_ = 'F';
-    chunks_.append(new FloatArray());
+    chunks_.append(newChunk);
   }
 
-  ~FloatColumn() {}
+  ~FloatColumn() {
+    delete newChunk;
+  }
 
   FloatColumn(Deserializer *d) :  Column(d, 'F')
   {
@@ -384,11 +395,12 @@ class BoolColumn : public Column
 public:
   ArrayBoolArray chunks_;
   size_t size_ = 0;
+  BoolArray * newChunk = new BoolArray();
 
   BoolColumn()
   {
     type_ = 'B';
-    chunks_.append(new BoolArray());
+    chunks_.append(newChunk);
   }
 
   BoolColumn(Deserializer *d) : Column(d, 'B')
@@ -401,7 +413,9 @@ public:
     size_ = numStr;
   }
 
-  ~BoolColumn() {}
+  ~BoolColumn() {
+    delete newChunk;
+  }
 
   void serialize(Serializer *ser)
   {

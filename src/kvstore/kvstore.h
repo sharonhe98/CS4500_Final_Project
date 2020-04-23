@@ -141,7 +141,6 @@ DataFrame *fromArray(Key &key, KVStore &kv, size_t SZ, double *vals)
       fc->push_back(vals[i]);
     }
     df->cols[0] = fc;
-	printf(df->scm.track_types);
     Serializer* serializer = new Serializer();
     df->serialize(serializer);
     Value* df_v = new Value(serializer->getSerChar());
