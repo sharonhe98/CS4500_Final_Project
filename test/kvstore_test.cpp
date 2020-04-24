@@ -10,12 +10,12 @@ void testGet()
 {
 	Schema s("II");
 	DataFrame *df = new DataFrame(s);
-	KVStore *kv = new KVStore(0);
+	KVStore *kv = new KVStore(0, "127.0.0.1", 1);
 	Key *key = new Key("df_key", 0);
 	assert(!kv->get(key));
-	Serializer *ser;
+	Serializer *ser = new Serializer();
 	df->serialize(ser);
-	char* result = ser->getSerChar();
+	char *result = ser->getSerChar();
 	Value *v = new Value(result);
 
 	kv->put(key, v);
@@ -25,22 +25,19 @@ void testGet()
 
 void testWaitAndGet()
 {
+	KVStore *k0 = new KVStore(0, "127.0.0.1", 3);
+	KVStore *k1 = new KVStore(1, "127.0.0.1", 3);
+	Key *key1 = new Key("df_key", 1);
 	Schema s("II");
 	DataFrame *df = new DataFrame(s);
-	Key *key = new Key("df_key", 0);
-	Serializer *ser;
+	Serializer *ser = new Serializer();
 	df->serialize(ser);
-	char* result = ser->getSerChar();
+	char *result = ser->getSerChar();
 	Value v(result);
-
-	KVStore **all_nodes = new KVStore *[3];
-	for (size_t i = 0; i < 3; i++)
-	{
-		all_nodes[i] = new KVStore(i);
-	}
-	// we don't yet have a network layer, but this would be our expected result
-	//	assert(all_nodes[1]->waitAndGet(key)->equals(df));
-	//	all_nodes[0]->put(key, v);
+	k1->put(key1, &v);
+	DataFrame *getDF = k0->waitAndGet(key1);
+	assert(getDF);
+	assert(strcmp(getDF->scm.track_types, "II") == 0);
 }
 
 int main()

@@ -50,14 +50,14 @@ public:
 
 	Value(Deserializer *d)
 	{
-		data_ = d->readChars();
 		len_ = d->readSizeT();
+		data_ = d->readChars();
 	}
 
 	void serialize(Serializer *s)
 	{
-		s->write(data_);
 		s->write(len_);
+		s->write(data_);
 	}
 
 	static Value *deserialize(Deserializer *d)

@@ -204,28 +204,6 @@ public:
     return elements_[nn];
   }
 
-  // remove the n'th item in the array
-  // returning the removed item to the caller
-  int remove(size_t nn)
-  {
-    assert(nn < size_);
-    int *temp = new int[size_ - 1];
-    int res = elements_[nn];
-    // set temp to elements up to the index of removed
-    for (size_t i = 0; i < nn; i++)
-    {
-      temp[i] = elements_[i];
-    }
-    // set temp to elements after index of removed
-    for (size_t j = nn + 1; j < size_; j++)
-    {
-      temp[j - 1] = elements_[j];
-    }
-    // decrease array size
-    size_ -= 1;
-    return res;
-  }
-
   // set n'th element to the given element
   // returns the replace Object.
   int set(size_t nn, int oo)
@@ -268,20 +246,6 @@ public:
       return size_ + 500;
     }
   }
-
-  // reset and delete every element in the array
-  void clear()
-  {
-    // if anything in array, remove it
-    if (size_ > 0)
-    {
-      for (size_t i = 0; i < size_; i++)
-      {
-        remove(i);
-      }
-    }
-    size_ = 0;
-  };
 
   // Compares other with this array for equality.
   bool equals(Object *oo)
@@ -616,35 +580,6 @@ public:
     return elements_[nn];
   }
 
-  // remove the n'th item in the array
-  // returning the removed item to the caller
-  bool remove(size_t nn)
-  {
-    // if out of bounds, return NULL
-    if (size_ == 0 || nn > size_)
-    {
-      return NULL;
-    }
-    assert(nn < size_);
-    // allocate memory for temp array with one less than size
-    bool *temp = new bool[size_ - 1];
-    // set the result to be returned to the element at given index
-    bool res = elements_[nn];
-    // set temp to elements up to the index of removed
-    for (size_t i = 0; i < nn; i++)
-    {
-      temp[i] = elements_[i];
-    }
-    // set temp to elements after index of removed
-    for (size_t j = nn + 1; j < size_; j++)
-    {
-      temp[j - 1] = elements_[j];
-    }
-    // decrease array size
-    size_ -= 1;
-    return res;
-  }
-
   // set n'th element to the given element
   // returns the replace Object.
   bool set(size_t nn, bool oo)
@@ -687,20 +622,6 @@ public:
       return size_ + 500;
     }
   }
-
-  // reset and delete every element in the array
-  void clear()
-  {
-    // if anything in array, remove it
-    if (size_ > 0)
-    {
-      for (size_t i = 0; i < size_; i++)
-      {
-        remove(i);
-      }
-    }
-    size_ = 0;
-  };
 
   // Compares other with this array for equality.
   bool equals(Object *oo)

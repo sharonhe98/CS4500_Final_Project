@@ -16,9 +16,9 @@ void testArray()
 	sa->append(something);
 	assert(sa->length() == 3);
 	assert(sa->get(0)->c_str() == something->c_str());
-	
+
 	delete something;
-	
+
 	delete sa;
 	printf("test array passsed\n");
 }
@@ -89,10 +89,11 @@ void testConcat()
 
 void testGetSchema()
 {
-	FILE *f = fopen("data.sor", "r");
+	FILE *f = fopen("test/data.sor", "r");
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
 	assert(strcmp(schemaFromFile, "BISFI") == 0);
+	delete sor;
 	printf("get schema passed!\n");
 }
 
@@ -107,14 +108,6 @@ void test4()
 	df->print();
 	delete sor;
 	printf("Build DF from file passed!\n");
-}
-
-void test5()
-{
-	FILE *f = fopen("../src/3.sor", "r");
-	SOR *sor = new SOR();
-	DataFrame *df = sor->setDataFrame(f, 0, 10000000);
-	df->print();
 }
 
 void testFloatArray()
@@ -262,6 +255,5 @@ int main(int argc, char **argv)
 	testStringArray();
 	testStringColumn();
 	testStringForRow();
-	// testGetSchema();
-	// test5();
+	testGetSchema();
 }

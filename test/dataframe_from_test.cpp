@@ -9,28 +9,24 @@ void test_from_array() {
 	for (size_t i = 0; i < SZ; i++) {
 		fa[i] = 5.0;
 	}
-	Key k("fa", 0);
-	KVStore* kv = new KVStore(0);
-	DataFrame* df = fromArray(k, *kv, SZ, fa);
-	Serializer* ser = new Serializer();
-	df->serialize(ser);
-	Value* v = new Value(ser->getSerChar());
-	assert(df->get(0, 30) == 5.0);
-	assert(df->nrows() == 100);
-	assert(kv->get(k)->equals(v));
+	Key * k = new Key("fa", 0);
+	KVStore* kv = new KVStore(0, "127.0.0.1", 1);
+	DataFrame* df = fromArray(*k, *kv, SZ, fa);
+	assert(df->get_double(0, 30) == 5.0);
+	delete k;
+	delete kv;
+	delete [] fa;
 	printf("test fromArray success!\n");
 }
 
 void test_from_scalar() {
 	double sca = 500.0;
-	Key k("f", 0);
-	KVStore* kv = new KVStore(0);
-	DataFrame* df = fromScalar(k, *kv, sca);
-	Serializer* ser = new Serializer();
-	df->serialize(ser);
-	Value* v = new Value(ser->getSerChar());
-	assert(df->get(0, 0) == 500.0);
-	assert(kv->get(k)->equals(v));
+	Key * k = new Key("f", 0);
+	KVStore* kv = new KVStore(0, "127.0.0.1", 1);
+	DataFrame* df = fromScalar(*k, *kv, sca);
+	assert(df->get_double(0,0) == 500.0);
+	delete k;
+	delete kv;
 	printf("test fromScalar success!\n");
 }
 

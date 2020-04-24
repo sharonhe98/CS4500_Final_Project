@@ -23,7 +23,7 @@ public:
 	size_t num_nodes;		// number of nodes in network system
 	size_t current_node;	// this node index
 	int sock_;				// the socket
-	char *ipstring;			// the current ip address string
+	const char *ipstring;			// the current ip address string
 	struct sockaddr_in ip_; // this node ip address
 	IntArray *ports;		// list of ports in the network system
 	StringArray *addresses; // list of addresses in the network system
@@ -32,7 +32,7 @@ public:
 	Array *pending_messages;
 
 	// network constructor
-	NetworkIP(char *ip, size_t total_nodes, size_t idx)
+	NetworkIP(const char *ip, size_t total_nodes, size_t idx)
 	{
 		ipstring = ip;
 		ports = new IntArray();
@@ -47,8 +47,8 @@ public:
 	// network destructor
 	~NetworkIP()
 	{
-		delete[] ports;
-		delete[] addresses;
+		delete ports;
+		delete addresses;
 		delete pending_messages;
 		close(sock_); // close socket
 	}

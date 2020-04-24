@@ -11,6 +11,7 @@ void test_double_column() {
 	assert(fc->get(2001) == 3.0);
 	fc->set(2001, 3.5);
 	assert(fc->get(2001) == 3.5);
+	delete fc;
 	printf("test_double_column succeeded!\n");
 }
 

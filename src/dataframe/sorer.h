@@ -246,27 +246,29 @@ public:
     //converts from ColumnType to String*
     String *typeConvertToString(char type)
     {
+        String * tmp;
         if (type == 'B')
         {
-            return new String("B");
+            tmp = new String("B");
         }
         if (type == 'I')
         {
-            return new String("I");
+            tmp = new String("I");
         }
         if (type == 'F')
         {
-            return new String("F");
+            tmp = new String("F");
         }
         if (type == 'S')
         {
-            return new String("S");
+            tmp = new String("S");
         }
         if (type == 'U')
         {
-            return new String("U");
+            tmp = new String("U");
         }
-        assert(false);
+
+        return tmp;
     }
 
     // method added by us, separate from original implementation
@@ -278,8 +280,10 @@ public:
         {
             char colType = cols_[i]->get_type();
             String *typConvert = typeConvertToString(colType);
+            String * res = schemaString->concat(typConvert);
+            delete schemaString;
+            schemaString = res;
 
-            schemaString = schemaString->concat(typConvert);
         }
         return schemaString->c_str();
     }

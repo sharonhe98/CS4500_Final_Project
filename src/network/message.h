@@ -310,7 +310,7 @@ public:
     key_ = val_;
   }
   // constructor that builds a Data message based on the deserialized message
-  KeyMessage(Deserializer *d) : Message(d, MsgKind::Data)
+  KeyMessage(Deserializer *d) : Message(d, MsgKind::KeyMessage)
   {
     key_ = Key::deserialize(d);
   }

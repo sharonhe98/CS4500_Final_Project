@@ -23,7 +23,7 @@ public:
 	std::condition_variable_any cv;
 	std::mutex cv_mtx;
 
-	KVStore(size_t idx, char *ip, size_t total_nodes)
+	KVStore(size_t idx, const char *ip, size_t total_nodes)
 	{
 		index = idx;
 		kv = new Map();
@@ -83,6 +83,7 @@ public:
 						{
 							Put *msg = new Put(MsgKind::Put, index, idx, index);
 							node->send_m(msg);
+
 							Data *response = new Data(MsgKind::Data, index, m->getSender(), m->id_, value);
 							node->send_m(response);
 						}
@@ -91,12 +92,9 @@ public:
 			}
 		}
 
-		// Message *recvd = node->recv_m();
-		// if (idx == index || recvd->getKind() == MsgKind::Put) {
-		// 	kv->set(key, value);
-		// }
 		else
 		{
+			kv->set(key, value);
 		}
 		cv.notify_all();
 	}
@@ -111,7 +109,7 @@ public:
 		{
 			df = get(key);
 			int i = 0;
-			while (i < 500)
+			while (true)
 			{
 				if (Message *sent = node->recv_m())
 				{
@@ -136,14 +134,14 @@ public:
 				Message *val = node->recv_m();
 				assert(val->kind_ == MsgKind::Data);
 				Data *data = dynamic_cast<Data *>(val);
-				if (val)
+				if (data)
 				{
-					put(key, data->v_);
+					kv->set(key, data->v_);
 				}
 				df_v = get_(key);
 			}
 			Deserializer *des = new Deserializer(df_v->data_);
-			df = new DataFrame(des);
+			df = DataFrame::deserialize(des);
 			return df;
 		}
 	}
@@ -171,9 +169,7 @@ DataFrame *fromScalar(Key &key, KVStore &kv, double val)
 {
 	Schema s("F");
 	DataFrame *df = new DataFrame(s);
-	FloatColumn *fc = new FloatColumn();
-	fc->push_back(val);
-	df->add_column(fc, key.key);
+	df->cols[0]->push_back(val);
 	Serializer *serializer = new Serializer();
 	df->serialize(serializer);
 	Value *df_v = new Value(serializer->getSerChar());
