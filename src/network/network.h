@@ -7,12 +7,11 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-
 /** Class represents a Node*/
 class NodeInfo : public Object
 {
 public:
-	size_t id; // node id
+	size_t id;			 // node id
 	sockaddr_in address; // node sock address
 };
 
@@ -20,20 +19,20 @@ public:
 class NetworkIP : public NetworkIfc
 {
 public:
-	NodeInfo *nodes_; // a collection/directory of all the nodes in the network system
-	size_t num_nodes; // number of nodes in network system
-	size_t current_node; // this node index
-	int sock_;			 // the socket
-	char* ipstring;		// the current ip address string
-	struct sockaddr_in ip_;	 // this node ip address
-	IntArray* ports;	// list of ports in the network system
-	StringArray* addresses;	// list of addresses in the network system
+	NodeInfo *nodes_;		// a collection/directory of all the nodes in the network system
+	size_t num_nodes;		// number of nodes in network system
+	size_t current_node;	// this node index
+	int sock_;				// the socket
+	char *ipstring;			// the current ip address string
+	struct sockaddr_in ip_; // this node ip address
+	IntArray *ports;		// list of ports in the network system
+	StringArray *addresses; // list of addresses in the network system
 	std::thread thread1;
 	int msg_id;
 	Array *pending_messages;
 
 	// network constructor
-	NetworkIP(char* ip, size_t total_nodes, size_t idx)
+	NetworkIP(char *ip, size_t total_nodes, size_t idx)
 	{
 		ipstring = ip;
 		ports = new IntArray();
@@ -46,11 +45,12 @@ public:
 	}
 
 	// network destructor
-	~NetworkIP() {
-		delete [] ports;
-		delete [] addresses;
+	~NetworkIP()
+	{
+		delete[] ports;
+		delete[] addresses;
 		delete pending_messages;
-		close(sock_);	// close socket
+		close(sock_); // close socket
 	}
 
 	// Returns this node's index
@@ -71,13 +71,16 @@ public:
 	}
 
 	// listens for messages
-	void listen_m() {
-		while (true) {
-		   if (Message *recvd = recv_m()) {
-		     std::cout << "in listen_m message sender: " << recvd->getSender() << "\n";
-		     pending_messages->append(recvd);
-		     std::cout << "message added to pending is msgkind: " << (int)recvd->kind_ << "\n";
-		   }
+	void listen_m()
+	{
+		while (true)
+		{
+			if (Message *recvd = recv_m())
+			{
+				std::cout << "in listen_m message sender: " << recvd->getSender() << "\n";
+				pending_messages->append(recvd);
+				std::cout << "message added to pending is msgkind: " << (int)recvd->kind_ << "\n";
+			}
 		}
 	}
 
@@ -86,9 +89,9 @@ public:
 	// Once server receives all of clients' Register messages, we have a Directory message we can then send to the clients
 	void server_init(unsigned idx, unsigned port)
 	{
-		current_node = idx;	// set this node as server idx
-		init_sock_(port);	// initialize sock address info
-		nodes_ = new NodeInfo[num_nodes];	// initialize directory of nodes
+		current_node = idx;				  // set this node as server idx
+		init_sock_(port);				  // initialize sock address info
+		nodes_ = new NodeInfo[num_nodes]; // initialize directory of nodes
 
 		// initialize each Node ids
 		for (size_t i = 0; i < num_nodes; i++)
@@ -101,37 +104,37 @@ public:
 		// loop over number of client nodes
 		// receives message and casts to Register message
 		// grabs the data from Register and set the client Node Info
-		for (size_t i = 1; i < num_nodes; ++i) {
-			Register* regMsg = dynamic_cast<Register*>(recv_m());
-			printf("register port is : %zu\n", regMsg->port_);
+		for (size_t i = 1; i < num_nodes; ++i)
+		{
+			Register *regMsg = dynamic_cast<Register *>(recv_m());
 			nodes_[regMsg->getSender()].id = regMsg->getSender();
 			nodes_[regMsg->getSender()].address.sin_family = AF_INET;
 			nodes_[regMsg->getSender()].address.sin_addr = regMsg->client_.sin_addr;
 			nodes_[regMsg->getSender()].address.sin_port = htons(regMsg->port_);
 		}
 		// after client nodes are registered
-		// add each client port and address to list of ports and addresses 
-		for (size_t i = 0; i < num_nodes; i++) {
-			ports->append(ntohs(nodes_[i+1].address.sin_port));
-			String * addr = new String(inet_ntoa(nodes_[i+1].address.sin_addr));
+		// add each client port and address to list of ports and addresses
+		for (size_t i = 0; i < num_nodes; i++)
+		{
+			ports->append(ntohs(nodes_[i + 1].address.sin_port));
+			String *addr = new String(inet_ntoa(nodes_[i + 1].address.sin_addr));
 			addresses->append(addr);
 		}
 		// at the end of server init, we create a Directory that contains ports and addresses of all the nodes in the system
 		// send it to each target / client node
-		for (size_t i = 1; i < num_nodes; i++) {
-			Directory ipd(MsgKind::Directory, current_node, i, 24, num_nodes-1, ports, addresses);
+		for (size_t i = 1; i < num_nodes; i++)
+		{
+			Directory ipd(MsgKind::Directory, current_node, i, 24, num_nodes - 1, ports, addresses);
 			send_m(&ipd);
 		}
 		printf("Server has been initialized!\n");
 		thread1 = std::thread(&NetworkIP::listen_m, this);
-		// t1.join();
-		// std::cout << "aaaa pls\n";	
 	}
 
 	// Initializes a client Node
 	void client_init(unsigned idx, unsigned port, char *server_addr, unsigned server_port)
 	{
-		current_node = idx;	// set this node idx to client idx
+		current_node = idx; // set this node idx to client idx
 		init_sock_(port);	// initialize sock address info
 
 		// initialize server node info
@@ -146,30 +149,29 @@ public:
 		}
 
 		// send registration message to server to register itself
-		Register* msg = new Register(MsgKind::Register, idx, 0, 42, ip_, port);
+		Register *msg = new Register(MsgKind::Register, idx, 0, 42, ip_, port);
 		send_m(msg);
 
 		// Receives Directory message from server node
 		Directory *ipd = dynamic_cast<Directory *>(recv_m());
 		printf("Client has registered!\n");
-		
 
-		NodeInfo * nodes = new NodeInfo[num_nodes];
+		NodeInfo *nodes = new NodeInfo[num_nodes];
 		nodes[0] = nodes_[0];
 
 		for (size_t i = 0; i < num_nodes; i++)
 		{
-			nodes[i+1].id = i + 1;
-			nodes[i+1].address.sin_family = AF_INET;
-			nodes[i+1].address.sin_port = htons(ipd->ports_->get(i));
-			if (inet_pton(AF_INET, ipd->addresses_->get(i)->c_str(), &nodes_[i+1].address.sin_addr) <= 0)
+			nodes[i + 1].id = i + 1;
+			nodes[i + 1].address.sin_family = AF_INET;
+			nodes[i + 1].address.sin_port = htons(ipd->ports_->get(i));
+			if (inet_pton(AF_INET, ipd->addresses_->get(i)->c_str(), &nodes_[i + 1].address.sin_addr) <= 0)
 			{
 				printf("Invalid IP directory-addr for node %zu", (i + 1));
 				exit(1);
 			}
 		}
-		delete [] nodes_;
-		nodes_ = nodes;	// replace provisional nodes with the new nodes
+		delete[] nodes_;
+		nodes_ = nodes; // replace provisional nodes with the new nodes
 		delete ipd;
 	}
 
@@ -182,24 +184,13 @@ public:
 		assert(connected >= 0 && "Unable to create client socket");
 		if (connect(connected, (sockaddr *)&target.address, sizeof(target.address)) < 0)
 		{
-			printf("Unable to connect to remote node :(\n");
 			perror("Unable to connect to remote node :(");
 		}
 		// serialize the message
-		Serializer* ser = new Serializer();
+		Serializer *ser = new Serializer();
 		msg->serialize(ser);
 		char *buffer = ser->getSerChar();
 		size_t size = ser->getPos();
-		if (msg->getKind() == MsgKind::Data) {
-			Deserializer * d = new Deserializer(buffer);
-			Message * m = Message::deserializeMsg(d);
-			assert(m->getKind() == MsgKind::Data);
-			Data * dat = dynamic_cast<Data*>(m);
-			Value * v = dat->v_;
-			Deserializer * vdser = new Deserializer(v->data_);
-			Key * expectedKey = Key::deserialize(vdser);
-			printf("expected key name sent %s\n", expectedKey->key->c_str());
-		}
 		// send the serialized message
 		int status = send(connected, &size, sizeof(size_t), 0);
 		assert(status >= 0);
@@ -207,16 +198,15 @@ public:
 		assert(status2 >= 0);
 	}
 
-
 	// node receives a message
 	Message *recv_m() override
 	{
-		printf(("called receive!!\n"));
 		sockaddr_in sender;
 		socklen_t addrlen = sizeof(sender);
-		
+
 		int req = accept(sock_, (sockaddr *)&sender, &addrlen);
-		if (req <= 0){
+		if (req <= 0)
+		{
 			perror("failed to accept\n");
 			exit(1);
 		}
@@ -235,17 +225,9 @@ public:
 		}
 
 		// deserializes the message
-		Deserializer* des = new Deserializer(buffer);
+		Deserializer *des = new Deserializer(buffer);
 		Message *msg = Message::deserializeMsg(des);
-		if (msg->getKind() == MsgKind::Data) {
-			printf("testing the deserialized receive\n");
-			Data * dat = dynamic_cast<Data*>(msg);
-			Value * v = dat->v_;
-			Deserializer * vdser = new Deserializer(v->data_);
-			Key * expectedKey = Key::deserialize(vdser);
-			printf("expected key name receive %s\n", expectedKey->key->c_str());
-		}
+
 		return msg;
 	}
-
 };

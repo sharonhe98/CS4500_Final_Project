@@ -46,11 +46,13 @@ public:
     }
   }
 
-  DataFrame(Deserializer* d) {
+  DataFrame(Deserializer *d)
+  {
     Schema s(*Schema::deserialize(d));
     scm = s;
     cols = new Column *[scm.width()];
-    for (size_t i = 0; i < scm.width(); i++) {
+    for (size_t i = 0; i < scm.width(); i++)
+    {
       cols[i] = Column::deserialize(d);
       assert(cols[i]);
     }
@@ -59,15 +61,17 @@ public:
   ~DataFrame()
   {
     for (size_t i = 0; i < scm.width(); i++)
-      {
-        delete cols[i];
-      }
+    {
+      delete cols[i];
+    }
     delete[] cols;
   }
 
-  void serialize(Serializer* ser) {
+  void serialize(Serializer *ser)
+  {
     scm.serialize(ser);
-    for (size_t i = 0; i < ncols(); i++) {
+    for (size_t i = 0; i < ncols(); i++)
+    {
       cols[i]->serialize(ser);
     }
   }
@@ -187,7 +191,7 @@ public:
   double get_double(size_t col, size_t row)
   {
     assert((cols[col]->get_type() != 'F' || col >= scm.width() || row >= scm.length()));
-    FloatColumn * fc = dynamic_cast<FloatColumn*>(cols[col]);
+    FloatColumn *fc = dynamic_cast<FloatColumn *>(cols[col]);
     return fc->get(row);
   }
 
@@ -199,7 +203,6 @@ public:
       exit(1);
     }
   }
-
 
   /** Set the value at the given column and row to the given value.
     * If the column is not  of the right type or the indices are out of
@@ -336,7 +339,7 @@ public:
     return ndf;
   }
 
-    /** Print the dataframe in SoR format to standard output. */
+  /** Print the dataframe in SoR format to standard output. */
   void print()
   {
     for (size_t i = 0; i < nrows(); i++)

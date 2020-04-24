@@ -6,7 +6,6 @@
 #include "../array.h"
 #include "../kvstore/kv.h"
 
-
 // enum list of message types
 enum class MsgKind
 {
@@ -21,7 +20,7 @@ enum class MsgKind
 
   Kill,
   Register,
-  Directory, 
+  Directory,
   Data
 };
 
@@ -64,32 +63,34 @@ public:
     ser->write(sender_);
     ser->write(target_);
     ser->write(id_);
-    printf("Called general messg serialize\n");
   }
 
   // function declaration
   static Message *deserializeMsg(Deserializer *dser);
 
   // returns the message kind/type
-  MsgKind getKind() {
-	return kind_;
+  MsgKind getKind()
+  {
+    return kind_;
   }
 
   // gets the message sender
-  size_t getSender() {
-	return sender_;
+  size_t getSender()
+  {
+    return sender_;
   }
 
   // returns the message target
-  size_t getTarget() {
-	return target_;
+  size_t getTarget()
+  {
+    return target_;
   }
 
   // returns the id
-  size_t getId() {
-	return id_;
+  size_t getId()
+  {
+    return id_;
   }
-
 };
 
 /**
@@ -188,7 +189,6 @@ public:
     Message::serialize(ser);
     ser->write(msg_);
   }
-
 };
 
 /**
@@ -278,10 +278,10 @@ public:
 class Data : public Message
 {
 public:
-  Value * v_;
+  Value *v_;
 
   // constructor
-  Data(MsgKind kind_, size_t sender_, size_t target_, size_t id_, Value * val_) : Message(kind_, sender_, target_, id_)
+  Data(MsgKind kind_, size_t sender_, size_t target_, size_t id_, Value *val_) : Message(kind_, sender_, target_, id_)
   {
     v_ = val_;
   }
@@ -289,14 +289,12 @@ public:
   Data(Deserializer *d) : Message(d, MsgKind::Data)
   {
     v_ = Value::deserialize(d);
-    printf("you have been chosen\n");
   }
   // serialize a Data message
   void serialize(Serializer *ser)
   {
     Message::serialize(ser);
     v_->serialize(ser);
-    printf("Calling data serialize!\n");
   }
 };
 
@@ -315,7 +313,7 @@ Message *Message::deserializeMsg(Deserializer *dser)
     break;
   case MsgKind::Put:
     result = new Put(dser);
-    break;  
+    break;
   case MsgKind::Reply:
     result = new Reply(dser);
     break;

@@ -16,7 +16,6 @@ public:
   // the number of items stored in the array
   size_t size_;
 
-
   // constructor
   Array()
   {
@@ -25,8 +24,9 @@ public:
   }
 
   // destructor
-  ~Array() {
-    delete [] elements_;
+  ~Array()
+  {
+    delete[] elements_;
   }
 
   // putting an item at the end of the array
@@ -35,15 +35,19 @@ public:
     // allocate memory for result array with larger size
     Object **res = new Object *[size_ + 1];
     // if not empty array, put item to end of array
-    if (size_ != 0) {
-      for (size_t i = 0; i < size_; i++) {
+    if (size_ != 0)
+    {
+      for (size_t i = 0; i < size_; i++)
+      {
         res[i] = elements_[i];
       }
       res[size_] = oo;
-    } else {
+    }
+    else
+    {
       res[0] = oo;
     }
-    delete [] elements_;
+    delete[] elements_;
     elements_ = res;
     size_ += 1;
   }
@@ -162,8 +166,9 @@ public:
   }
 
   // destructor
-  ~IntArray() {
-    delete [] elements_;
+  ~IntArray()
+  {
+    delete[] elements_;
   }
 
   // putting an item at the end of the array
@@ -185,7 +190,7 @@ public:
       }
       res[size_] = oo;
     }
-    delete [] elements_;
+    delete[] elements_;
     // set elements field to result
     elements_ = res;
     // increase size
@@ -385,8 +390,9 @@ public:
   }
 
   // destructor
-  ~FloatArray() {
-    delete [] elements_;
+  ~FloatArray()
+  {
+    delete[] elements_;
   }
 
   // putting an item at the end of the array
@@ -408,7 +414,7 @@ public:
       }
       res[size_] = oo;
     }
-    delete [] elements_;
+    delete[] elements_;
     // set elements field to result
     elements_ = res;
     // increase size
@@ -572,8 +578,9 @@ public:
   }
 
   // destructor
-  ~BoolArray() {
-    delete [] elements_;
+  ~BoolArray()
+  {
+    delete[] elements_;
   }
 
   // putting an item at the end of the array
@@ -595,7 +602,7 @@ public:
       }
       res[size_] = oo;
     }
-    delete [] elements_;
+    delete[] elements_;
     // set elements field to result
     elements_ = res;
     // increase size
@@ -786,7 +793,6 @@ public:
 class StringArray : public Array
 {
 public:
-
   String *get(size_t nn)
   {
     return dynamic_cast<String *>(get_(nn));

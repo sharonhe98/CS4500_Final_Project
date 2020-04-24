@@ -44,9 +44,7 @@ public:
 	DataFrame *get(Key *key)
 	{
 		cv.wait(cv_mtx);
-		std::cout << "done waiting\n";
 		cv_mtx.unlock();
-		std::cout << "mutex unlocked\n";
 		if (kv->check_key_exists(key))
 		{
 			Value *df_v = get_(key);
@@ -67,28 +65,22 @@ public:
 	void put(Key *key, Value *value)
 	{
 		size_t idx = key->home_node_;
-		std::cout << "idx is: " << idx << "\n";
 		if (idx == index)
 		{
 			kv->set(key, value);
-			std::cout << "hey there demons\n";
 			size_t len = node->pending_messages->length();
 			if (len > 0)
 			{
 				for (size_t i = 0; i < len; i++)
 				{
-					printf("Msg number: %zu\n", i);
 					Message *m = dynamic_cast<Message *>(node->pending_messages->get_(i));
-					printf("msgkind is: %i sender is: %zu\n", (int)m->getKind(), m->getSender());
 					if (m->getKind() == MsgKind::Data)
 					{
-						printf("msgkind is data!\n");
 						Data *d = dynamic_cast<Data *>(m);
 						Value *v = d->v_;
 						assert(v->data_);
 						Deserializer *des = new Deserializer(v->data_);
 						Key *wag = Key::deserialize(des);
-						printf("deserialzied key name is %s key is: %s\n", wag->key->c_str(), key->key->c_str());
 						if (key->equals(wag))
 						{
 							Put *msg = new Put(MsgKind::Put, index, idx, index);
@@ -111,12 +103,10 @@ public:
 			std::cout << "ya boi\n";
 		}
 		cv.notify_all();
-		std::cout << "notified!\n";
 	}
 
 	DataFrame *waitAndGet(Key *key)
 	{
-		std::cout << "I am in kvwait and get!\n";
 		size_t idx = key->home_node_;
 		Value *df_v = get_(key);
 
@@ -125,16 +115,12 @@ public:
 		{
 			df = get(key);
 			int i = 0;
-			std::cout << i << "hooooow\n";
 			while (i < 500)
 			{
-				std::cout << i << "aaaaa\n";
 				if (Message *sent = node->recv_m())
 				{
-					std::cout << sent->getSender() << "\n";
 					if (sent->getKind() == MsgKind::WaitAndGet)
 					{
-						std::cout << "we've got mail!\n";
 						Data *data_m = new Data(MsgKind::Data, index, sent->getSender(), 11037, df_v);
 						node->send_m(data_m);
 					}
@@ -146,7 +132,6 @@ public:
 		else
 		{
 			WaitAndGet *wg = new WaitAndGet(MsgKind::WaitAndGet, index, idx, 2);
-			std::cout << "we're sending mail!\n";
 			node->send_m(wg);
 			Serializer *s1 = new Serializer();
 			key->serialize(s1);
@@ -154,26 +139,8 @@ public:
 			Data *da = new Data(MsgKind::Data, index, idx, 2, v1);
 			node->send_m(da);
 
-			// Serializer* ser = new Serializer();
-			// da->serialize(ser);
-			// char *buffer = ser->getSerChar();
-			// size_t size = ser->getPos();
-			// if (da->getKind() == MsgKind::Data) {
-			// Deserializer * d = new Deserializer(buffer);
-			// Message * m = Message::deserializeMsg(d);
-			// assert(m->getKind() == MsgKind::Data);
-			// Data * dat = dynamic_cast<Data*>(m);
-			// Value * v = dat->v_;
-			// Deserializer * vdser = new Deserializer(v->data_);
-			// Key * expectedKey = Key::deserialize(vdser);
-			// printf("expected key name kvwaiteget %s\n", expectedKey->key->c_str());
-			// }
-
-			std::cout << "please my crops are dying\n";
-
 			while (!df_v)
 			{
-				std::cout << "keep waiting!\n";
 				Message *val = node->recv_m();
 				assert(val->kind_ == MsgKind::Data);
 				Data *data = dynamic_cast<Data *>(val);

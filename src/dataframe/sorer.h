@@ -205,20 +205,23 @@ public:
             {
                 if (i >= num_fields)
                 {
-                    if(cols_[i]->get_type() == 'I') {
+                    if (cols_[i]->get_type() == 'I')
+                    {
                         r.set(i, (int)NULL);
                     }
-                    if(cols_[i]->get_type() == 'F') {
+                    if (cols_[i]->get_type() == 'F')
+                    {
                         r.set(i, (float)NULL);
                     }
-                    if(cols_[i]->get_type() == 'B') {
+                    if (cols_[i]->get_type() == 'B')
+                    {
                         r.set(i, (bool)NULL);
                     }
-                    else {
-                        String* mt = new String("");
+                    else
+                    {
+                        String *mt = new String("");
                         r.set(i, mt);
                     }
-                    
                 }
 
                 else if (cols_[i]->get_type() == 'B')

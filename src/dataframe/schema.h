@@ -120,11 +120,13 @@ public:
     track_types = "";
   }
 
-  ~Row() {
-    for (size_t i = 0; i < width(); i++) {
+  ~Row()
+  {
+    for (size_t i = 0; i < width(); i++)
+    {
       delete columns[i];
     }
-    delete [] columns;
+    delete[] columns;
   }
 
   // helper to add column
@@ -171,7 +173,7 @@ public:
   void set(size_t col, int val)
   {
     Column *c = columns[col] == nullptr ? new IntColumn() : columns[col];
-  
+
     assert(c->get_type() == 'I');
     IntColumn *ic = dynamic_cast<IntColumn *>(c);
     if (ic->size() == 0)
@@ -183,7 +185,7 @@ public:
   void set(size_t col, double val)
   {
     Column *c = columns[col] == nullptr ? new FloatColumn() : columns[col];
-  
+
     assert(c->get_type() == 'F');
     FloatColumn *fc = dynamic_cast<FloatColumn *>(c);
     if (fc->size() == 0)
@@ -207,14 +209,13 @@ public:
   void set(size_t col, String *val)
   {
     Column *c = columns[col] == nullptr ? new StringColumn() : columns[col];
-  
+
     assert(c->get_type() == 'S');
     StringColumn *sc = dynamic_cast<StringColumn *>(c);
     if (sc->size() == 0)
       sc->push_back(val);
     else
       sc->set(0, val);
-    
   }
 
   /** Set/get the index of this row (ie. its position in the dataframe. This is

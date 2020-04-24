@@ -16,13 +16,22 @@ class BoolColumn;
 // returns the inferred typing of the char*
 char inferred_type(char *c)
 {
-  if (c == nullptr || ((strlen(c) == 1) && ((*c == '0') || (*c == '1')))) 
+  if (c == nullptr || ((strlen(c) == 1) && ((*c == '0') || (*c == '1'))))
   {
     return 'B';
-  } 
-  if (is_int(c)) {return 'I';}
-  if (is_float(c)) {return 'F';}
-  else {return 'S';}
+  }
+  if (is_int(c))
+  {
+    return 'I';
+  }
+  if (is_float(c))
+  {
+    return 'F';
+  }
+  else
+  {
+    return 'S';
+  }
 }
 
 /**************************************************************************
@@ -38,15 +47,18 @@ public:
   Array **vals_;
   char type_;
 
-  Column() {
-    vals_ = new Array*[CHUNK_SIZE];
+  Column()
+  {
+    vals_ = new Array *[CHUNK_SIZE];
   }
-  Column(Deserializer* d, char typ) {
+  Column(Deserializer *d, char typ)
+  {
     type_ = typ;
   }
 
-  ~Column() {
-    delete [] vals_;
+  ~Column()
+  {
+    delete[] vals_;
   }
   /** Type converters: Return the same column under its actual type, or
  *    *  nullptr if of the wrong type.  */
@@ -88,7 +100,7 @@ public:
   };
 
   /** Returns the number of elements in the column. */
-  virtual size_t size() {return 0;};
+  virtual size_t size() { return 0; };
 
   virtual void set(size_t idx, int val)
   {
@@ -113,14 +125,15 @@ public:
  * IntColumn::
  * Holds primitive int values, unwrapped.
  */
-class ArrayIntArray : public Array {
-  public:
-
+class ArrayIntArray : public Array
+{
+public:
   ArrayIntArray() {}
 
-  static void serialize(Serializer* s ) {}
+  static void serialize(Serializer *s) {}
 
-  IntArray* get(size_t i) {
+  IntArray *get(size_t i)
+  {
     return dynamic_cast<IntArray *>(Array::get_(i));
   }
 };
@@ -130,7 +143,7 @@ class IntColumn : public Column
 public:
   ArrayIntArray chunks_;
   size_t size_ = 0;
-  IntArray * newChunk = new IntArray();
+  IntArray *newChunk = new IntArray();
 
   IntColumn()
   {
@@ -138,8 +151,10 @@ public:
     chunks_.append(newChunk);
   }
 
-  ~IntColumn() {
-    for (size_t i = 0; i < chunks_.length(); i++) {
+  ~IntColumn()
+  {
+    for (size_t i = 0; i < chunks_.length(); i++)
+    {
       delete chunks_.get(i);
     }
   }
@@ -147,7 +162,8 @@ public:
   IntColumn(Deserializer *d) : Column(d, 'I')
   {
     size_t numStr = d->readSizeT();
-    for (size_t i = 0; i < numStr; i++) {
+    for (size_t i = 0; i < numStr; i++)
+    {
       int ii = d->readInt();
       push_back(ii);
     }
@@ -160,17 +176,16 @@ public:
     ser->write(size_);
     for (size_t i = 0; i < size_; i++)
     {
-     ser->write(get(i));
+      ser->write(get(i));
     }
   }
-
-
 
   void push_back(int val)
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
-    if (chunk_id >= chunks_.length()) {
-      IntArray * arr = new IntArray();
+    if (chunk_id >= chunks_.length())
+    {
+      IntArray *arr = new IntArray();
       chunks_.append(arr);
     }
     chunks_.get(chunk_id)->append(val);
@@ -180,7 +195,7 @@ public:
   int get(size_t idx)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    return chunks_.get(idx/CHUNK_SIZE)->get(idx_in_val);
+    return chunks_.get(idx / CHUNK_SIZE)->get(idx_in_val);
   }
 
   IntColumn *as_int()
@@ -192,25 +207,24 @@ public:
   void set(size_t idx, int val)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    chunks_.get(idx/CHUNK_SIZE)->set(idx_in_val, val);
+    chunks_.get(idx / CHUNK_SIZE)->set(idx_in_val, val);
   }
 
   size_t size()
   {
     return size_;
   }
-
-
 };
 
-class ArrayStringArray : public Array {
-  public:
-
+class ArrayStringArray : public Array
+{
+public:
   ArrayStringArray() {}
 
-  static void serialize(Serializer* s ) {}
+  static void serialize(Serializer *s) {}
 
-  StringArray* get(size_t i) {
+  StringArray *get(size_t i)
+  {
     return dynamic_cast<StringArray *>(Array::get_(i));
   }
 };
@@ -221,13 +235,15 @@ class ArrayStringArray : public Array {
  * Holds string pointers. The strings are external.  Nullptr is a valid
  * value.
  */
-class StringColumn : public Column {
-  public:
+class StringColumn : public Column
+{
+public:
   ArrayStringArray chunks_;
   size_t size_ = 0;
-  StringArray * newChunk = new StringArray();
+  StringArray *newChunk = new StringArray();
 
-  StringColumn() {
+  StringColumn()
+  {
     type_ = 'S';
     chunks_.append(newChunk);
   }
@@ -235,14 +251,17 @@ class StringColumn : public Column {
   StringColumn(Deserializer *d) : Column(d, 'S')
   {
     size_t numStr = d->readSizeT();
-    for (size_t i = 0; i < numStr; i++) {
+    for (size_t i = 0; i < numStr; i++)
+    {
       push_back(d->readString());
     }
     size_ = numStr;
   }
 
-  ~StringColumn() {
-    for (size_t i = 0; i < chunks_.length(); i++) {
+  ~StringColumn()
+  {
+    for (size_t i = 0; i < chunks_.length(); i++)
+    {
       delete chunks_.get(i);
     }
   }
@@ -250,24 +269,27 @@ class StringColumn : public Column {
   String *get(size_t idx)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    return chunks_.get(idx/CHUNK_SIZE)->get(idx_in_val);
+    return chunks_.get(idx / CHUNK_SIZE)->get(idx_in_val);
   }
 
   void push_back(String *val)
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
-    if (chunk_id >= chunks_.length()) {
-      StringArray * arr = new StringArray();
+    if (chunk_id >= chunks_.length())
+    {
+      StringArray *arr = new StringArray();
       chunks_.append(arr);
     }
     chunks_.get(chunk_id)->append(val);
     size_++;
   }
 
-  void serialize(Serializer* s) {
+  void serialize(Serializer *s)
+  {
     s->write(type_);
     s->write(size_);
-    for (size_t i = 0; i < size_; i++) {
+    for (size_t i = 0; i < size_; i++)
+    {
       s->write(get(i));
     }
   }
@@ -277,43 +299,41 @@ class StringColumn : public Column {
     return this;
   }
 
-  void set(size_t idx, String * val)
+  void set(size_t idx, String *val)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    chunks_.get(idx/CHUNK_SIZE)->set(idx_in_val, val);
+    chunks_.get(idx / CHUNK_SIZE)->set(idx_in_val, val);
   }
 
   size_t size()
   {
     return size_;
   }
-
 };
-
 
 /*************************************************************************
  * FloatColumn::
  * Holds primitive float values, unwrapped.
  */
-class ArrayFloatArray : public Array {
-  public:
-
+class ArrayFloatArray : public Array
+{
+public:
   ArrayFloatArray() {}
 
-  static void serialize(Serializer* s ) {}
+  static void serialize(Serializer *s) {}
 
-  FloatArray* get(size_t i) {
+  FloatArray *get(size_t i)
+  {
     return dynamic_cast<FloatArray *>(Array::get_(i));
   }
 };
-
 
 class FloatColumn : public Column
 {
 public:
   ArrayFloatArray chunks_;
   size_t size_ = 0;
-  FloatArray * newChunk = new FloatArray();
+  FloatArray *newChunk = new FloatArray();
 
   FloatColumn()
   {
@@ -321,16 +341,19 @@ public:
     chunks_.append(newChunk);
   }
 
-  ~FloatColumn() {
-    for (size_t i = 0; i < chunks_.length(); i++) {
+  ~FloatColumn()
+  {
+    for (size_t i = 0; i < chunks_.length(); i++)
+    {
       delete chunks_.get(i);
     }
   }
 
-  FloatColumn(Deserializer *d) :  Column(d, 'F')
+  FloatColumn(Deserializer *d) : Column(d, 'F')
   {
     size_t numStr = d->readSizeT();
-    for (size_t i = 0; i < numStr; i++) {
+    for (size_t i = 0; i < numStr; i++)
+    {
       push_back(d->readDouble());
     }
     size_ = numStr;
@@ -342,15 +365,16 @@ public:
     ser->write(size_);
     for (size_t i = 0; i < size_; i++)
     {
-     ser->write(get(i));
+      ser->write(get(i));
     }
   }
 
   void push_back(double val)
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
-    if (chunk_id >= chunks_.length()) {
-      FloatArray * arr = new FloatArray();
+    if (chunk_id >= chunks_.length())
+    {
+      FloatArray *arr = new FloatArray();
       chunks_.append(arr);
     }
     chunks_.get(chunk_id)->append(val);
@@ -360,7 +384,7 @@ public:
   double get(size_t idx)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    return chunks_.get(idx/CHUNK_SIZE)->get(idx_in_val);
+    return chunks_.get(idx / CHUNK_SIZE)->get(idx_in_val);
   }
 
   FloatColumn *as_float()
@@ -372,28 +396,28 @@ public:
   void set(size_t idx, double val)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    chunks_.get(idx/CHUNK_SIZE)->set(idx_in_val, val);
+    chunks_.get(idx / CHUNK_SIZE)->set(idx_in_val, val);
   }
 
   size_t size()
   {
     return size_;
   }
-
 };
 
 /*************************************************************************
  * BoolColumn::
  * Holds primitive bool values, unwrapped.
  */
-class ArrayBoolArray : public Array {
-  public:
-
+class ArrayBoolArray : public Array
+{
+public:
   ArrayBoolArray() {}
 
-  static void serialize(Serializer* s ) {}
+  static void serialize(Serializer *s) {}
 
-  BoolArray* get(size_t i) {
+  BoolArray *get(size_t i)
+  {
     return dynamic_cast<BoolArray *>(Array::get_(i));
   }
 };
@@ -403,7 +427,7 @@ class BoolColumn : public Column
 public:
   ArrayBoolArray chunks_;
   size_t size_ = 0;
-  BoolArray * newChunk = new BoolArray();
+  BoolArray *newChunk = new BoolArray();
 
   BoolColumn()
   {
@@ -414,15 +438,18 @@ public:
   BoolColumn(Deserializer *d) : Column(d, 'B')
   {
     size_t numStr = d->readSizeT();
-    for (size_t i = 0; i < numStr; i++) {
+    for (size_t i = 0; i < numStr; i++)
+    {
       bool b = d->readBool();
       push_back(b);
     }
     size_ = numStr;
   }
 
-  ~BoolColumn() {
-    for (size_t i = 0; i < chunks_.length(); i++) {
+  ~BoolColumn()
+  {
+    for (size_t i = 0; i < chunks_.length(); i++)
+    {
       delete chunks_.get(i);
     }
   }
@@ -433,15 +460,16 @@ public:
     ser->write(size_);
     for (size_t i = 0; i < size_; i++)
     {
-     ser->write(get(i));
+      ser->write(get(i));
     }
   }
 
   void push_back(bool val)
   {
     size_t chunk_id = size_ / CHUNK_SIZE;
-    if (chunk_id >= chunks_.length()) {
-      BoolArray * arr = new BoolArray();
+    if (chunk_id >= chunks_.length())
+    {
+      BoolArray *arr = new BoolArray();
       chunks_.append(arr);
     }
     chunks_.get(chunk_id)->append(val);
@@ -451,7 +479,7 @@ public:
   bool get(size_t idx)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    return chunks_.get(idx/CHUNK_SIZE)->get(idx_in_val);
+    return chunks_.get(idx / CHUNK_SIZE)->get(idx_in_val);
   }
 
   BoolColumn *as_bool()
@@ -463,14 +491,13 @@ public:
   void set(size_t idx, bool val)
   {
     size_t idx_in_val = idx % CHUNK_SIZE;
-    chunks_.get(idx/CHUNK_SIZE)->set(idx_in_val, val);
+    chunks_.get(idx / CHUNK_SIZE)->set(idx_in_val, val);
   }
 
   size_t size()
   {
     return size_;
   }
-
 };
 
 Column *Column::deserialize(Deserializer *dser)

@@ -18,21 +18,20 @@ public:
 		home_node_ = node_number;
 	}
 
-	Key(Deserializer* d) {
-		printf("called key derser const\n");
+	Key(Deserializer *d)
+	{
 		key = d->readString();
-		printf("key name!\n");
 		home_node_ = d->readSizeT();
-		printf("key node\n");
 	}
 
-	void serialize(Serializer* s) {
+	void serialize(Serializer *s)
+	{
 		s->write(key);
 		s->write(home_node_);
 	}
 
-	static Key* deserialize(Deserializer* d) {
-		printf("called key deserialize!\n");
+	static Key *deserialize(Deserializer *d)
+	{
 		return new Key(d);
 	}
 };
@@ -48,18 +47,21 @@ public:
 		data_ = data;
 		len_ = strlen(data);
 	}
-	
-	Value(Deserializer* d) {
+
+	Value(Deserializer *d)
+	{
 		data_ = d->readChars();
 		len_ = d->readSizeT();
 	}
 
-	void serialize(Serializer* s) {
+	void serialize(Serializer *s)
+	{
 		s->write(data_);
 		s->write(len_);
 	}
-	
-	static Value* deserialize(Deserializer* d) {
+
+	static Value *deserialize(Deserializer *d)
+	{
 		return new Value(d);
 	}
 };

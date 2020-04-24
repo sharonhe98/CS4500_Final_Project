@@ -27,16 +27,17 @@ public:
   }
 
   // resize buffer when capacity is reached
-  void resize(size_t sizeOf) {
+  void resize(size_t sizeOf)
+  {
 
-    if (pos + sizeOf >= capacity) {
+    if (pos + sizeOf >= capacity)
+    {
       capacity *= 2;
       char *oldV = buf;
       buf = new char[capacity];
       memcpy(buf, oldV, pos);
       delete[] oldV;
     }
-    
   }
 
   void write(size_t size)
@@ -79,10 +80,10 @@ public:
   {
     // size_t length = strlen(c);
     // resize(length);
-    resize(sizeof(char*));
+    resize(sizeof(char *));
     // write(length);
-    memcpy(buf + pos, &c, sizeof(char*));
-    pos += sizeof(char*);
+    memcpy(buf + pos, &c, sizeof(char *));
+    pos += sizeof(char *);
   }
 
   void write(String *s)
@@ -152,8 +153,8 @@ public:
     // for (size_t i = 0; i < length; i++) {
     //   res += readChar();
     // }
-    memcpy(&res, buf + pos, sizeof(char*));
-    pos += sizeof(char*);
+    memcpy(&res, buf + pos, sizeof(char *));
+    pos += sizeof(char *);
     return res;
   }
 
