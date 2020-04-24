@@ -43,8 +43,10 @@ public:
 
 	DataFrame *get(Key *key)
 	{
+		// wait for value to get put
 		cv.wait(cv_mtx);
 		cv_mtx.unlock();
+		// if key exists locally, then return df
 		if (kv->check_key_exists(key))
 		{
 			Value *df_v = get_(key);
@@ -53,6 +55,7 @@ public:
 			DataFrame *df = DataFrame::deserialize(des);
 			return df;
 		}
+		// TODO: send get message to node the key exists on and wait for node to return df
 		else
 		{
 			size_t target = key->home_node_;
@@ -65,20 +68,25 @@ public:
 	void put(Key *key, Value *value)
 	{
 		size_t idx = key->home_node_;
+		// if in home node
 		if (idx == index)
 		{
+			// put key and value in the store
 			kv->set(key, value);
+			// check for pending waitandget messages
 			size_t len = node->pending_messages->length();
 			if (len > 0)
 			{
 				for (size_t i = 0; i < len; i++)
 				{
 					Message *m = dynamic_cast<Message *>(node->pending_messages->get_(i));
+					// if the message has key
 					if (m->getKind() == MsgKind::KeyMessage)
 					{
 						KeyMessage *d = dynamic_cast<KeyMessage *>(m);
 						Key *v = d->key_;
 						assert(v);
+						// if keys match send value back over network
 						if (strcmp(key->key->c_str(), v->key->c_str()) == 0)
 						{
 							Put *msg = new Put(MsgKind::Put, index, idx, index);
@@ -91,11 +99,11 @@ public:
 				}
 			}
 		}
-
 		else
 		{
 			kv->set(key, value);
 		}
+		// notify all nodes that value has been put
 		cv.notify_all();
 	}
 
@@ -105,41 +113,35 @@ public:
 		Value *df_v = get_(key);
 
 		DataFrame *df;
+		// if key node equals node index
 		if (key->home_node_ == index)
 		{
+			// handles the waiting and return
 			df = get(key);
-			int i = 0;
-			while (true)
-			{
-				if (Message *sent = node->recv_m())
-				{
-					if (sent->getKind() == MsgKind::WaitAndGet)
-					{
-						Data *data_m = new Data(MsgKind::Data, index, sent->getSender(), 11037, df_v);
-						node->send_m(data_m);
-					}
-				}
-				i += 1;
-			}
 			return df;
 		}
 		else
 		{
+			// send key that we want value of within a message
 			KeyMessage *da = new KeyMessage(MsgKind::KeyMessage, index, idx, 2, key);
 			node->send_m(da);
-			std::cout << "I just printed a key! :)\n";
-
+			
+			// wait for response
 			while (!df_v)
 			{
+				// get the response
 				Message *val = node->recv_m();
 				assert(val->kind_ == MsgKind::Data);
+				// cast message to data to get the value
 				Data *data = dynamic_cast<Data *>(val);
 				if (data)
 				{
+					// put the value in the kv store
 					kv->set(key, data->v_);
 				}
 				df_v = get_(key);
 			}
+			// deserialize the dataframe
 			Deserializer *des = new Deserializer(df_v->data_);
 			df = DataFrame::deserialize(des);
 			return df;
