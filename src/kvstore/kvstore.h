@@ -74,14 +74,12 @@ public:
 				for (size_t i = 0; i < len; i++)
 				{
 					Message *m = dynamic_cast<Message *>(node->pending_messages->get_(i));
-					if (m->getKind() == MsgKind::Data)
+					if (m->getKind() == MsgKind::KeyMessage)
 					{
-						Data *d = dynamic_cast<Data *>(m);
-						Value *v = d->v_;
-						assert(v->data_);
-						Deserializer *des = new Deserializer(v->data_);
-						Key *wag = Key::deserialize(des);
-						if (key->equals(wag))
+						KeyMessage *d = dynamic_cast<KeyMessage *>(m);
+						Key *v = d->key_;
+						assert(v);
+						if (strcmp(key->key->c_str(), v->key->c_str()) == 0)
 						{
 							Put *msg = new Put(MsgKind::Put, index, idx, index);
 							node->send_m(msg);
@@ -129,13 +127,9 @@ public:
 		}
 		else
 		{
-			Serializer *s1 = new Serializer();
-			key->serialize(s1);
-			char *keyBuf = s1->getSerChar();
-
-			Value *v1 = new Value(keyBuf);
-			Data *da = new Data(MsgKind::Data, index, idx, 2, v1);
+			KeyMessage *da = new KeyMessage(MsgKind::KeyMessage, index, idx, 2, key);
 			node->send_m(da);
+			std::cout << "I just printed a key! :)\n";
 
 			while (!df_v)
 			{

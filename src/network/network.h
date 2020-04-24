@@ -226,6 +226,8 @@ public:
 		Deserializer *des = new Deserializer(buffer);
 		Message *msg = Message::deserializeMsg(des);
 
+		std::cout << "in recv_m() my type is: " << (int)(msg->getKind()) << "\n";
+
 		return msg;
 	}
 };

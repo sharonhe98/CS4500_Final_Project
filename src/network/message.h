@@ -21,7 +21,8 @@ enum class MsgKind
   Kill,
   Register,
   Directory,
-  Data
+  Data,
+  KeyMessage
 };
 
 /**
@@ -298,6 +299,29 @@ public:
   }
 };
 
+class KeyMessage : public Message
+{
+public:
+  Key *key_;
+
+  // constructor
+  KeyMessage(MsgKind kind_, size_t sender_, size_t target_, size_t id_, Key *val_) : Message(kind_, sender_, target_, id_)
+  {
+    key_ = val_;
+  }
+  // constructor that builds a Data message based on the deserialized message
+  KeyMessage(Deserializer *d) : Message(d, MsgKind::Data)
+  {
+    key_ = Key::deserialize(d);
+  }
+  // serialize a Data message
+  void serialize(Serializer *ser)
+  {
+    Message::serialize(ser);
+    key_->serialize(ser);
+  }
+};
+
 // deserialize message and return message by type
 Message *Message::deserializeMsg(Deserializer *dser)
 {
@@ -337,6 +361,9 @@ Message *Message::deserializeMsg(Deserializer *dser)
     break;
   case MsgKind::Data:
     result = new Data(dser);
+    break;
+  case MsgKind::KeyMessage:
+    result = new KeyMessage(dser);
     break;
   }
   return result;
