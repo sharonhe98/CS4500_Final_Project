@@ -63,14 +63,6 @@ public:
         return cols_[index]->get_type();
     }
 
-    // Reads in the data from the file starting at the from byte
-    // and reading at most len bytes
-    void read(FILE *f, size_t from, size_t len)
-    {
-        infer_columns_(f, from, len);
-        parse_(f, from, len);
-    }
-
     // reallocates columns array if more space is needed.
     void check_reallocate_()
     {
@@ -364,59 +356,5 @@ public:
 
         *len = l;
         return output;
-    }
-
-    // read the rows from the starting byte up to len bytes into Columns.
-    void parse_(FILE *f, size_t from, size_t len)
-    {
-        printf("PARSE CALLED HERE!\n");
-        seek_(f, from);
-        char buf[buff_len];
-
-        size_t total_bytes = 0;
-        while (fgets(buf, buff_len, f) != nullptr)
-        {
-            total_bytes += strlen(buf);
-            if (total_bytes >= len)
-            {
-                break;
-            }
-
-            size_t num_fields;
-            // current row could have more columns than infered - parse the frist len_ columns
-            char **row = parse_row_(buf, &num_fields);
-            // skipping rows with too few fields
-            if (num_fields == 0)
-            {
-                delete[] row;
-                continue;
-            }
-
-            // we skip the row as soon as we find a field that does not match our schema
-            bool skip = false;
-            for (size_t i = 0; i < len_; i++)
-            {
-                printf("FOR LOOP CALLED HERE!\n");
-            }
-            if (skip)
-            {
-                delete[] row;
-                continue;
-            }
-
-            // add all fields in this row to columns
-            for (size_t i = 0; i < len_; i++)
-            {
-                if (i >= num_fields || row[i] == nullptr)
-                {
-                    cols_[i]->push_back(nullptr);
-                }
-                else
-                {
-                    cols_[i]->push_back(row[i]);
-                }
-            }
-            delete[] row;
-        }
     }
 };

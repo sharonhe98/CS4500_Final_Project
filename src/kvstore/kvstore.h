@@ -99,7 +99,6 @@ public:
 		// }
 		else
 		{
-
 		}
 		cv.notify_all();
 	}
@@ -130,11 +129,11 @@ public:
 		}
 		else
 		{
-			WaitAndGet *wg = new WaitAndGet(MsgKind::WaitAndGet, index, idx, 2);
-			node->send_m(wg);
 			Serializer *s1 = new Serializer();
 			key->serialize(s1);
-			Value *v1 = new Value(s1->getSerChar());
+			char *keyBuf = s1->getSerChar();
+
+			Value *v1 = new Value(keyBuf);
 			Data *da = new Data(MsgKind::Data, index, idx, 2, v1);
 			node->send_m(da);
 

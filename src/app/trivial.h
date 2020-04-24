@@ -3,12 +3,9 @@
 class Trivial : public Application
 {
 public:
-    // KVStore *kv;
-    // size_t node_idx_;
-  Trivial(size_t idx_, char* ip_, size_t num_nodes_) : Application(idx_, ip_, num_nodes_) {
-    //   kv = new KVStore(idx_, ip_, num_nodes_);
-    //   node_idx_ = idx_;
-  }
+  
+  Trivial(size_t idx_, char* ip_, size_t num_nodes_) : Application(idx_, ip_, num_nodes_) {}
+  
   void run_()
   {
     size_t SZ = 1000 * 1000;
