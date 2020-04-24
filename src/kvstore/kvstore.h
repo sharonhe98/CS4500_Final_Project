@@ -96,11 +96,10 @@ public:
 		// Message *recvd = node->recv_m();
 		// if (idx == index || recvd->getKind() == MsgKind::Put) {
 		// 	kv->set(key, value);
-		// 	std::cout << "it's me\n";
 		// }
 		else
 		{
-			std::cout << "ya boi\n";
+
 		}
 		cv.notify_all();
 	}
