@@ -19,8 +19,11 @@ public:
 	}
 
 	Key(Deserializer* d) {
+		printf("called key derser const\n");
 		key = d->readString();
+		printf("key name!\n");
 		home_node_ = d->readSizeT();
+		printf("key node\n");
 	}
 
 	void serialize(Serializer* s) {
@@ -29,6 +32,7 @@ public:
 	}
 
 	static Key* deserialize(Deserializer* d) {
+		printf("called key deserialize!\n");
 		return new Key(d);
 	}
 };

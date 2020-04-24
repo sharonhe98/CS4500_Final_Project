@@ -142,7 +142,6 @@ public:
     for (size_t i = 0; i < chunks_.length(); i++) {
       delete chunks_.get(i);
     }
-    delete newChunk;
   }
 
   IntColumn(Deserializer *d) : Column(d, 'I')
@@ -246,7 +245,6 @@ class StringColumn : public Column {
     for (size_t i = 0; i < chunks_.length(); i++) {
       delete chunks_.get(i);
     }
-    delete newChunk;
   }
 
   String *get(size_t idx)
@@ -327,7 +325,6 @@ public:
     for (size_t i = 0; i < chunks_.length(); i++) {
       delete chunks_.get(i);
     }
-    delete newChunk;
   }
 
   FloatColumn(Deserializer *d) :  Column(d, 'F')
@@ -428,7 +425,6 @@ public:
     for (size_t i = 0; i < chunks_.length(); i++) {
       delete chunks_.get(i);
     }
-    delete newChunk;
   }
 
   void serialize(Serializer *ser)

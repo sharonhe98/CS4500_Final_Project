@@ -64,6 +64,7 @@ public:
     ser->write(sender_);
     ser->write(target_);
     ser->write(id_);
+    printf("Called general messg serialize\n");
   }
 
   // function declaration
@@ -284,16 +285,18 @@ public:
   {
     v_ = val_;
   }
-  // constructor that builds a Directory message based on the deserialized message
+  // constructor that builds a Data message based on the deserialized message
   Data(Deserializer *d) : Message(d, MsgKind::Data)
   {
     v_ = Value::deserialize(d);
+    printf("you have been chosen\n");
   }
-  // serialize a Directory message
+  // serialize a Data message
   void serialize(Serializer *ser)
   {
     Message::serialize(ser);
-    ser->write(v_);
+    v_->serialize(ser);
+    printf("Calling data serialize!\n");
   }
 };
 

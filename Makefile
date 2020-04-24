@@ -7,7 +7,7 @@ run:
 valgrind:
 	valgrind ./a.out
 
-serial:
+serial_test:
 	g++ -g -Wall -pedantic -std=c++11 test/serial_test.cpp -o serial
 
 chunked_test:

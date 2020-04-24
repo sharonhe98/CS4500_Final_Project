@@ -103,6 +103,7 @@ public:
 		// grabs the data from Register and set the client Node Info
 		for (size_t i = 1; i < num_nodes; ++i) {
 			Register* regMsg = dynamic_cast<Register*>(recv_m());
+			printf("register port is : %zu\n", regMsg->port_);
 			nodes_[regMsg->getSender()].id = regMsg->getSender();
 			nodes_[regMsg->getSender()].address.sin_family = AF_INET;
 			nodes_[regMsg->getSender()].address.sin_addr = regMsg->client_.sin_addr;
@@ -184,12 +185,21 @@ public:
 			printf("Unable to connect to remote node :(\n");
 			perror("Unable to connect to remote node :(");
 		}
-
 		// serialize the message
 		Serializer* ser = new Serializer();
 		msg->serialize(ser);
 		char *buffer = ser->getSerChar();
 		size_t size = ser->getPos();
+		if (msg->getKind() == MsgKind::Data) {
+			Deserializer * d = new Deserializer(buffer);
+			Message * m = Message::deserializeMsg(d);
+			assert(m->getKind() == MsgKind::Data);
+			Data * dat = dynamic_cast<Data*>(m);
+			Value * v = dat->v_;
+			Deserializer * vdser = new Deserializer(v->data_);
+			Key * expectedKey = Key::deserialize(vdser);
+			printf("expected key name sent %s\n", expectedKey->key->c_str());
+		}
 		// send the serialized message
 		int status = send(connected, &size, sizeof(size_t), 0);
 		assert(status >= 0);
@@ -201,6 +211,7 @@ public:
 	// node receives a message
 	Message *recv_m() override
 	{
+		printf(("called receive!!\n"));
 		sockaddr_in sender;
 		socklen_t addrlen = sizeof(sender);
 		
@@ -226,6 +237,14 @@ public:
 		// deserializes the message
 		Deserializer* des = new Deserializer(buffer);
 		Message *msg = Message::deserializeMsg(des);
+		if (msg->getKind() == MsgKind::Data) {
+			printf("testing the deserialized receive\n");
+			Data * dat = dynamic_cast<Data*>(msg);
+			Value * v = dat->v_;
+			Deserializer * vdser = new Deserializer(v->data_);
+			Key * expectedKey = Key::deserialize(vdser);
+			printf("expected key name receive %s\n", expectedKey->key->c_str());
+		}
 		return msg;
 	}
 

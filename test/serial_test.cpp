@@ -115,6 +115,7 @@ void testCharStar()
     char *result = serializer->getSerChar();
     Deserializer *deserializer = new Deserializer(result);
     char *deChar = deserializer->readChars();
+    printf("dechar length is %zu\n", strlen(deChar));
     assert(types == deChar);
     assert(strlen(types) == strlen(deChar));
     assert(types[1] == deChar[1]);
@@ -211,7 +212,6 @@ void testDFSerialize()
 	SOR *sor = new SOR();
 	char *schemaFromFile = sor->getSchema(f, 0, 1000000);
 	Schema s(schemaFromFile);
-
 	DataFrame *df = sor->setDataFrame(f, 0, 100000);
     assert(df->cols[0]->get_type() == 'B');
     assert(df->cols[1]->get_type() == 'I');
@@ -318,6 +318,85 @@ void testDirectoryMessageSerialize()
     delete ser;
 }
 
+void testKey() {
+    Key *verify = new Key("verif", 0);
+    Serializer *s1 = new Serializer();
+    verify->serialize(s1);
+    char* result = s1->getSerChar();
+    Deserializer *dser = new Deserializer(result);
+    Key * deKey = Key::deserialize(dser);
+    assert(strcmp(deKey->key->c_str(), verify->key->c_str()) == 0);
+    printf("Key deserialized!\n");
+
+}
+
+void testValue() {
+    Key *verify = new Key("verif", 0);
+    Serializer *s1 = new Serializer();
+    verify->serialize(s1);
+    char* result = s1->getSerChar();
+    Value * val = new Value(result);
+    Serializer * valser = new Serializer();
+    val->serialize(valser);
+    char* buf = valser->getSerChar();
+    Deserializer *dser = new Deserializer(buf);
+    Value * v = Value::deserialize(dser);
+    Deserializer * dedata = new Deserializer(v->data_);
+    Key * deKey = Key::deserialize(dedata);
+    assert(strcmp(deKey->key->c_str(), verify->key->c_str()) == 0);
+    printf("Key in value deserialized!\n");
+
+}
+
+void testKeyInData() {
+    Key *verify = new Key("verif", 0);
+    Serializer *s1 = new Serializer();
+    verify->serialize(s1);
+    printf("key buff length is : %zu\n", s1->getPos());
+	Value *v1 = new Value(s1->getSerChar());
+	Data *da = new Data(MsgKind::Data, 1, 0, 2, v1);
+    Serializer *ss = new Serializer();
+    da->serialize(ss);
+    char* buffer = ss->getSerChar();
+    printf("buffer size is: %zu\n", ss->getPos());
+    Deserializer* des = new Deserializer(buffer);
+	Message *msg = Message::deserializeMsg(des);
+    assert((int)msg->getKind() == (int)MsgKind::Data);
+    Data *d = dynamic_cast<Data*>(msg);
+	Value *v = d->v_;
+    printf("deserizliezd msg!\n");
+    assert(v->data_);
+    printf("data!\n");
+	Deserializer *dee = new Deserializer(v->data_);
+    printf("gets here?\n");
+	Key* wag = Key::deserialize(dee);
+    assert(strcmp(wag->key->c_str(), verify->key->c_str()) == 0);
+    printf("Deserialized Data!\n");
+}
+
+void testData() {
+    Key *verify = new Key("verif", 0);
+    Serializer *s1 = new Serializer();
+	verify->serialize(s1);
+	Value *v1 = new Value(s1->getSerChar());
+	Data *da = new Data(MsgKind::Data, 1, 0, 2, v1);
+    Serializer* ser = new Serializer();
+	da->serialize(ser);
+	char *buffer = ser->getSerChar();
+	size_t size = ser->getPos();
+	if (da->getKind() == MsgKind::Data) {
+	Deserializer * d = new Deserializer(buffer);
+	Message * m = Message::deserializeMsg(d);
+	assert(m->getKind() == MsgKind::Data);
+	Data * dat = dynamic_cast<Data*>(m);
+	Value * v = dat->v_;
+	Deserializer * vdser = new Deserializer(v->data_);
+	Key * expectedKey = Key::deserialize(vdser);
+	printf("expected key name kvwaiteget%s\n", expectedKey->key->c_str());
+
+}
+}
+
 int main(int argc, char **argv)
 {
     testStringSerialize();
@@ -333,6 +412,10 @@ int main(int argc, char **argv)
     testRegisterMessageSerialize();
     testDirectoryMessageSerialize();
     testDFSerialize();
+    testKey();
+    testValue();
+    testKeyInData();
+    testData();
 
     LOG("Done.\n");
     return 0;

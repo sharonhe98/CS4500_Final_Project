@@ -77,11 +77,12 @@ public:
 
   void write(char *c)
   {
-    size_t length = strlen(c);
-    resize(length);
-    write(length);
-    memcpy(buf + pos, &c, length);
-    pos += length;
+    // size_t length = strlen(c);
+    // resize(length);
+    resize(sizeof(char*));
+    // write(length);
+    memcpy(buf + pos, &c, sizeof(char*));
+    pos += sizeof(char*);
   }
 
   void write(String *s)
@@ -147,9 +148,12 @@ public:
   char *readChars()
   {
     char *res;
-    size_t length = readSizeT();
-    memcpy(&res, buf + pos, length);
-    pos += length;
+    //size_t length = readSizeT();
+    // for (size_t i = 0; i < length; i++) {
+    //   res += readChar();
+    // }
+    memcpy(&res, buf + pos, sizeof(char*));
+    pos += sizeof(char*);
     return res;
   }
 
