@@ -128,7 +128,5 @@ int main() {
 
 * Note: Certain use cases are not working at the moment due to issues with incomplete implementation
 
-<p><i>Open Questions:</i></p>
-1. We would like to know how the chunking works when pushing to the KVStore. We have discussed with professor Vitek, but need some time to work out our implementation.
 <p><i>Status:</i></p>
-<p>We finally have our NetworkIP class running. We need to refactor our column and array classes in order to work in tandem with the KVStore. Serialization is now finished, and we have a better understanding of how we want to implement KVStore methods. Out of all the demo applications, Trivial is running at a small scale, with Demo soon to follow. We will continue working refactoring and implementation to get our application layer running and will add tests as we go.</p>
+<p>We Out of all the demo applications, Trivial is able to run on a scale of 1000 by 1000 values of floats. Unfortunately, due to time constraints and pressure from other classes (which we worked on per the advice of Professor Vitek), we were not able to complete the Demo application. We have found we are able to at least register our clients to the server and send and receive our wait and get messages, as well as send KVStore keys across the network to the node we wish to get from, as well as send data back, but we ran into some errors deserializing any Values we sent across the network in a Message (we suspect due to our readChars method in Serializer)</p>
